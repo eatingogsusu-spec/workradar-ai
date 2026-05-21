@@ -1,32 +1,61 @@
 erDiagram
-  TEAMS ||--o{ PROJECTS : has
+  TEAMS ||--o{ PROJECTS : owns
   USERS ||--o{ PROJECTS : creates
   PROJECTS ||--o{ PROJECT_MEMBERS : has
   USERS ||--o{ PROJECT_MEMBERS : joins
+
   PROJECTS ||--o{ DOCUMENTS : contains
   USERS ||--o{ DOCUMENTS : uploads
   DOCUMENTS ||--o{ DOCUMENT_CHUNKS : splits
   PROJECTS ||--o{ DOCUMENT_CHUNKS : scopes
   DOCUMENT_CHUNKS ||--o{ CHUNK_EMBEDDINGS : indexes
+
+  DOCUMENTS ||--o{ ANALYSIS_JOBS : analyzed_by
+  ANALYSIS_JOBS ||--o{ ANALYSIS_STEPS : tracks
+  ANALYSIS_JOBS ||--o{ AI_EXTRACTIONS : produces
+  DOCUMENTS ||--o{ AI_EXTRACTIONS : supports
+  DOCUMENT_CHUNKS ||--o{ AI_EXTRACTIONS : cites
+
   PROJECTS ||--o{ TODOS : tracks
   USERS ||--o{ TODOS : assigned
   USERS ||--o{ TODOS : creates
   DOCUMENTS ||--o{ TODOS : sources
-  DOCUMENT_CHUNKS ||--o{ TODOS : sources
+  DOCUMENT_CHUNKS ||--o{ TODOS : cites
+  AI_EXTRACTIONS ||--o{ TODOS : proposes
+
   PROJECTS ||--o{ ISSUES : logs
-  USERS ||--o{ ISSUES : reports
   USERS ||--o{ ISSUES : assigned
   DOCUMENTS ||--o{ ISSUES : sources
-  PROJECTS ||--o{ CHAT_MESSAGES : contains
-  USERS ||--o{ CHAT_MESSAGES : sends
-  PROJECTS ||--o{ WEEKLY_REPORTS : has
-  USERS ||--o{ WEEKLY_REPORTS : creates
-  PROJECTS ||--o{ MONTHLY_REPORTS : has
-  USERS ||--o{ MONTHLY_REPORTS : creates
+  DOCUMENT_CHUNKS ||--o{ ISSUES : cites
+  AI_EXTRACTIONS ||--o{ ISSUES : proposes
+  ISSUES ||--o{ ISSUE_STATUS_HISTORY : changes
+  TODOS }o--o| ISSUES : linked_to
+
+  PROJECTS ||--o{ PROJECT_EVENTS : schedules
+  USERS ||--o{ PROJECT_EVENTS : creates
+  PROJECTS ||--o{ RISK_WINDOWS : predicts
+  RISK_WINDOWS }o--o| TODOS : related_todo
+  RISK_WINDOWS }o--o| ISSUES : related_issue
+
+  PROJECTS ||--o{ PROJECT_REPORTS : has
+  USERS ||--o{ PROJECT_REPORTS : writes
+
   PROJECTS ||--o{ HANDOFF_REPORTS : has
-  USERS ||--o{ HANDOFF_REPORTS : creates
-  PROJECTS ||--o{ AI_SUMMARIES : has
-  DOCUMENTS ||--o{ AI_SUMMARIES : summarized_by
+  HANDOFF_REPORTS ||--o{ HANDOFF_ITEMS : contains
+  HANDOFF_ITEMS }o--o| TODOS : related_todo
+  HANDOFF_ITEMS }o--o| ISSUES : related_issue
+  HANDOFF_ITEMS }o--o| DOCUMENTS : related_document
+
+  PROJECTS ||--o{ CHAT_SESSIONS : has
+  USERS ||--o{ CHAT_SESSIONS : starts
+  CHAT_SESSIONS ||--o{ CHAT_MESSAGES : contains
+  USERS ||--o{ CHAT_MESSAGES : sends
+  CHAT_MESSAGES ||--o{ CHAT_MESSAGE_SOURCES : cites
+  DOCUMENTS ||--o{ CHAT_MESSAGE_SOURCES : cited_by
+  DOCUMENT_CHUNKS ||--o{ CHAT_MESSAGE_SOURCES : cited_by
+
+  PROJECTS ||--o{ PROJECT_ACTIVITY_LOGS : records
+  USERS ||--o{ PROJECT_ACTIVITY_LOGS : acts
 
   USERS {
     uuid id PK
@@ -99,6 +128,45 @@ erDiagram
     timestamp created_at
   }
 
+  ANALYSIS_JOBS {
+    uuid id PK
+    uuid project_id FK
+    uuid document_id FK
+    uuid requested_by FK
+    string status
+    int progress_percent
+    timestamp started_at
+    timestamp completed_at
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  ANALYSIS_STEPS {
+    uuid id PK
+    uuid analysis_job_id FK
+    string step_name
+    string status
+    int step_order
+    text message
+    timestamp started_at
+    timestamp completed_at
+  }
+
+  AI_EXTRACTIONS {
+    uuid id PK
+    uuid analysis_job_id FK
+    uuid project_id FK
+    uuid document_id FK
+    uuid source_chunk_id FK
+    string extraction_type
+    text title
+    text body
+    int confidence_score
+    string status
+    jsonb extracted_json
+    timestamp created_at
+  }
+
   TODOS {
     uuid id PK
     uuid project_id FK
@@ -106,6 +174,7 @@ erDiagram
     uuid created_by FK
     uuid source_document_id FK
     uuid source_chunk_id FK
+    uuid source_extraction_id FK
     uuid linked_issue_id FK
     string title
     text description
@@ -127,6 +196,8 @@ erDiagram
     uuid reporter_id FK
     uuid assignee_id FK
     uuid source_document_id FK
+    uuid source_chunk_id FK
+    uuid source_extraction_id FK
     string title
     text description
     string severity
@@ -134,39 +205,63 @@ erDiagram
     string source_type
     int confidence_score
     boolean is_candidate
+    timestamp detected_at
     timestamp created_at
     timestamp updated_at
   }
 
-  CHAT_MESSAGES {
+  ISSUE_STATUS_HISTORY {
     uuid id PK
-    uuid project_id FK
-    uuid user_id FK
-    string role
-    text content
-    jsonb sources_json
-    timestamp created_at
+    uuid issue_id FK
+    uuid changed_by FK
+    string from_status
+    string to_status
+    text note
+    timestamp changed_at
   }
 
-  WEEKLY_REPORTS {
+  PROJECT_EVENTS {
     uuid id PK
     uuid project_id FK
     uuid created_by FK
-    timestamp week_start
-    timestamp week_end
-    text content
-    int progress_rate
+    string title
+    string event_type
+    string risk_level
+    timestamp start_at
+    timestamp end_at
+    text description
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  RISK_WINDOWS {
+    uuid id PK
+    uuid project_id FK
+    uuid related_todo_id FK
+    uuid related_issue_id FK
+    string title
+    string risk_level
+    date start_date
+    date end_date
+    text reason
+    int confidence_score
     timestamp created_at
   }
 
-  MONTHLY_REPORTS {
+  PROJECT_REPORTS {
     uuid id PK
     uuid project_id FK
     uuid created_by FK
-    timestamp month_start
-    timestamp month_end
+    string report_type
+    string title
     text content
+    string status
+    int version
     int progress_rate
+    timestamp period_start
+    timestamp period_end
+    timestamp created_at
+    timestamp updated_at
   }
 
   HANDOFF_REPORTS {
@@ -174,19 +269,62 @@ erDiagram
     uuid project_id FK
     uuid created_by FK
     string title
-    text content
+    text summary
     int handoff_score
-    jsonb missing_items_json
     timestamp created_at
     timestamp updated_at
   }
 
-  AI_SUMMARIES {
+  HANDOFF_ITEMS {
     uuid id PK
-    uuid project_id FK
-    uuid document_id FK
-    string summary_type
-    text summary
-    jsonb extracted_json
+    uuid handoff_report_id FK
+    uuid related_todo_id FK
+    uuid related_issue_id FK
+    uuid related_document_id FK
+    string item_type
+    string title
+    text body
+    string priority
+    string status
     timestamp created_at
   }
+
+  CHAT_SESSIONS {
+    uuid id PK
+    uuid project_id FK
+    uuid user_id FK
+    string title
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  CHAT_MESSAGES {
+    uuid id PK
+    uuid chat_session_id FK
+    uuid user_id FK
+    string role
+    text content
+    timestamp created_at
+  }
+
+  CHAT_MESSAGE_SOURCES {
+    uuid id PK
+    uuid chat_message_id FK
+    uuid document_id FK
+    uuid chunk_id FK
+    string source_label
+    int page_number
+    timestamp created_at
+  }
+
+  PROJECT_ACTIVITY_LOGS {
+    uuid id PK
+    uuid project_id FK
+    uuid actor_id FK
+    string activity_type
+    string title
+    text body
+    jsonb metadata
+    timestamp created_at
+  }
+
