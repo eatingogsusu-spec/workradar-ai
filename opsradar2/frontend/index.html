@@ -1,0 +1,2211 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OpsRadar — 통합 인터랙티브 프로토타입</title>
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f5f7;--surface:#fff;--surface2:#f8f9fb;
+  --border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.12);
+  --text:#1a1d2e;--text2:#5a6282;--text3:#9aa0bc;
+  --accent:#4263eb;--accent-soft:rgba(66,99,235,.08);
+  --danger:#e03e3e;--danger-soft:rgba(224,62,62,.07);
+  --warn:#c47c00;--warn-soft:rgba(196,124,0,.08);
+  --success:#1a9e6a;--success-soft:rgba(26,158,106,.08);
+  --sb-w:196px;--font:'Noto Sans KR',sans-serif;--mono:'DM Mono',monospace;
+  --radius:10px;--radius-sm:6px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);height:100vh;display:flex;overflow:hidden;flex-direction:column}
+
+/* ── 공통 ── */
+.sidebar{width:var(--sb-w);background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;height:100vh}
+.sb-logo{padding:18px 16px 14px;border-bottom:1px solid var(--border)}
+.sb-logo-name{font-size:15px;font-weight:700;color:var(--accent)}
+.sb-logo-tag{font-size:10px;color:var(--text3);margin-top:2px;font-family:var(--mono)}
+.sb-nav{padding:10px 0;flex:1;overflow-y:auto}
+.sb-section{font-size:10px;color:var(--text3);padding:10px 16px 4px;letter-spacing:.5px;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 16px;font-size:12px;color:var(--text2);cursor:pointer;border-left:2px solid transparent;transition:all .12s;user-select:none}
+.sb-item i{font-size:15px}
+.sb-item:hover{background:var(--surface2)}
+.sb-item.active{background:var(--accent-soft);color:var(--accent);border-left-color:var(--accent);font-weight:500}
+.sb-footer{padding:12px 16px;border-top:1px solid var(--border)}
+.sb-avatar{width:26px;height:26px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);flex-shrink:0}
+.topbar-title{font-size:14px;font-weight:500;color:var(--text)}
+.chip{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);font-family:var(--mono)}
+.tbtn{font-size:11px;padding:5px 12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface);color:var(--text2);cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .12s}
+.tbtn:hover{background:var(--surface2)}
+.tbtn i{font-size:13px}
+.tbtn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tbtn.primary:hover{opacity:.9}
+.badge{font-size:10px;padding:2px 7px;border-radius:5px;font-family:var(--mono);font-weight:500;flex-shrink:0}
+.b-danger{background:var(--danger-soft);color:var(--danger)}
+.b-warn{background:var(--warn-soft);color:var(--warn)}
+.b-success{background:var(--success-soft);color:var(--success)}
+.b-accent{background:var(--accent-soft);color:var(--accent)}
+.b-gray{background:var(--surface2);color:var(--text3);border:1px solid var(--border)}
+.card{background:var(--surface);border-radius:var(--radius);border:1px solid var(--border);padding:14px 16px}
+.card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-hd-l{font-size:12px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px}
+.card-hd-l i{font-size:14px;color:var(--text2)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:11px}
+.row:last-child{border-bottom:none}
+.row-title{flex:1;color:var(--text2)}
+.content{flex:1;overflow-y:auto;padding:18px 20px;display:flex;flex-direction:column;gap:14px}
+.screen{display:none;flex-direction:column;flex:1;overflow:auto}
+.screen.active{display:flex}
+.chunk-box{background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius-sm);padding:8px 10px;font-size:10px;line-height:1.7;color:var(--text2);font-family:var(--mono);margin-top:6px}
+.chunk-meta{font-size:9px;color:var(--text3);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.chunk-hl{background:rgba(66,99,235,.1);color:var(--accent);padding:0 2px;border-radius:2px}
+
+/* 탭 */
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--surface);padding:0 16px;flex-shrink:0}
+.tab{padding:10px 14px;font-size:12px;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px;user-select:none}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+
+/* 분석 흐름 */
+.flow-wrap{display:flex;flex-direction:column}
+.flow-step{display:flex;align-items:flex-start;gap:10px;padding:10px 0;position:relative}
+.flow-step:not(:last-child)::after{content:'';position:absolute;left:11px;top:32px;bottom:0;width:1px;background:var(--border2)}
+.flow-icon{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;z-index:1;transition:all .3s}
+.fi-wait{background:var(--surface2);color:var(--text3)}
+.fi-active{background:var(--accent-soft);color:var(--accent)}
+.fi-done{background:var(--success-soft);color:var(--success)}
+.flow-body{flex:1;padding-top:2px}
+.flow-title{font-size:12px;font-weight:500;color:var(--text);margin-bottom:2px}
+.flow-sub{font-size:10px;color:var(--text3)}
+.flow-sub.s-active{color:var(--accent)}
+.flow-sub.s-done{color:var(--success)}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .8s linear infinite;display:inline-block}
+
+/* Todo 테이블 */
+.body-wrap{display:flex;flex:1;overflow:hidden}
+.table-area{flex:1;overflow-y:auto}
+.todo-table{width:100%;border-collapse:collapse;font-size:11px}
+.todo-table th{padding:8px 12px;text-align:left;font-size:10px;font-weight:500;color:var(--text3);background:var(--surface2);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.3px;position:sticky;top:0;z-index:1}
+.todo-table td{padding:0;border-bottom:1px solid var(--border);vertical-align:middle}
+.todo-row{display:flex;align-items:center;padding:9px 12px;gap:10px;cursor:pointer;transition:background .1s}
+.todo-row:hover{background:var(--surface2)}
+.todo-row.selected{background:#eef1ff}
+.todo-row.rejected .todo-title{text-decoration:line-through;color:var(--text3)}
+.todo-row.rejected{opacity:.6}
+.todo-title-w{flex:1;min-width:0}
+.todo-title{font-weight:500;color:var(--text);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.todo-src{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.detail-panel{width:248px;border-left:1px solid var(--border);background:var(--surface);overflow-y:auto;flex-shrink:0;display:flex;flex-direction:column}
+.detail-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--text3);font-size:11px;text-align:center}
+.detail-empty i{font-size:28px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.detail-cell{background:var(--surface2);border-radius:var(--radius-sm);padding:8px 10px}
+.detail-label{font-size:10px;color:var(--text3);margin-bottom:3px}
+.detail-section{font-size:11px;font-weight:500;color:var(--text);margin:12px 0 6px}
+.detail-item{display:flex;align-items:flex-start;gap:5px;padding:5px 0;border-bottom:1px solid var(--border);font-size:10px;color:var(--text2)}
+.detail-item:last-child{border-bottom:none}
+.detail-item i{font-size:12px;color:var(--accent);flex-shrink:0;margin-top:1px}
+.risk-box{background:var(--danger-soft);border-radius:var(--radius-sm);padding:8px 10px;font-size:10px;color:var(--danger);line-height:1.6;margin-top:6px}
+.action-btns{display:flex;gap:3px}
+.ab{font-size:10px;padding:3px 7px;border-radius:4px;border:1px solid var(--border2);cursor:pointer;transition:all .12s;white-space:nowrap}
+.ab-approve{background:var(--accent);color:#fff;border-color:var(--accent)}
+.ab-reject{background:var(--surface);color:var(--danger);border-color:var(--danger)}
+.ab-edit{background:var(--surface);color:var(--text2)}
+.ab-undo{background:var(--surface);color:var(--text3);font-size:9px}
+
+/* 이슈 */
+.issue-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;cursor:pointer;transition:all .15s}
+.issue-card:hover{border-color:var(--border2);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.issue-card.selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.issue-card.candidate{border:1px dashed var(--warn);background:var(--warn-soft)}
+.issue-card.resolved-card{opacity:.5}
+.issue-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.issue-title{font-size:12px;font-weight:500;color:var(--text);flex:1;line-height:1.4}
+.issue-desc{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:10px}
+.issue-footer{display:flex;align-items:center;justify-content:space-between}
+.history-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:11px}
+.history-row:last-child{border-bottom:none}
+.history-date{font-size:10px;color:var(--text3);font-family:var(--mono);min-width:52px}
+.history-no-change{color:var(--warn)}
+.history-warn{color:var(--danger);font-weight:500}
+.domino{background:var(--danger-soft);border-radius:var(--radius-sm);padding:8px 10px;font-size:10px;color:var(--text2);line-height:1.8;margin-top:6px}
+.domino-lbl{color:var(--danger);font-weight:500;margin-bottom:4px}
+.domino-final{color:var(--danger);font-weight:500}
+
+/* 캘린더 */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--border);border-radius:var(--radius);overflow:hidden}
+.cal-dow{background:var(--surface2);text-align:center;padding:7px 0;font-size:10px;font-weight:500;color:var(--text3)}
+.cal-dow.weekend{color:var(--danger)}
+.cal-cell{background:var(--surface);padding:5px 6px;min-height:64px;cursor:pointer;position:relative;transition:background .1s}
+.cal-cell:hover{background:var(--surface2)}
+.cal-cell.today{background:var(--accent-soft)}
+.cal-cell.risk{background:#fff8f0}
+.cal-cell.other{opacity:.4;pointer-events:none}
+.cal-cell.new-event{animation:flashCell .8s ease}
+.cal-cell.cal-selected{outline:2px solid var(--accent);outline-offset:-2px;background:rgba(66,99,235,.14)!important}
+@keyframes flashCell{0%,100%{background:var(--surface)}50%{background:rgba(26,158,106,.15)}}
+.cal-date{font-size:11px;font-weight:500;color:var(--text2);margin-bottom:3px}
+.cal-cell.today .cal-date{color:var(--accent)}
+.cal-tags{display:flex;flex-direction:column;gap:2px}
+.cal-tag{font-size:9px;padding:1px 5px;border-radius:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct-danger{background:var(--danger-soft);color:var(--danger)}
+.ct-warn{background:var(--warn-soft);color:var(--warn)}
+.ct-success{background:var(--success-soft);color:var(--success)}
+.ct-info{background:var(--accent-soft);color:var(--accent)}
+.ct-gray{background:var(--surface2);color:var(--text3)}
+.ct-new{background:rgba(26,158,106,.15);color:var(--success);border:1px solid rgba(26,158,106,.3);font-weight:500}
+.risk-dot{position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:var(--danger)}
+.cal-side{width:210px;border-left:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.mini-chat-hd{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:5px}
+.mini-log{padding:8px 10px;min-height:56px;max-height:110px;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
+.mini-bubble{font-size:10px;padding:5px 8px;border-radius:6px;max-width:90%;line-height:1.5}
+.mini-bubble-user{background:var(--accent-soft);color:var(--text);align-self:flex-end}
+.mini-bubble-ai{background:var(--surface);border:1px solid var(--border);color:var(--text2)}
+.mini-input-row{display:flex;gap:5px;padding:7px 10px;border-top:1px solid var(--border)}
+.mini-input{flex:1;background:var(--surface);border:1px solid var(--border2);border-radius:6px;padding:5px 8px;font-size:10px;color:var(--text);font-family:var(--font);outline:none}
+.mini-input:focus{border-color:var(--accent)}
+.mini-send{background:var(--accent);border:none;border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0}
+
+/* 채팅 */
+.chat-area{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+.msg{display:flex;align-items:flex-start;gap:8px}
+.msg.user{flex-direction:row-reverse}
+.msg-av{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0}
+.av-ai{background:var(--accent-soft);color:var(--accent)}
+.av-user{background:var(--surface2);color:var(--text2)}
+.bubble{border-radius:10px;padding:10px 13px;font-size:12px;line-height:1.7;max-width:84%}
+.bubble-ai{background:var(--surface);border:1px solid var(--border);color:var(--text2)}
+.bubble-user{background:var(--accent);color:#fff}
+.src-tag{font-size:10px;color:var(--accent);margin-top:5px;font-family:var(--mono);display:flex;align-items:center;gap:4px}
+.confirm-card{background:var(--surface);border:1px solid rgba(66,99,235,.25);border-radius:var(--radius-sm);padding:10px 12px;margin-top:8px;font-size:11px}
+.confirm-row{display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid var(--border)}
+.confirm-row:last-child{border-bottom:none}
+.confirm-lbl{font-size:10px;color:var(--text3);min-width:52px}
+.confirm-val{color:var(--text);font-weight:500}
+.confirm-actions{display:flex;gap:6px;margin-top:10px}
+.sq{font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);color:var(--text2);cursor:pointer;background:var(--surface2);transition:all .12s;white-space:nowrap}
+.sq:hover{border-color:var(--accent);color:var(--accent)}
+.chat-input-bar{padding:12px 16px;border-top:1px solid var(--border);background:var(--surface);display:flex;gap:8px;align-items:flex-end;flex-shrink:0}
+.chat-input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:9px 13px;font-size:12px;color:var(--text);font-family:var(--font);outline:none;resize:none;line-height:1.5;max-height:80px}
+.chat-input:focus{border-color:var(--accent)}
+.send-btn{background:var(--accent);border:none;border-radius:10px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;flex-shrink:0}
+.typing{display:flex;align-items:center;gap:3px;padding:10px 13px}
+.typing span{width:5px;height:5px;border-radius:50%;background:var(--text3);animation:blink 1.2s ease infinite}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,100%{opacity:.2}50%{opacity:1}}
+
+/* 업로드 */
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--radius);padding:32px 20px;text-align:center;cursor:pointer;transition:all .15s;position:relative}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--accent);background:var(--accent-soft)}
+.upload-zone.done{border-color:var(--success);border-style:solid;background:var(--success-soft);cursor:default}
+input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.file-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);font-size:11px;margin-bottom:6px}
+.file-row.done{border-color:rgba(26,158,106,.3);background:var(--success-soft)}
+
+/* 모달 */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:100;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex;animation:fadeIn .15s ease}
+.modal{background:var(--surface);border-radius:var(--radius);padding:20px;width:420px;box-shadow:0 8px 32px rgba(0,0,0,.14)}
+.modal-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(--text3);margin-bottom:12px}
+.form-label{font-size:11px;color:var(--text3);margin-bottom:4px}
+.form-input{width:100%;border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;font-family:var(--font);color:var(--text);outline:none;background:var(--surface)}
+.form-input:focus{border-color:var(--accent)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.modal-actions{display:flex;gap:8px;margin-top:14px;justify-content:flex-end}
+
+/* 토스트 */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;font-size:12px;padding:10px 16px;border-radius:var(--radius-sm);display:flex;align-items:center;gap:8px;z-index:999;opacity:0;transition:opacity .2s;pointer-events:none;max-width:340px}
+.toast.show{opacity:1}
+.toast i{font-size:15px;flex-shrink:0}
+
+/* 전환 오버레이 */
+.screen-transition{position:fixed;inset:0;background:var(--accent-soft);z-index:200;display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.screen-transition.show{display:flex}
+
+/* Dashboard 요소 */
+.tl-row{display:flex;align-items:flex-start;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)}
+.tl-row:last-child{border-bottom:none}
+.tl-date{font-size:11px;color:var(--text3);font-family:var(--mono);min-width:52px;padding-top:2px}
+.tl-date.today{color:var(--accent);font-weight:500}
+.tl-items{display:flex;flex-direction:column;gap:4px;flex:1}
+.tl-item{display:flex;align-items:center;gap:6px;font-size:11px}
+.tl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.d-danger{background:var(--danger)}.d-warn{background:var(--warn)}.d-success{background:var(--success)}.d-info{background:var(--accent)}.d-gray{background:var(--text3)}
+.tl-text{color:var(--text);flex:1}
+.tl-risk{font-size:10px;color:var(--danger);margin-left:64px;margin-top:3px;padding:4px 10px;background:var(--danger-soft);border-radius:var(--radius-sm);display:flex;align-items:center;gap:4px}
+.domino-chain{display:flex;flex-direction:column;gap:0}
+.domino-item{display:flex;align-items:flex-start;gap:8px;padding:5px 0;border-bottom:1px dashed var(--border2)}
+.domino-item:last-child{border-bottom:none}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes newItem{from{background:rgba(66,99,235,.12);transform:translateX(-4px)}to{background:transparent;transform:translateX(0)}}
+.fade-up{animation:fadeUp .25s ease}
+.slide-up{animation:slideUp .25s ease}
+</style>
+</head>
+<body>
+<div style="display:flex;flex:1;overflow:hidden">
+
+<!-- ══ 사이드바 ══ -->
+<div class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-name">OpsRadar</div>
+    <div class="sb-logo-tag">운영 인텔리전스</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">운영</div>
+    <div class="sb-item active" id="nav-dashboard" onclick="nav('dashboard')"><i class="ti ti-layout-dashboard"></i> Dashboard</div>
+    <div class="sb-item" id="nav-analysis" onclick="nav('analysis')"><i class="ti ti-file-analysis"></i> 운영 로그 분석</div>
+    <div class="sb-item" id="nav-todo" onclick="nav('todo')">
+      <i class="ti ti-checkbox"></i> Todo
+      <span id="todoBadge" style="display:none;margin-left:auto" class="badge b-accent">새항목</span>
+    </div>
+    <div class="sb-item" id="nav-issues" onclick="nav('issues')"><i class="ti ti-alert-triangle"></i> 이슈 로그</div>
+    <div class="sb-item" id="nav-calendar" onclick="nav('calendar')">
+      <i class="ti ti-calendar"></i> 캘린더
+      <span id="calBadge" style="display:none;margin-left:auto" class="badge b-success">업데이트</span>
+    </div>
+    <div class="sb-section">지식</div>
+    <div class="sb-item" id="nav-knowledge" onclick="nav('knowledge')"><i class="ti ti-transfer"></i> 인수인계 센터</div>
+    <div class="sb-item" id="nav-reports" onclick="nav('reports')"><i class="ti ti-report"></i> 보고서</div>
+    <div class="sb-section">AI</div>
+    <div class="sb-item" id="nav-chat" onclick="nav('chat')"><i class="ti ti-message-dots"></i> AI Assistant</div>
+  </div>
+  <div class="sb-footer">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="sb-avatar">희진</div>
+      <div>
+        <div style="font-size:11px;color:var(--text);font-weight:500">김희진</div>
+        <div style="font-size:10px;color:var(--text3)">PM · 팀장</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ══ DASHBOARD ══ -->
+<div class="screen active" id="s-dashboard">
+  <div class="topbar">
+    <div class="topbar-title">Dashboard — 운영 브리핑</div>
+    <div style="display:flex;gap:8px"><div class="chip">2026-05-20 (화)</div></div>
+  </div>
+  <div class="content">
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)">
+      <div style="background:var(--accent-soft);border-bottom:1px solid rgba(66,99,235,.12);padding:10px 16px;display:flex;align-items:center;gap:6px">
+        <i class="ti ti-sparkles" style="font-size:14px;color:var(--accent)"></i>
+        <span style="font-size:11px;font-weight:500;color:var(--accent)">AI 운영 추론 엔진</span>
+        <span style="font-size:10px;color:var(--text3);margin-left:auto;font-family:var(--mono)">최근 3일 데이터 기반</span>
+      </div>
+      <div style="padding:16px 20px;display:flex;align-items:stretch;gap:20px;min-height:180px;overflow:auto">
+        <div style="flex:1;min-width:220px">
+          <div style="font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">추론 근거</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--danger-soft);border-radius:var(--radius-sm)">
+              <div style="display:flex;gap:2px;flex-shrink:0"><div style="width:5px;height:10px;background:var(--danger);border-radius:1px;opacity:.4"></div><div style="width:5px;height:14px;background:var(--danger);border-radius:1px;opacity:.7"></div><div style="width:5px;height:18px;background:var(--danger);border-radius:1px"></div></div>
+              <div style="font-size:11px;color:var(--text)">Azure timeout <span style="color:var(--danger)">▲ 3일 연속 증가</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--warn-soft);border-radius:var(--radius-sm)">
+              <div style="display:flex;gap:2px;flex-shrink:0"><div style="width:5px;height:14px;background:var(--warn);border-radius:1px"></div><div style="width:5px;height:14px;background:var(--warn);border-radius:1px"></div><div style="width:5px;height:14px;background:var(--warn);border-radius:1px"></div></div>
+              <div style="font-size:11px;color:var(--text)">RAG Blocked <span style="color:var(--warn)">─── 3일 유지</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--warn-soft);border-radius:var(--radius-sm)">
+              <div style="display:flex;gap:2px;flex-shrink:0"><div style="width:5px;height:10px;background:var(--warn);border-radius:1px;opacity:.5"></div><div style="width:5px;height:10px;background:var(--warn);border-radius:1px;opacity:.5"></div><div style="width:5px;height:16px;background:var(--warn);border-radius:1px"></div></div>
+              <div style="font-size:11px;color:var(--text)">승인 대기 <span style="color:var(--warn)">▲ 5건 → 8건</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;color:var(--text3);font-size:22px;flex-shrink:0;padding:0 4px">→</div>
+        <div style="flex:1;min-width:220px">
+          <div style="font-size:10px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">추론 결과</div>
+          <div style="background:var(--danger-soft);border:1px solid rgba(224,62,62,.15);border-radius:var(--radius-sm);padding:14px 16px">
+            <div style="font-size:14px;font-weight:700;color:var(--danger);margin-bottom:8px">운영 리스크 상승 판단</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.8">이번 주 금요일(5/22)까지 핵심 이슈 2건 미해결 시 <strong style="color:var(--danger)">4주차 시연(5/29) 직접 위협.</strong> 즉각 조치 필요.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="two-col" style="align-items:start">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:11px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px"><i class="ti ti-urgent" style="font-size:14px;color:var(--danger)"></i> 지금 당장 봐야 할 것</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--danger);border-radius:var(--radius);padding:12px 14px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span class="badge b-danger">High · 3일째</span><span style="font-size:11px;font-weight:500;color:var(--text)">Azure timeout 미해결</span></div>
+          <div style="font-size:10px;color:var(--text2);line-height:1.7;padding:8px 10px;background:var(--danger-soft);border-radius:var(--radius-sm)">
+            <div style="color:var(--danger);font-weight:500;margin-bottom:4px">도미노 영향</div>
+            <div>→ 임베딩 실패 → Todo 추출 불가</div><div>→ Dashboard 데이터 공백</div>
+            <div style="color:var(--danger);font-weight:500">→ 4주차 시연 직접 위협</div>
+          </div>
+          <div style="margin-top:8px"><div class="tbtn primary" style="font-size:10px;padding:4px 10px" onclick="nav('issues')"><i class="ti ti-arrow-right"></i> 이슈 확인</div></div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--danger);border-radius:var(--radius);padding:12px 14px">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px"><span class="badge b-danger">High · Blocked</span><span style="font-size:11px;font-weight:500;color:var(--text)">RAG 정확도 미해결</span></div>
+          <div style="font-size:10px;color:var(--text2);line-height:1.7;padding:8px 10px;background:var(--danger-soft);border-radius:var(--radius-sm)">
+            <div style="color:var(--danger);font-weight:500;margin-bottom:4px">도미노 영향</div>
+            <div>→ AI 답변 신뢰도 하락</div><div>→ AI Assistant 시연 불가</div>
+            <div style="color:var(--danger);font-weight:500">→ UC-07 핵심 기능 증명 실패</div>
+          </div>
+          <div style="margin-top:8px"><div class="tbtn primary" style="font-size:10px;padding:4px 10px" onclick="nav('issues')"><i class="ti ti-arrow-right"></i> 이슈 확인</div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:11px;font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px"><i class="ti ti-activity" style="font-size:14px;color:var(--text2)"></i> 운영 현황 스냅샷</div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px"><span style="color:var(--text2)">Todo 진행률</span><span style="font-weight:500;font-family:var(--mono)" id="db-todo-rate">12 / 18</span></div>
+          <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:67%;background:var(--success);border-radius:3px" id="db-todo-bar"></div></div>
+          <div style="font-size:10px;color:var(--text3);margin-top:3px">완료율 67% · 지난주 대비 +12%</div>
+          <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:10px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;font-size:11px"><span style="color:var(--text2);display:flex;align-items:center;gap:5px"><div class="tl-dot d-warn"></div> Blocked</span><div style="text-align:right"><div style="font-weight:500;color:var(--warn);font-family:var(--mono)" id="db-blocked">2건</div><div style="font-size:10px;color:var(--text3)">지난주 대비 +1</div></div></div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;font-size:11px"><span style="color:var(--text2);display:flex;align-items:center;gap:5px"><div class="tl-dot d-info"></div> 승인 대기</span><div style="text-align:right"><div style="font-weight:500;color:var(--accent);font-family:var(--mono)" id="db-pending">8건 ↑</div><div style="font-size:10px;color:var(--text3)">3일째 누적 · 최장 D+4</div></div></div>
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;font-size:11px"><span style="color:var(--text2);display:flex;align-items:center;gap:5px"><div class="tl-dot d-danger"></div> 신규 Risk</span><div style="text-align:right"><div style="font-weight:500;color:var(--danger);font-family:var(--mono)">+1건</div><div style="font-size:10px;color:var(--text3)">오늘 신규 감지</div></div></div>
+          </div>
+        </div>
+        <div style="background:var(--warn-soft);border:1px solid rgba(196,124,0,.15);border-radius:var(--radius);padding:12px 14px">
+          <div style="font-size:10px;font-weight:500;color:var(--warn);margin-bottom:8px;display:flex;align-items:center;gap:5px"><i class="ti ti-clock" style="font-size:12px"></i> 이번 주 마감 압박</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:11px">
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">todos API 로직</span><span class="badge b-warn">D-1</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">RAG 정확도 개선</span><span class="badge b-warn">D-2</span></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px solid rgba(196,124,0,.15)"><span style="color:var(--danger);font-weight:500">마감 4건 집중</span><span style="color:var(--danger);font-size:10px;font-weight:500">금 5/22</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-hd"><div class="card-hd-l"><i class="ti ti-bolt"></i> 빠른 이동</div></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <div class="tbtn" style="flex-direction:column;align-items:flex-start;padding:12px 14px;height:auto;gap:4px;border-left:3px solid var(--danger)" onclick="nav('issues')"><i class="ti ti-alert-triangle" style="font-size:16px;color:var(--danger)"></i><div style="font-size:11px;font-weight:500;color:var(--text)">이슈 확인</div><div style="font-size:10px;color:var(--danger);font-weight:500">High 2건 · 오늘 +1</div></div>
+        <div class="tbtn" style="flex-direction:column;align-items:flex-start;padding:12px 14px;height:auto;gap:4px;border-left:3px solid var(--accent)" onclick="nav('todo')"><i class="ti ti-checkbox" style="font-size:16px;color:var(--accent)"></i><div style="font-size:11px;font-weight:500;color:var(--text)">Todo 승인</div><div style="font-size:10px;color:var(--accent);font-weight:500">8건 대기 · 최장 D+4</div></div>
+        <div class="tbtn" style="flex-direction:column;align-items:flex-start;padding:12px 14px;height:auto;gap:4px;border-left:3px solid var(--success)" onclick="nav('analysis')"><i class="ti ti-file-analysis" style="font-size:16px;color:var(--success)"></i><div style="font-size:11px;font-weight:500;color:var(--text)">파일 분석</div><div style="font-size:10px;color:var(--text3)">마지막 업로드 2일 전</div></div>
+        <div class="tbtn" style="flex-direction:column;align-items:flex-start;padding:12px 14px;height:auto;gap:4px;border-left:3px solid var(--warn)" onclick="nav('calendar')"><i class="ti ti-calendar" style="font-size:16px;color:var(--warn)"></i><div style="font-size:11px;font-weight:500;color:var(--text)">캘린더</div><div style="font-size:10px;color:var(--warn);font-weight:500">D-2 마감 집중</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 운영 로그 분석 ══ -->
+<div class="screen" id="s-analysis">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="topbar-title">운영 로그 분석</div>
+      <div id="stepBar" style="display:none;align-items:center;gap:6px;font-size:10px;color:var(--text3);font-family:var(--mono)">
+        <span id="s1lbl" class="badge b-accent">① 업로드</span>
+        <span>→</span><span id="s2lbl">② 분석</span>
+        <span>→</span><span id="s3lbl">③ 결과</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px"><div class="tbtn" onclick="toggleHistory()"><i class="ti ti-history"></i> 업로드 이력</div><div class="chip">2026-05-20</div></div>
+  </div>
+  <div class="content">
+    <div style="background:var(--accent-soft);border:1px solid rgba(66,99,235,.12);border-radius:var(--radius);padding:10px 14px;font-size:11px;color:var(--text2);display:flex;align-items:center;gap:8px" id="analysisGuide">
+      <i class="ti ti-info-circle" style="font-size:14px;color:var(--accent)"></i>
+      운영 기록 파일을 업로드하면 AI가 자동으로 업무 항목을 추출하고 위험 이슈를 탐지합니다.
+    </div>
+    <div id="uploadSection">
+      <div class="upload-zone" id="uploadZone" ondragover="ondov(event)" ondragleave="ondl(event)" ondrop="ondrop(event)">
+        <input type="file" accept=".txt,.pdf,.csv,.docx" multiple onchange="onFileSelect(event)">
+        <i class="ti ti-cloud-upload" style="font-size:30px;color:var(--text3);display:block;margin-bottom:10px"></i>
+        <p style="font-size:12px;color:var(--text2)">파일을 드래그하거나 클릭하여 업로드</p>
+        <span style="font-size:11px;color:var(--text3);display:block;margin-top:4px">지원 형식: txt · csv · pdf · docx</span>
+      </div>
+      <div id="fileList" style="display:none;margin-top:10px">
+        <div id="fileItems"></div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <div class="tbtn" onclick="resetUpload()"><i class="ti ti-x"></i> 취소</div>
+          <div class="tbtn primary" onclick="startAnalysis()"><i class="ti ti-sparkles"></i> AI 분석 시작</div>
+        </div>
+      </div>
+    </div>
+    <div id="analysisSection" style="display:none">
+      <div class="card" style="border-left:3px solid var(--accent)">
+        <div class="card-hd"><div class="card-hd-l"><i class="ti ti-sparkles" style="color:var(--accent)"></i> AI 분석 진행 중</div><div class="badge b-accent" id="analysisBadge">분석 중...</div></div>
+        <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--success-soft);border-radius:var(--radius-sm);margin-bottom:14px">
+          <i class="ti ti-circle-check" style="font-size:16px;color:var(--success);flex-shrink:0"></i>
+          <div><div style="font-size:12px;font-weight:500;color:var(--success)">파일 업로드 완료</div><div style="font-size:10px;color:var(--text3);margin-top:1px" id="uploadedFname">AI가 업무 내용을 분석하고 있습니다...</div></div>
+        </div>
+        <div class="flow-wrap">
+          <div class="flow-step"><div class="flow-icon fi-wait" id="ficon1"><i class="ti ti-checkbox" style="font-size:11px"></i></div><div class="flow-body"><div class="flow-title" id="ftitle1">업무 항목 추출 중</div><div class="flow-sub" id="fsub1">회의록·채팅에서 Todo 항목 감지 중...</div></div></div>
+          <div class="flow-step"><div class="flow-icon fi-wait" id="ficon2"><i class="ti ti-alert-triangle" style="font-size:11px"></i></div><div class="flow-body"><div class="flow-title" id="ftitle2">위험 이슈 확인 중</div><div class="flow-sub" id="fsub2">리스크 키워드 및 Blocked 상태 탐지 대기</div></div></div>
+          <div class="flow-step"><div class="flow-icon fi-wait" id="ficon3"><i class="ti ti-file-description" style="font-size:11px"></i></div><div class="flow-body"><div class="flow-title" id="ftitle3">운영 요약 생성 중</div><div class="flow-sub" id="fsub3">이슈 확인 완료 후 주간 요약 자동 생성</div></div></div>
+        </div>
+      </div>
+    </div>
+    <div id="resultSection" style="display:none;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--success);border-radius:var(--radius);padding:14px 16px" class="fade-up">
+      <div class="card-hd"><div class="card-hd-l"><i class="ti ti-sparkles" style="color:var(--success)"></i> 분석 완료 <span class="badge b-success" style="margin-left:4px">완료</span></div><div style="font-size:10px;color:var(--text3);font-family:var(--mono)" id="resultFname"></div></div>
+      <div class="three-col" style="margin-bottom:14px">
+        <div style="text-align:center;padding:12px 10px;background:var(--surface2);border-radius:var(--radius-sm);cursor:pointer" onclick="nav('todo')"><div style="font-size:24px;font-weight:700;color:var(--accent);font-family:var(--mono)" id="rTodo">0</div><div style="font-size:10px;color:var(--text3);margin-top:3px">Todo 추출</div><div style="font-size:9px;color:var(--accent);margin-top:2px">클릭하여 확인 →</div></div>
+        <div style="text-align:center;padding:12px 10px;background:var(--surface2);border-radius:var(--radius-sm);cursor:pointer" onclick="nav('issues')"><div style="font-size:24px;font-weight:700;color:var(--danger);font-family:var(--mono)" id="rIssue">0</div><div style="font-size:10px;color:var(--text3);margin-top:3px">리스크 탐지</div><div style="font-size:9px;color:var(--danger);margin-top:2px">클릭하여 확인 →</div></div>
+        <div style="text-align:center;padding:12px 10px;background:var(--surface2);border-radius:var(--radius-sm)"><div style="font-size:24px;font-weight:700;color:var(--warn);font-family:var(--mono)" id="rBlocked">0</div><div style="font-size:10px;color:var(--text3);margin-top:3px">Blocked</div></div>
+      </div>
+      <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:6px">출처 기반 추출 근거</div>
+      <div class="chunk-box"><div class="chunk-meta"><i class="ti ti-file-text" style="font-size:11px;color:var(--accent)"></i><span id="rChunkMeta"></span></div><div id="rChunkContent"></div></div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+        <div class="tbtn" onclick="nav('todo')" style="color:var(--accent)"><i class="ti ti-checkbox"></i> Todo 확인</div>
+        <div class="tbtn" onclick="nav('issues')" style="color:var(--danger)"><i class="ti ti-alert-triangle"></i> 이슈 확인</div>
+        <div class="tbtn primary" onclick="applyDashboard()"><i class="ti ti-layout-dashboard"></i> Dashboard 반영 →</div>
+        <div class="tbtn" onclick="resetFlow()" style="margin-left:auto"><i class="ti ti-plus"></i> 다른 파일 분석</div>
+      </div>
+    </div>
+    <div id="historySection" style="display:none">
+      <div class="card"><div class="card-hd"><div class="card-hd-l"><i class="ti ti-history"></i> 업로드 이력</div><div style="font-size:11px;color:var(--accent);cursor:pointer" onclick="toggleHistory()">닫기</div></div><div id="historyList"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TODO ══ -->
+<div class="screen" id="s-todo">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="topbar-title">Todo 관리</div>
+      <span id="todoFromIssueBanner" style="display:none;font-size:10px;padding:3px 8px;border-radius:10px;background:var(--success-soft);color:var(--success);border:1px solid rgba(26,158,106,.2)">이슈에서 생성된 Todo 있음</span>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div style="font-size:11px;display:flex;align-items:center;gap:5px;color:var(--text2)">승인 대기 <span style="font-weight:600;color:var(--warn);font-family:var(--mono)" id="pendingCount">5</span>건</div>
+      <div class="tbtn" onclick="bulkApprove()"><i class="ti ti-checks"></i> 전체 승인</div>
+      <div class="tbtn primary" onclick="openManualModal()"><i class="ti ti-plus"></i> 수동 등록</div>
+    </div>
+  </div>
+  <div class="tabs" id="todoTabs">
+    <div class="tab active" onclick="switchTodoTab('ai')">AI 제안 <span class="badge b-warn" id="t-ai-cnt">5</span></div>
+    <div class="tab" onclick="switchTodoTab('inprogress')">진행 Todo <span class="badge b-gray" id="t-in-cnt">2</span></div>
+    <div class="tab" onclick="switchTodoTab('done')">완료 <span class="badge b-gray" id="t-done-cnt">1</span></div>
+  </div>
+  <div style="background:var(--accent-soft);border-bottom:1px solid rgba(66,99,235,.12);padding:8px 16px;font-size:11px;color:var(--accent);display:flex;align-items:center;gap:6px;flex-shrink:0" id="todoAINotice">
+    <i class="ti ti-sparkles" style="font-size:13px"></i> AI가 추출한 Todo 제안입니다. 검토 후 승인 또는 반려해주세요.
+  </div>
+  <div class="body-wrap">
+    <div class="table-area">
+      <table class="todo-table">
+        <thead><tr><th style="width:28px"><input type="checkbox" id="chkAll" onchange="toggleAllChk(this)" style="accent-color:var(--accent)"></th><th>Todo</th><th style="width:100px">근거</th><th style="width:52px;text-align:center">우선순위</th><th style="width:48px;text-align:center">신뢰도</th><th style="width:72px;text-align:center">상태</th><th style="width:130px">액션</th></tr></thead>
+        <tbody id="todoBody"></tbody>
+      </table>
+      <div id="todoEmpty" style="display:none;padding:40px;text-align:center;color:var(--text3);font-size:12px"><i class="ti ti-checkbox" style="font-size:28px;display:block;margin-bottom:8px"></i>이 탭에 항목이 없습니다.</div>
+    </div>
+    <div class="detail-panel">
+      <div class="detail-empty" id="todoDetailEmpty"><i class="ti ti-hand-click"></i><span>Todo를 클릭하면<br>상세 내용이 표시됩니다</span></div>
+      <div id="todoDetailContent" style="display:none;flex:1;display:flex;flex-direction:column;overflow-y:auto"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 이슈 로그 ══ -->
+<div class="screen" id="s-issues">
+  <div class="topbar">
+    <div class="topbar-title">이슈 로그</div>
+    <div style="display:flex;gap:8px"><div class="tbtn primary"><i class="ti ti-plus"></i> 수동 등록</div><div class="chip">2026-05-20</div></div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="switchIssueTab('confirmed')">확정 이슈 <span class="badge b-danger" id="i-conf-cnt">3</span></div>
+    <div class="tab" onclick="switchIssueTab('candidate')">이슈 후보 <span class="badge b-warn" id="i-cand-cnt">2</span></div>
+    <div class="tab" onclick="switchIssueTab('resolved')">Resolved <span class="badge b-gray">1</span></div>
+  </div>
+  <div class="body-wrap">
+    <div class="issue-list" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px" id="issueList"></div>
+    <div class="detail-panel">
+      <div class="detail-empty" id="issueDetailEmpty"><i class="ti ti-hand-click"></i><span>이슈를 클릭하면<br>상세 내용이 표시됩니다</span></div>
+      <div id="issueDetailContent" style="display:none;padding:14px;overflow-y:auto;flex:1"></div>
+      <div id="issueDetailActions" style="display:none;padding:12px 14px;border-top:1px solid var(--border);flex-direction:column;gap:6px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 캘린더 ══ -->
+<div class="screen" id="s-calendar">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="topbar-title">캘린더 — 운영 리스크 예측</div>
+      <span id="calUpdatedBadge" class="badge b-success" style="display:none">방금 업데이트됨</span>
+    </div>
+    <div style="display:flex;gap:8px"><div class="tbtn">← 4월</div><div class="chip">2026년 5월</div><div class="tbtn">6월 →</div></div>
+  </div>
+  <div id="calEventBanner" style="display:none;background:var(--success-soft);border-bottom:1px solid rgba(26,158,106,.15);padding:10px 16px;font-size:11px;color:var(--success);display:flex;align-items:center;gap:8px;flex-shrink:0">
+    <i class="ti ti-calendar-plus" style="font-size:16px"></i><span id="calBannerText"></span>
+  </div>
+  <div style="display:flex;flex:1;overflow:hidden">
+    <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px">
+      <div style="background:var(--accent-soft);border:1px solid rgba(66,99,235,.15);border-radius:var(--radius);padding:10px 14px;font-size:11px;color:var(--text2)">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;font-weight:500;color:var(--accent)"><i class="ti ti-sparkles" style="font-size:13px"></i> AI 추론 — 5월 리스크 예측</div>
+        <span id="calAIText">5/22(금) 마감 4건 집중. 이성우 5/19 부재로 RAG 작업 공백 예상. Azure timeout 미해결 3일째 지속.</span>
+      </div>
+      <div class="cal-grid" id="calGrid">
+        <div class="cal-dow">월</div><div class="cal-dow">화</div><div class="cal-dow">수</div><div class="cal-dow">목</div><div class="cal-dow">금</div><div class="cal-dow weekend">토</div><div class="cal-dow weekend">일</div>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2)"><div style="width:8px;height:8px;border-radius:2px;background:var(--danger-soft);border:1px solid var(--danger)"></div>High Risk</div>
+        <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2)"><div style="width:8px;height:8px;border-radius:2px;background:var(--warn-soft);border:1px solid var(--warn)"></div>주의</div>
+        <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2)"><div style="width:8px;height:8px;border-radius:2px;background:var(--surface2)"></div>부재</div>
+        <div style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--success)"><div style="width:8px;height:8px;border-radius:2px;background:rgba(26,158,106,.15);border:1px solid rgba(26,158,106,.3)"></div>신규 등록</div>
+      </div>
+    </div>
+    <div class="cal-side">
+      <div style="flex:1;overflow-y:auto;padding:14px">
+        <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:5px"><i class="ti ti-alert-triangle" style="font-size:13px;color:var(--text2)"></i> 리스크 구간</div>
+        <div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:11px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:2px">5/21~22 (목~금)</div><div style="color:var(--text)">마감 4건 + 부재 겹침</div><span class="badge b-danger" style="margin-top:4px;display:inline-block">최고 위험</span></div>
+        <div style="font-size:11px;font-weight:500;color:var(--text);margin:14px 0 8px;display:flex;align-items:center;gap:5px"><i class="ti ti-user-off" style="font-size:13px;color:var(--text2)"></i> 부재 현황</div>
+        <div id="calAbsenceList">
+          <div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:11px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">5/19 이성우</div><div style="color:var(--text)">출장 — RAG 공백</div></div>
+          <div style="padding:6px 0;font-size:11px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">5/21 김희진</div><div style="color:var(--text)">부산 출장 — PR 지연</div></div>
+        </div>
+        <div style="font-size:11px;font-weight:500;color:var(--text);margin:14px 0 8px;display:flex;align-items:center;gap:5px"><i class="ti ti-flag" style="font-size:13px;color:var(--text2)"></i> 마일스톤</div>
+        <div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:11px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">5/29</div><div style="color:var(--text)">4주차 시연</div><span class="badge b-accent" style="margin-top:4px;display:inline-block">D-9</span></div>
+        <div style="padding:7px 0;font-size:11px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">6/26</div><div style="color:var(--text)">MVP 최종 시연</div><span class="badge b-accent" style="margin-top:4px;display:inline-block">D-37</span></div>
+      </div>
+      <div class="cal-mini-chat" style="border-top:1px solid var(--border);background:var(--surface2)">
+        <div class="mini-chat-hd"><i class="ti ti-sparkles" style="font-size:13px;color:var(--accent)"></i><span style="font-size:11px;font-weight:500;color:var(--accent)">일정 등록</span></div>
+        <div class="mini-log" id="miniLog">
+          <div style="font-size:10px;color:var(--text3);line-height:1.5">누락된 일정을 말로 알려주세요.</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">
+            <div class="sq" style="font-size:9px;padding:2px 6px" onclick="miniChat('이성우 5/26 부재야')">이성우 5/26 부재</div>
+            <div class="sq" style="font-size:9px;padding:2px 6px" onclick="miniChat('6/3 팀 회의')">6/3 팀 회의</div>
+          </div>
+        </div>
+        <div class="mini-input-row">
+          <input class="mini-input" id="miniInput" placeholder="예: 박주원 5/28 부재야" onkeydown="if(event.key==='Enter')miniChat()">
+          <button class="mini-send" onclick="miniChat()"><i class="ti ti-send" style="font-size:12px"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 인수인계 센터 ══ -->
+<div class="screen" id="s-knowledge">
+  <div class="topbar">
+    <div class="topbar-title">인수인계 센터</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <div class="tbtn" onclick="selectKnowledgeType('onboarding')" id="kbtn-onboarding"><i class="ti ti-user-plus"></i> 신규 입사자 온보딩</div>
+      <div class="tbtn" onclick="selectKnowledgeType('absence')" id="kbtn-absence"><i class="ti ti-user-off"></i> 부재자 업무 인수인계</div>
+      <div class="tbtn" onclick="selectKnowledgeType('offboard')" id="kbtn-offboard"><i class="ti ti-logout"></i> 담당자 변경/퇴직 인수인계</div>
+    </div>
+  </div>
+
+  <!-- 공통: 흐름 안내 바 -->
+  <div style="background:var(--surface);border-bottom:1px solid var(--border);padding:8px 20px;display:flex;align-items:center;gap:6px;flex-shrink:0" id="knowledgeFlowBar">
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-family:var(--mono)" id="knowledgeFlowSteps"></div>
+    <div style="margin-left:auto;font-size:10px;color:var(--text3)" id="knowledgeFlowHint"></div>
+  </div>
+
+  <div style="display:flex;flex:1;overflow:hidden">
+
+    <!-- 좌측: 컨텍스트 패널 -->
+    <div style="width:220px;border-right:1px solid var(--border);background:var(--surface);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;padding:16px;height:100%">
+      <div id="knowledgeContextPanel"></div>
+    </div>
+
+    <!-- 우측: 흐름 콘텐츠 -->
+    <div style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;height:100%" id="knowledgeContent"></div>
+  </div>
+</div>
+
+<style>
+/* 흐름 단계 표시 */
+.kflow-step{display:flex;align-items:center;gap:5px;font-size:10px;padding:3px 8px;border-radius:20px;border:1px solid var(--border2);color:var(--text3);cursor:pointer;transition:all .12s}
+.kflow-step.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.kflow-step.done{background:var(--success-soft);color:var(--success);border-color:rgba(26,158,106,.2)}
+.kflow-arr{font-size:10px;color:var(--text3)}
+/* 흐름 카드 */
+.kcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.kcard-hd{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;transition:background .15s}
+.kcard-hd:hover{background:var(--surface2)}
+.kcard-title{font-size:13px;font-weight:500;color:var(--text);flex:1}
+.kcard-sub{font-size:11px;color:var(--text3)}
+.kcard-arrow{font-size:14px;color:var(--text3);transition:transform .2s;flex-shrink:0}
+.kcard.open .kcard-arrow{transform:rotate(180deg)}
+.kcard-body{display:none;border-top:1px solid var(--border);padding:14px 16px;max-height:400px;overflow-y:auto}
+.kcard.open .kcard-body{display:block;animation:fadeUp .2s ease}
+/* 섹션 블록 */
+.kb-why{background:var(--warn-soft);border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:var(--warn);margin-bottom:10px;display:flex;align-items:flex-start;gap:6px;line-height:1.6}
+.kb-now{background:var(--danger-soft);border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:var(--danger);margin-bottom:10px;display:flex;align-items:flex-start;gap:6px;line-height:1.6}
+.kb-next{background:var(--success-soft);border-radius:var(--radius-sm);padding:10px 12px;font-size:11px;color:var(--success);margin-bottom:10px;display:flex;align-items:flex-start;gap:6px;line-height:1.6}
+.kb-item{display:flex;align-items:flex-start;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:11px;color:var(--text2)}
+.kb-item:last-child{border-bottom:none}
+.kb-item i{font-size:13px;color:var(--accent);flex-shrink:0;margin-top:1px}
+/* 진행 단계 바 */
+.kstep-bar{display:flex;align-items:center;gap:0;margin-bottom:14px}
+.kstep{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;position:relative}
+.kstep:not(:last-child)::after{content:'';position:absolute;top:14px;left:50%;width:100%;height:1px;background:var(--border2)}
+.kstep-circle{width:28px;height:28px;border-radius:50%;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--surface);z-index:1;transition:all .2s}
+.kstep-circle.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.kstep-circle.done{border-color:var(--success);background:var(--success);color:#fff}
+.kstep-label{font-size:10px;color:var(--text3);text-align:center;line-height:1.3}
+.kstep-label.active{color:var(--accent);font-weight:500}
+.kstep-label.done{color:var(--success)}
+/* 체크리스트 */
+.checklist-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:11px;cursor:pointer;user-select:none}
+.checklist-item:last-child{border-bottom:none}
+.checklist-item.checked .cl-text{text-decoration:line-through;color:var(--text3)}
+.cl-box{width:16px;height:16px;border:1.5px solid var(--border2);border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.checklist-item.checked .cl-box{background:var(--success);border-color:var(--success);color:#fff}
+</style>
+
+<!-- ══ 보고서 ══ -->
+<div class="screen" id="s-reports">
+  <div class="topbar"><div class="topbar-title">보고서 생성</div><div style="display:flex;gap:8px"><div style="display:flex;gap:4px"><div class="tbtn" style="background:var(--accent);color:#fff;border-color:var(--accent)">주간</div><div class="tbtn">월간</div></div><div class="tbtn primary"><i class="ti ti-wand"></i> AI 초안 생성</div></div></div>
+  <div class="content">
+    <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+      <div style="display:flex;align-items:center;gap:3px;padding:7px 10px;border-bottom:1px solid var(--border);background:var(--surface2)">
+        <div class="tbtn" style="font-weight:700;padding:3px 8px">B</div><div class="tbtn" style="font-style:italic;padding:3px 8px">I</div><div class="tbtn" style="padding:3px 8px">H1</div><div class="tbtn" style="padding:3px 8px">H2</div><div style="width:1px;height:16px;background:var(--border2);margin:0 4px"></div><div class="tbtn" style="padding:3px 8px"><i class="ti ti-list" style="font-size:12px"></i></div><div style="flex:1"></div><span style="font-size:10px;color:var(--text3)">AI 초안 · 직접 편집 가능</span>
+      </div>
+      <div contenteditable="true" style="padding:14px 16px;font-size:12px;line-height:1.8;color:var(--text2);min-height:160px;outline:none">
+        <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:8px">5월 2주차 운영 보고서</div>
+        <p style="margin-bottom:8px">이번 주 주요 리스크는 Azure OpenAI API 타임아웃(3일째 미해결)과 RAG 검색 정확도 저하입니다.</p>
+        <ul style="padding-left:16px"><li>Todo 18건 중 12건 완료 (완료율 67%)</li><li>Blocked 상태 작업 2건</li><li style="color:var(--danger)">High Risk 이슈 2건 — 즉시 조치 필요</li></ul>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end"><div class="tbtn"><i class="ti ti-share"></i> 공유</div><div class="tbtn primary"><i class="ti ti-device-floppy"></i> 저장</div></div>
+  </div>
+</div>
+
+<!-- ══ AI Assistant ══ -->
+<div class="screen" id="s-chat">
+  <div class="topbar">
+    <div class="topbar-title">AI Assistant</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="badge b-success" style="display:flex;align-items:center;gap:4px"><i class="ti ti-circle-filled" style="font-size:8px"></i> RAG 연결됨</span>
+      <span style="font-size:10px;color:var(--text3)">운영 데이터 기반 + 범용 답변 + 일정 등록</span>
+    </div>
+  </div>
+  <div class="chat-area" id="chatArea">
+    <div class="msg"><div class="msg-av av-ai"><i class="ti ti-sparkles" style="font-size:13px"></i></div>
+    <div><div class="bubble bubble-ai">안녕하세요. 운영 데이터 기반으로 질문에 답변드립니다.<br><strong>일정 등록도 자연어로</strong> 입력하시면 캘린더에 자동 반영됩니다.</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
+      <div class="sq" onclick="sendMsg('현재 가장 위험한 이슈는?')">현재 가장 위험한 이슈는?</div>
+      <div class="sq" onclick="sendMsg('이번주 미완료 Todo 알려줘')">이번주 미완료 Todo</div>
+      <div class="sq" onclick="sendMsg('이성우 5/26 부재야')">이성우 5/26 부재야</div>
+      <div class="sq" onclick="sendMsg('박주원 다음주 화요일 출장이야')">박주원 다음주 화요일 출장</div>
+    </div></div></div>
+  </div>
+  <div class="chat-input-bar">
+    <textarea class="chat-input" id="chatInput" rows="1" placeholder="운영 상태 질문 또는 일정 등록..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}" oninput="autoResize(this)"></textarea>
+    <button class="send-btn" id="sendBtn" onclick="sendMsg()"><i class="ti ti-send" style="font-size:14px"></i></button>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div>
+
+<!-- 모달들 -->
+<div class="modal-overlay" id="todoCreateModal">
+  <div class="modal slide-up">
+    <div class="modal-title">대응 Todo 생성</div>
+    <div class="modal-sub" id="tcModalSub"></div>
+    <div style="background:var(--danger-soft);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px;color:var(--danger);margin-bottom:12px;display:flex;align-items:flex-start;gap:6px"><i class="ti ti-alert-triangle" style="font-size:13px;flex-shrink:0"></i><div id="tcModalFrom"></div></div>
+    <div><div class="form-label">Todo 제목</div><input class="form-input" id="tcTitle" type="text"></div>
+    <div class="form-row"><div><div class="form-label">담당자</div><select class="form-input" id="tcAssignee"><option>이성우</option><option>김성호</option><option>김예은</option><option>박주원</option><option>김희진</option></select></div><div><div class="form-label">우선순위</div><select class="form-input" id="tcPriority"><option value="high">높음</option><option value="medium">중간</option><option value="low">낮음</option></select></div></div>
+    <div style="margin-top:8px"><div class="form-label">마감일</div><input class="form-input" id="tcDue" type="date" value="2026-05-23"></div>
+    <div class="modal-actions"><div class="tbtn" onclick="closeModal('todoCreateModal')">취소</div><div class="tbtn primary" onclick="confirmTodoCreate()"><i class="ti ti-plus"></i> Todo 생성 및 이동</div></div>
+  </div>
+</div>
+<div class="modal-overlay" id="calModal">
+  <div class="modal slide-up" style="min-width:340px;max-width:420px">
+    <div class="modal-title" style="display:flex;align-items:center;gap:8px">
+      <i class="ti ti-calendar" style="font-size:16px;color:var(--accent)"></i>
+      <span id="calModalDate">날짜</span> 일정 관리
+    </div>
+    <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px">등록된 일정</div>
+    <div id="calModalList" style="display:flex;flex-direction:column;gap:6px;min-height:40px;margin-bottom:16px"></div>
+    <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px">일정 추가</div>
+    <div style="display:flex;gap:6px;margin-bottom:8px">
+      <input class="form-input" id="calModalInput" type="text" placeholder="일정 내용 입력..." style="flex:1">
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:16px;align-items:center">
+      <div style="font-size:11px;color:var(--text3);flex-shrink:0">상태</div>
+      <div style="flex:1;position:relative" id="calColorPicker">
+        <div onclick="toggleColorPicker()" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;background:var(--surface);font-size:11px" id="calColorSelected">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0" id="calColorDot"></div>
+          <span id="calColorLabel">일반</span>
+          <i class="ti ti-chevron-down" style="font-size:11px;color:var(--text3);margin-left:auto"></i>
+        </div>
+        <div id="calColorDropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);z-index:100;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.08)">
+          <div onclick="pickColor('ct-info','일반','var(--accent)')" style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;font-size:11px" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0"></div><span>일반</span>
+          </div>
+          <div onclick="pickColor('ct-warn','주의','var(--warn)')" style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;font-size:11px" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--warn);flex-shrink:0"></div><span>주의</span>
+          </div>
+          <div onclick="pickColor('ct-danger','위험','var(--danger)')" style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;font-size:11px" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--danger);flex-shrink:0"></div><span>위험</span>
+          </div>
+          <div onclick="pickColor('ct-success','완료','var(--success)')" style="display:flex;align-items:center;gap:10px;padding:8px 12px;cursor:pointer;font-size:11px" onmouseover="this.style.background='var(--surface2)'" onmouseout="this.style.background=''">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--success);flex-shrink:0"></div><span>완료</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <div class="tbtn" onclick="closeModal('calModal');G.selectedCalDay=null;renderCalendar()">닫기</div>
+      <div class="tbtn primary" onclick="addCalTag()"><i class="ti ti-plus"></i> 일정 추가</div>
+    </div>
+  </div>
+</div>
+<div class="modal-overlay" id="editModal">
+  <div class="modal slide-up">
+    <div class="modal-title">Todo 수정</div>
+    <div style="margin-bottom:8px"><div class="form-label">제목</div><input class="form-input" id="editTitle" type="text"></div>
+    <div><div class="form-label">담당자</div><select class="form-input" id="editAssignee"><option>이성우</option><option>김성호</option><option>김예은</option><option>박주원</option><option>김희진</option></select></div>
+    <div class="modal-actions"><div class="tbtn" onclick="closeModal('editModal')">취소</div><div class="tbtn primary" onclick="saveEdit()">저장</div></div>
+  </div>
+</div>
+<div class="modal-overlay" id="manualModal">
+  <div class="modal slide-up">
+    <div class="modal-title">Todo 수동 등록</div>
+    <div style="margin-bottom:8px"><div class="form-label">Todo 내용</div><textarea class="form-input" id="manualTitle" rows="3" style="resize:vertical" placeholder="Todo 내용을 입력하세요"></textarea></div>
+    <div class="form-row"><div><div class="form-label">담당자</div><select class="form-input" id="manualAssignee"><option>이성우</option><option>김성호</option><option>김예은</option><option>박주원</option><option>김희진</option></select></div><div><div class="form-label">우선순위</div><select class="form-input" id="manualPriority"><option value="high">높음</option><option value="medium" selected>중간</option><option value="low">낮음</option></select></div></div>
+    <div class="modal-actions"><div class="tbtn" onclick="closeModal('manualModal')">취소</div><div class="tbtn primary" onclick="saveManual()">등록</div></div>
+  </div>
+</div>
+<div class="modal-overlay" id="confirmIssueModal">
+  <div class="modal slide-up" style="width:360px">
+    <div class="modal-title">이슈 확정</div>
+    <div style="font-size:11px;color:var(--text2);margin:10px 0 16px;line-height:1.7" id="confirmIssueText"></div>
+    <div class="modal-actions"><div class="tbtn" onclick="closeModal('confirmIssueModal')">취소</div><div class="tbtn" onclick="dismissIssue()" style="color:var(--text3)">무시</div><div class="tbtn primary" style="background:var(--danger);border-color:var(--danger)" onclick="doConfirmIssue()">이슈 확정</div></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="ti ti-check" id="toastIcon" style="color:var(--success)"></i><span id="toastMsg"></span></div>
+<div class="screen-transition" id="transition"><i class="ti ti-sparkles" style="font-size:32px;color:var(--accent)"></i><div style="font-size:14px;font-weight:500;color:var(--accent)">처리 중...</div><div style="font-size:11px;color:var(--text3)" id="transitionMsg"></div></div>
+
+<!-- ki-item CSS -->
+<style>
+.ki-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:border-color .15s}
+.ki-item:hover{border-color:var(--border2)}
+.ki-item.open .ki-arrow{transform:rotate(180deg)}
+</style>
+
+<script>
+// ════════════════════════════════════════════════
+// 전역 상태
+// ════════════════════════════════════════════════
+const G = {
+  currentScreen: 'dashboard',
+  currentTodoTab: 'ai',
+  currentIssueTab: 'confirmed',
+  selectedTodoId: null,
+  selectedIssueId: null,
+  selectedCalDay: null,
+  editTargetId: null,
+  createIssueId: null,
+  confirmIssueId: null,
+  chatTyping: false,
+  uploadedFiles: [],
+  createdTodosFromIssue: [],
+  calEvents: [
+    {d:5,tags:[{t:'킥오프 완료',c:'ct-success'}]},
+    {d:12,tags:[{t:'2주차 회의',c:'ct-success'}]},
+    {d:14,tags:[{t:'Azure 이슈↑',c:'ct-danger'}]},
+    {d:15,tags:[{t:'todos API',c:'ct-warn'}]},
+    {d:18,tags:[{t:'3주차 회의',c:'ct-success'}]},
+    {d:19,tags:[{t:'이성우 부재',c:'ct-gray'},{t:'멘토 미팅',c:'ct-success'}]},
+    {d:20,tags:[{t:'Azure 미해결',c:'ct-danger'}]},
+    {d:21,tags:[{t:'todos 마감',c:'ct-warn'},{t:'희진 부재',c:'ct-gray'}],risk:true},
+    {d:22,tags:[{t:'마감 4건↑',c:'ct-danger'}],risk:true},
+    {d:25,tags:[{t:'4주차 회의',c:'ct-info'}]},
+    {d:26,tags:[{t:'Dashboard 마감',c:'ct-warn'}]},
+    {d:27,tags:[{t:'월간 보고서',c:'ct-danger'}]},
+    {d:29,tags:[{t:'4주차 시연',c:'ct-info'}]},
+  ],
+  newCalEvents: [],
+  analysisHistory: [
+    {name:'meeting_notes_20260512_week2.pdf',type:'회의록',date:'2026-05-12',todo:4,issue:2,blocked:1},
+    {name:'chat_logs_20260514_ai_pipeline.txt',type:'채팅',date:'2026-05-14',todo:3,issue:2,blocked:1},
+  ],
+};
+
+// ── Todo 데이터
+const todos = [
+  {id:1,title:'Azure OpenAI API 타임아웃 재시도 로직 구현',src:'issue_log_20260514.txt',srcChunk:'chunk #8',assignee:'이성우',priority:'high',confidence:92,status:'pending',type:'ai',chunk:'[이슈 로그] Azure OpenAI API 응답 지연 <span class="chunk-hl">5초 초과</span>. 담당: <span class="chunk-hl">이성우</span>. <span class="chunk-hl">재시도 로직 추가 필요</span>.',grounds:['이슈 로그에서 timeout 빈발 감지','채팅에서 재시도 로직 언급'],risk:'임베딩 파이프라인 전체 불안정 → 4주차 시연 위협'},
+  {id:2,title:'RAG 검색 정확도 개선 — 임베딩 모델 재검토',src:'chat_logs_20260514.txt',srcChunk:'chunk #6,#7',assignee:'이성우',priority:'high',confidence:87,status:'pending',type:'ai',chunk:'이성우: <span class="chunk-hl">임베딩 모델 교체</span>를 고려해봐야 할 것 같습니다.',grounds:['채팅에서 RAG 정확도 문제 언급'],risk:'AI Assistant 신뢰도 하락 → UC-07 시연 불가'},
+  {id:3,title:'todos API 엔드포인트 비즈니스 로직 구현',src:'meeting_notes_20260512.pdf',srcChunk:'chunk #1',assignee:'김성호',priority:'high',confidence:85,status:'pending',type:'ai',chunk:'',grounds:['회의록에서 API 구현 일정 언급'],risk:''},
+  {id:4,title:'3주차 팀 미팅 자료 준비 및 진행',src:null,srcChunk:null,assignee:'김희진',priority:'medium',confidence:null,status:'pending',type:'ai',chunk:null,grounds:['수동 등록'],risk:''},
+  {id:5,title:'ERDCloud 수정 — FAISS 컬럼 + monthly_reports 반영',src:'chat_logs_20260512.txt',srcChunk:'chunk #3',assignee:'김성호',priority:'medium',confidence:78,status:'pending',type:'ai',chunk:'',grounds:['채팅에서 ERDCloud 수정 확인'],risk:''},
+  {id:6,title:'파일 업로드 UI — API 연동 완성',src:'chat_logs_20260512.txt',srcChunk:'chunk #4',assignee:'박주원',priority:'high',confidence:90,status:'approved',type:'ai',chunk:'',grounds:['채팅에서 구현 완료 확인'],risk:''},
+  {id:7,title:'Azure VM PostgreSQL 환경 세팅 완료',src:'meeting_notes_20260505.pdf',srcChunk:'chunk #2',assignee:'김예은',priority:'medium',confidence:88,status:'approved',type:'ai',chunk:'',grounds:['회의록에서 세팅 완료 확인'],risk:''},
+  {id:8,title:'FAISS 인덱스 파일 백업 정책 수립',src:'chat_logs_20260514.txt',srcChunk:'chunk #6',assignee:null,priority:'low',confidence:62,status:'done',type:'ai',chunk:'',grounds:['채팅에서 백업 정책 미수립 언급'],risk:''},
+];
+
+// ── 이슈 데이터
+const issues = [
+  {id:1,type:'confirmed',severity:'high',status:'in_progress',title:'Azure OpenAI API 타임아웃 이슈 — 응답 지연 5초 초과 빈발',src:'issue_log_20260514_azure_timeout.txt',assignee:'이성우',days:3,desc:'API 응답 지연 5초 초과 케이스 증가. Korea Central 리전 변경으로 부분 해결.',chunk:'[이슈 로그] Azure OpenAI API 응답 지연 <span class="chunk-hl">5초 초과</span>. 발생 빈도: 약 <span class="chunk-hl">30%</span>. 담당: <span class="chunk-hl">이성우</span>.',history:[{date:'5/14 발생',s:'Open',note:'AI 탐지 · 95%',cls:''},{date:'5/15',s:'In Progress',note:'이성우 배정',cls:''},{date:'5/16',s:'In Progress',note:'변화 없음 ↔',cls:'history-no-change'},{date:'오늘 5/20',s:'In Progress',note:'3일째 미해결 ⚠',cls:'history-warn'}],domino:['임베딩 실패 → 파일 분석 실패','분석 실패 → Todo/이슈 추출 안 됨'],dominoFinal:'4주차 시연(5/29) 직접 영향',suggestTodo:'Azure OpenAI API 재시도 로직 구현 및 배치 사이즈 최적화',suggestAssignee:'이성우',suggestPriority:'high'},
+  {id:2,type:'confirmed',severity:'high',status:'open',title:'RAG 검색 정확도 Blocked — 관련 없는 청크 혼입 문제',src:'chat_logs_20260514_ai_pipeline.txt',assignee:null,days:3,desc:'벡터 임베딩 품질 문제로 검색 정확도 저하. 임베딩 모델 교체 검토 중.',chunk:'이성우: <span class="chunk-hl">청크 사이즈를 줄여봤는데도</span> 관련 없는 결과가 섞여요. <span class="chunk-hl">임베딩 모델 교체</span>를 고려해봐야 할 것 같습니다.',history:[{date:'5/14 발생',s:'Open',note:'AI 탐지 · 88%',cls:''},{date:'오늘 5/20',s:'Open',note:'3일째 · 담당자 미지정',cls:'history-warn'}],domino:['AI 답변 신뢰도 하락','AI Assistant 사용 불가 수준'],dominoFinal:'UC-07 AI Assistant 시연 불가',suggestTodo:'text-embedding-3-small 모델 교체 테스트 및 FAISS 재인덱싱',suggestAssignee:'이성우',suggestPriority:'high'},
+  {id:3,type:'confirmed',severity:'medium',status:'open',title:'Dashboard 집계 API 미구현 — 3주차 연동 지연 가능성',src:'meeting_notes_20260512_week2.pdf',assignee:'김성호',days:8,desc:'Dashboard 화면 집계 데이터 API 미구현. Todo/이슈 데이터 축적 후 구현 가능.',chunk:'2주차 회의. Dashboard 집계 API는 <span class="chunk-hl">Todo/이슈 데이터가 쌓인 후</span> 구현. <span class="chunk-hl">3주차로 이월</span>.',history:[{date:'5/12 발생',s:'Open',note:'회의에서 확인',cls:''},{date:'오늘 5/20',s:'Open',note:'8일째 · 3주차 착수 예정',cls:'history-no-change'}],domino:['Dashboard API 미구현 → 프론트 연동 불가'],dominoFinal:'중간 시연 Dashboard 미완성 위험',suggestTodo:'GET /api/v1/dashboard/summary 집계 쿼리 및 API 구현',suggestAssignee:'김성호',suggestPriority:'medium'},
+  {id:4,type:'candidate',severity:'medium',status:'open',confidence:62,title:'FAISS 인덱스 파일 백업 정책 미수립 — 데이터 유실 위험',src:'chat_logs_20260514.txt',assignee:null,days:6,desc:'AI 감지: 채팅 로그에서 백업 정책 미수립 언급 감지.',chunk:'이성우: FAISS 인덱스 저장/로드 구현 완료. <span class="chunk-hl">백업 정책이 없어서</span> 인덱스 파일 날아가면 전부 재생성해야 함.',history:[],domino:[],dominoFinal:'',suggestTodo:'FAISS 인덱스 정기 백업 스크립트 작성',suggestAssignee:'김예은',suggestPriority:'medium'},
+  {id:5,type:'candidate',severity:'low',status:'open',confidence:55,title:'로컬 PostgreSQL 불필요 — 리눅스 서버 DB로 통일 필요',src:'chat_logs_20260519.txt',assignee:null,days:1,desc:'AI 감지: 팀원들 로컬 PostgreSQL 설치 불필요. 리눅스 서버 DB로 통일 결정.',chunk:'희진: <span class="chunk-hl">예은님이 Azure VM DB 외부 접속 열어주면</span> .env 설정만 바꾸면 됩니다.',history:[],domino:[],dominoFinal:'',suggestTodo:'팀원 전원 .env DATABASE_URL 리눅스 서버로 변경',suggestAssignee:'김예은',suggestPriority:'low'},
+  {id:6,type:'resolved',severity:'medium',status:'resolved',title:'Azure VM PostgreSQL 연결 오류 — asyncpg 드라이버 미설치',src:'meeting_notes_20260505.pdf',assignee:'김예은',days:0,desc:'asyncpg 드라이버 누락으로 DB 연결 실패. 설치 후 해결.',chunk:'',history:[{date:'5/6 발생',s:'Open',note:'연결 오류 확인',cls:''},{date:'5/8',s:'Resolved',note:'asyncpg 설치 완료 · 해결',cls:''}],domino:[],dominoFinal:'',suggestTodo:null},
+];
+
+// ── AI 응답
+const chatResponses = {
+  '현재 가장 위험한 이슈는?':{type:'ops',text:'현재 High Risk 이슈는 2건입니다.\n\n1. Azure OpenAI API 타임아웃 (3일째 미해결)\n→ 임베딩 파이프라인 실패 → Todo/이슈 추출 불가 → 4주차 시연 위협\n담당: 이성우 / In Progress\n\n2. RAG 검색 정확도 Blocked\n→ AI Assistant 신뢰도 하락 → UC-07 시연 불가\n담당: 미지정 (즉시 지정 필요)',src:'issue_log_20260514_azure_timeout.txt · chat_logs_20260514_ai_pipeline.txt'},
+  '이번주 미완료 Todo 알려줘':{type:'ops',text:'이번 주 미완료 Todo 4건입니다.\n\n[High] Azure timeout 재시도 로직 — 이성우 (진행중)\n[High] RAG 정확도 개선 — 이성우 (대기)\n[High] todos API 로직 — 김성호 (진행중)\n[Medium] 3주차 팀 미팅 자료 — 김희진 (대기)',src:'meeting_notes_20260512_week2.pdf'},
+  '이성우 5/26 부재야':{type:'schedule',parsed:{person:'이성우',date:'5/26 (화)',type:'부재',impact:'RAG 파이프라인 작업 공백 예상'},calDate:26},
+  '박주원 다음주 화요일 출장이야':{type:'schedule',parsed:{person:'박주원',date:'5/26 (화)',type:'출장',impact:'프론트 작업 공백 예상'},calDate:26},
+};
+
+// ════════════════════════════════════════════════
+// 네비게이션
+// ════════════════════════════════════════════════
+function nav(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+  document.getElementById('s-' + screen).classList.add('active');
+  document.getElementById('nav-' + screen).classList.add('active');
+  G.currentScreen = screen;
+
+  if (screen === 'todo') renderTodos();
+  if (screen === 'issues') renderIssues();
+  if (screen === 'calendar') { renderCalendar(); showCalBanner(); }
+  if (screen === 'knowledge') {
+    // 버튼 전체 초기화 후 온보딩으로 바로 시작
+    ['onboarding','absence','offboard'].forEach(t => {
+      const btn = document.getElementById('kbtn-'+t);
+      if (btn) btn.removeAttribute('style');
+    });
+    renderKnowledgeAbsence();
+    selectKnowledgeType('onboarding');
+  }
+}
+
+// ════════════════════════════════════════════════
+// 흐름 1 — 파일 업로드 → 분석
+// ════════════════════════════════════════════════
+function ondov(e){e.preventDefault();document.getElementById('uploadZone').classList.add('dragover')}
+function ondl(e){document.getElementById('uploadZone').classList.remove('dragover')}
+function ondrop(e){e.preventDefault();document.getElementById('uploadZone').classList.remove('dragover');handleFiles(Array.from(e.dataTransfer.files))}
+function onFileSelect(e){handleFiles(Array.from(e.target.files))}
+
+function handleFiles(files) {
+  if (!files.length) return;
+  G.uploadedFiles = files;
+  const items = document.getElementById('fileItems');
+  items.innerHTML = files.map(f => `<div class="file-row"><i class="ti ti-file-text" style="font-size:16px;color:var(--accent)"></i><div style="flex:1;font-weight:500;color:var(--text)">${f.name}</div><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${(f.size/1024).toFixed(1)}KB</div><span class="badge b-gray">대기</span></div>`).join('');
+  document.getElementById('fileList').style.display = 'block';
+  document.getElementById('stepBar').style.display = 'flex';
+  setStepBar(1);
+}
+
+function startAnalysis() {
+  if (!G.uploadedFiles.length) return;
+  document.getElementById('uploadSection').style.display = 'none';
+  document.getElementById('analysisSection').style.display = 'block';
+  document.getElementById('analysisGuide').style.display = 'none';
+  const fname = G.uploadedFiles[0].name;
+  document.getElementById('uploadedFname').textContent = `AI가 업무 내용을 분석하고 있습니다... · ${fname}`;
+  setStepBar(2);
+  runFlowStep(1, fname);
+}
+
+function runFlowStep(step, fname) {
+  const icons = ['ti-checkbox','ti-alert-triangle','ti-file-description'];
+  const activeTitles = ['업무 항목 추출 중...','위험 이슈 확인 중...','운영 요약 생성 중...'];
+  const doneTitles = ['업무 항목 추출 완료','위험 이슈 확인 완료','운영 요약 생성 완료'];
+  const doneSubs = ['Todo 4건 추출 · 담당자 자동 매핑','High Risk 2건 · Blocked 1건 탐지','주간 보고서 초안 생성 완료'];
+  const delays = [1800, 2000, 1800];
+
+  setFlow(step, 'active', activeTitles[step-1], 'AI 분석 진행 중...', 's-active');
+  setTimeout(() => {
+    setFlow(step, 'done', doneTitles[step-1], doneSubs[step-1], 's-done');
+    if (step < 3) runFlowStep(step+1, fname);
+    else {
+      document.getElementById('analysisBadge').textContent = '완료';
+      document.getElementById('analysisBadge').className = 'badge b-success';
+      showAnalysisResult(fname);
+    }
+  }, delays[step-1]);
+}
+
+function setFlow(n, state, title, sub, subCls) {
+  const icon = document.getElementById('ficon'+n);
+  icon.className = 'flow-icon fi-'+state;
+  icon.innerHTML = state==='active' ? '<i class="ti ti-loader-2 spin" style="font-size:11px"></i>' : '<i class="ti ti-check" style="font-size:11px"></i>';
+  document.getElementById('ftitle'+n).textContent = title;
+  const s = document.getElementById('fsub'+n);
+  s.textContent = sub; s.className = 'flow-sub '+subCls;
+}
+
+function showAnalysisResult(fname) {
+  setStepBar(3);
+  const key = fname.includes('meeting')||fname.includes('회의') ? 'meeting' : fname.includes('chat')||fname.includes('채팅') ? 'chat' : 'issue';
+  const data = {meeting:{t:5,i:2,b:1,cm:'회의록 · 1페이지 · chunk #1',cc:'2주차 회의. Azure OpenAI API 응답 지연 <span class="chunk-hl">5초 초과</span>. <span class="chunk-hl">이성우 추가 시간 필요</span>.'},chat:{t:3,i:2,b:1,cm:'채팅 로그 · chunk #6',cc:'이성우: <span class="chunk-hl">Azure OpenAI API 타임아웃</span>이 계속 발생합니다. <span class="chunk-hl">재시도 로직</span> 필요.'},issue:{t:2,i:3,b:1,cm:'이슈 로그 · chunk #8',cc:'Azure OpenAI API 응답 지연 <span class="chunk-hl">5초 초과</span>. 담당: <span class="chunk-hl">이성우</span>. <span class="chunk-hl">재시도 로직 추가 필요</span>.'}};
+  const d = data[key] || data.meeting;
+  document.getElementById('resultFname').textContent = fname;
+  document.getElementById('rChunkMeta').textContent = d.cm;
+  document.getElementById('rChunkContent').innerHTML = d.cc;
+  countUp('rTodo', d.t, 800); countUp('rIssue', d.i, 1000); countUp('rBlocked', d.b, 600);
+  const rs = document.getElementById('resultSection');
+  rs.style.display = 'block';
+  G.analysisHistory.unshift({name:fname,type:key,date:'2026-05-20',todo:d.t,issue:d.i,blocked:d.b});
+  showToast('분석이 완료되었습니다.');
+}
+
+function countUp(id, target, dur) {
+  const el = document.getElementById(id); let cur = 0;
+  const step = target/(dur/50);
+  const t = setInterval(()=>{cur=Math.min(cur+step,target);el.textContent=Math.floor(cur);if(cur>=target)clearInterval(t)},50);
+}
+
+function applyDashboard() { showToast('Dashboard에 반영되었습니다.'); setTimeout(()=>nav('dashboard'),1000); }
+
+function resetFlow() {
+  G.uploadedFiles = [];
+  document.getElementById('uploadSection').style.display = 'block';
+  document.getElementById('analysisSection').style.display = 'none';
+  document.getElementById('resultSection').style.display = 'none';
+  document.getElementById('fileList').style.display = 'none';
+  document.getElementById('analysisGuide').style.display = 'flex';
+  document.getElementById('stepBar').style.display = 'none';
+  document.getElementById('analysisBadge').textContent = '분석 중...';
+  document.getElementById('analysisBadge').className = 'badge b-accent';
+  [1,2,3].forEach(n=>{const ic=document.getElementById('ficon'+n);ic.className='flow-icon fi-wait';ic.innerHTML=`<i class="ti ${['ti-checkbox','ti-alert-triangle','ti-file-description'][n-1]}" style="font-size:11px"></i>`;});
+}
+
+function resetUpload(){G.uploadedFiles=[];document.getElementById('fileList').style.display='none';document.getElementById('stepBar').style.display='none';}
+function setStepBar(n){['s1lbl','s2lbl','s3lbl'].forEach((id,i)=>{const el=document.getElementById(id);el.className=i+1===n?'badge b-accent':'';el.style.color=i+1===n?'':'';})}
+function toggleHistory(){const s=document.getElementById('historySection');s.style.display=s.style.display==='none'?'block':'none';renderHistory();}
+function renderHistory(){document.getElementById('historyList').innerHTML=G.analysisHistory.map(h=>`<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:11px"><i class="ti ti-file-text" style="font-size:14px;color:var(--accent)"></i><div style="flex:1">${h.name}</div><div style="display:flex;gap:4px"><span class="badge b-accent" style="font-size:9px">Todo ${h.todo}</span><span class="badge b-danger" style="font-size:9px">Risk ${h.issue}</span></div><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${h.date}</div></div>`).join('');}
+
+// ════════════════════════════════════════════════
+// 흐름 2 — Todo 승인/반려
+// ════════════════════════════════════════════════
+function getFilteredTodos(){
+  if(G.currentTodoTab==='ai') return todos.filter(t=>t.status==='pending');
+  if(G.currentTodoTab==='inprogress') return todos.filter(t=>t.status==='approved');
+  return todos.filter(t=>t.status==='done'||t.status==='rejected');
+}
+
+function renderTodos() {
+  const list = getFilteredTodos();
+  const body = document.getElementById('todoBody');
+  const empty = document.getElementById('todoEmpty');
+  if (!list.length){body.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  body.innerHTML = list.map(t=>`<tr><td><div class="todo-row ${G.selectedTodoId===t.id?'selected':''} ${t.status}" onclick="selectTodo(${t.id})">
+    <input type="checkbox" class="row-chk" onclick="event.stopPropagation()" style="accent-color:var(--accent);flex-shrink:0">
+    <div class="todo-title-w"><div class="todo-title ${t.status==='rejected'?'done-text':''}">${t.title}</div><div class="todo-src">${t.src?t.src+' · '+t.srcChunk:'수동 등록'}</div></div>
+    <div style="width:100px;font-size:10px;color:var(--text3);flex-shrink:0">${t.src?t.src.slice(0,14)+'…':'—'}</div>
+    <div style="width:52px;text-align:center;flex-shrink:0">${priB(t.priority)}</div>
+    <div style="width:48px;text-align:center;font-family:var(--mono);font-weight:500;font-size:11px;flex-shrink:0;color:${confC(t.confidence)}">${t.confidence!==null?t.confidence+'%':'—'}</div>
+    <div style="width:72px;text-align:center;flex-shrink:0">${statusB(t.status)}</div>
+    <div style="width:130px;flex-shrink:0">${actionB(t)}</div>
+  </div></td></tr>`).join('');
+  updateTodoCounts();
+}
+
+function priB(p){return{high:'<span class="badge b-danger">높음</span>',medium:'<span class="badge b-warn">중간</span>',low:'<span class="badge b-gray">낮음</span>'}[p]||''}
+function statusB(s){return{pending:'<span class="badge b-warn">승인 대기</span>',approved:'<span class="badge b-accent">진행중</span>',done:'<span class="badge b-success">완료</span>',rejected:'<span class="badge b-gray">반려됨</span>'}[s]||''}
+function confC(c){if(c===null)return'var(--text3)';if(c>=85)return'var(--success)';if(c>=70)return'var(--warn)';return'var(--danger)';}
+function actionB(t){
+  if(t.status==='pending')return`<div class="action-btns" onclick="event.stopPropagation()"><div class="ab ab-approve" onclick="approveTodo(${t.id})">승인</div><div class="ab ab-edit" onclick="openEditModal(${t.id})">수정</div><div class="ab ab-reject" onclick="rejectTodo(${t.id})">반려</div></div>`;
+  if(t.status==='approved')return`<div class="action-btns" onclick="event.stopPropagation()"><div class="ab ab-approve" style="background:var(--success);border-color:var(--success)" onclick="doneTodo(${t.id})">완료</div><div class="ab ab-undo" onclick="undoTodo(${t.id})">↩</div></div>`;
+  if(t.status==='rejected')return`<div class="action-btns" onclick="event.stopPropagation()"><div class="ab ab-undo" onclick="undoTodo(${t.id})">↩ 되돌리기</div></div>`;
+  return '';
+}
+
+function selectTodo(id){G.selectedTodoId=id;renderTodos();renderTodoDetail(id);}
+function renderTodoDetail(id){
+  const t=todos.find(x=>x.id===id);if(!t)return;
+  document.getElementById('todoDetailEmpty').style.display='none';
+  const dc=document.getElementById('todoDetailContent');
+  dc.style.display='flex';dc.style.flexDirection='column';
+  dc.innerHTML=`<div style="padding:14px;flex:1;overflow-y:auto">
+    <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:12px;line-height:1.5">${t.title}</div>
+    <div class="detail-grid">
+      <div class="detail-cell"><div class="detail-label">우선순위</div>${priB(t.priority)}</div>
+      <div class="detail-cell"><div class="detail-label">신뢰도</div><div style="font-size:12px;font-weight:500;color:${confC(t.confidence)};font-family:var(--mono)">${t.confidence!==null?t.confidence+'%':'—'}</div></div>
+      <div class="detail-cell"><div class="detail-label">상태</div>${statusB(t.status)}</div>
+      <div class="detail-cell"><div class="detail-label">담당자</div><div style="font-size:11px;font-weight:500;color:var(--text)">${t.assignee||'미지정'}</div></div>
+    </div>
+    ${t.chunk?`<div class="detail-section">출처 청크 원문</div><div class="chunk-box"><div class="chunk-meta"><i class="ti ti-file-text" style="font-size:11px;color:var(--accent)"></i>${t.src} · ${t.srcChunk}</div>${t.chunk}</div>`:''}
+    <div class="detail-section">AI 분석 근거</div>
+    ${t.grounds.map(g=>`<div class="detail-item"><i class="ti ti-point"></i>${g}</div>`).join('')}
+    ${t.risk?`<div class="detail-section">왜 위험한가</div><div class="risk-box">${t.risk}</div>`:''}
+  </div>
+  <div style="padding:12px 14px;border-top:1px solid var(--border);display:flex;gap:5px">
+    ${t.status==='pending'?`<div class="tbtn primary" style="flex:1;justify-content:center;background:var(--success);border-color:var(--success)" onclick="approveTodo(${t.id})">승인</div><div class="tbtn" style="flex:1;justify-content:center" onclick="openEditModal(${t.id})">수정</div><div class="tbtn" style="flex:1;justify-content:center;color:var(--danger)" onclick="rejectTodo(${t.id})">반려</div>`:
+    t.status==='approved'?`<div class="tbtn primary" style="flex:1;justify-content:center;background:var(--success);border-color:var(--success)" onclick="doneTodo(${t.id})">완료</div><div class="tbtn" style="flex:1;justify-content:center" onclick="undoTodo(${t.id})">↩ 되돌리기</div>`:
+    `<div class="tbtn" style="flex:1;justify-content:center" onclick="undoTodo(${t.id})">↩ 되돌리기</div>`}
+  </div>`;
+}
+
+function approveTodo(id){const t=todos.find(x=>x.id===id);t.status='approved';showToast(`✅ "${t.title.slice(0,20)}..." 승인되었습니다.`,'success');afterTodoAction(id);}
+function rejectTodo(id){const t=todos.find(x=>x.id===id);t.status='rejected';showToast('반려 처리되었습니다.','warn');afterTodoAction(id);}
+function doneTodo(id){const t=todos.find(x=>x.id===id);t.status='done';showToast(`🎉 완료 처리되었습니다.`,'success');afterTodoAction(id);}
+function undoTodo(id){const t=todos.find(x=>x.id===id);t.status='pending';showToast('승인 대기로 되돌렸습니다.','info');afterTodoAction(id);}
+function afterTodoAction(id){renderTodos();if(G.selectedTodoId===id)renderTodoDetail(id);updateTodoCounts();}
+async function bulkApprove(){
+  const p = todos.filter(t => t.status === 'pending');
+  if(!p.length){ showToast('승인 대기 항목이 없습니다.','info'); return; }
+
+  for (const t of p) {
+    t.status = 'approved';
+    // DB에 있는 Todo만 API 호출 (수동 더미는 건너뜀)
+    if (typeof t.id === 'string') {
+      try {
+        await fetch(`${API}/todos/${t.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'in_progress' })
+        });
+      } catch(e) {
+        console.warn('전체 승인 API 실패:', t.id);
+      }
+    }
+  }
+  showToast(`✅ ${p.length}건 전체 승인되었습니다.`, 'success');
+  renderTodos();
+  updateTodoCounts();
+}
+function toggleAllChk(el){document.querySelectorAll('.row-chk').forEach(c=>c.checked=el.checked);}
+function updateTodoCounts(){
+  const ai=todos.filter(t=>t.status==='pending').length;
+  const ip=todos.filter(t=>t.status==='approved').length;
+  const dn=todos.filter(t=>t.status==='done'||t.status==='rejected').length;
+  document.getElementById('t-ai-cnt').textContent=ai;
+  document.getElementById('t-in-cnt').textContent=ip;
+  document.getElementById('t-done-cnt').textContent=dn;
+  document.getElementById('pendingCount').textContent=ai;
+  ['t-ai-cnt','t-in-cnt','t-done-cnt'].forEach((id,i)=>{const el=document.getElementById(id);el.className=i===0&&ai>0?'badge b-warn':'badge b-gray';});
+}
+function switchTodoTab(tab){G.currentTodoTab=tab;G.selectedTodoId=null;document.getElementById('todoDetailEmpty').style.display='flex';document.getElementById('todoDetailContent').style.display='none';document.querySelectorAll('#s-todo .tab').forEach((el,i)=>{el.classList.toggle('active',['ai','inprogress','done'][i]===tab);});document.getElementById('todoAINotice').style.display=tab==='ai'?'flex':'none';renderTodos();}
+function openEditModal(id){G.editTargetId=id;const t=todos.find(x=>x.id===id);document.getElementById('editTitle').value=t.title;document.getElementById('editAssignee').value=t.assignee||'이성우';document.getElementById('editModal').classList.add('show');}
+function saveEdit(){const t=todos.find(x=>x.id===G.editTargetId);t.title=document.getElementById('editTitle').value.trim();t.assignee=document.getElementById('editAssignee').value;closeModal('editModal');renderTodos();if(G.selectedTodoId===G.editTargetId)renderTodoDetail(G.editTargetId);showToast('수정되었습니다.','info');}
+function openManualModal(){document.getElementById('manualModal').classList.add('show');}
+function saveManual(){const title=document.getElementById('manualTitle').value.trim();if(!title)return;todos.unshift({id:Date.now(),title,src:null,srcChunk:null,assignee:document.getElementById('manualAssignee').value,priority:document.getElementById('manualPriority').value,confidence:null,status:'pending',type:'manual',chunk:null,grounds:['수동 등록'],risk:''});closeModal('manualModal');document.getElementById('manualTitle').value='';if(G.currentTodoTab!=='ai')switchTodoTab('ai');else renderTodos();updateTodoCounts();showToast('✅ Todo가 등록되었습니다.','success');}
+
+// ════════════════════════════════════════════════
+// 흐름 3 — 이슈 → 대응 Todo 생성
+// ════════════════════════════════════════════════
+function switchIssueTab(tab){G.currentIssueTab=tab;G.selectedIssueId=null;hideIssueDetail();document.querySelectorAll('#s-issues .tab').forEach((el,i)=>el.classList.toggle('active',['confirmed','candidate','resolved'][i]===tab));renderIssues();}
+function renderIssues(){
+  const list=issues.filter(i=>i.type===G.currentIssueTab);
+  const el=document.getElementById('issueList');
+  if(!list.length){el.innerHTML=`<div style="padding:40px;text-align:center;color:var(--text3);font-size:12px"><i class="ti ti-check" style="font-size:28px;display:block;margin-bottom:8px"></i>이 탭에 항목이 없습니다.</div>`;return;}
+  el.innerHTML=list.map(issue=>{
+    const hasTodo=G.createdTodosFromIssue.some(t=>t.issueId===issue.id);
+    const isCandidate=issue.type==='candidate';
+    return `<div class="issue-card ${G.selectedIssueId===issue.id?'selected':''} ${isCandidate?'candidate':''}" onclick="selectIssue(${issue.id})">
+      <div class="issue-hd">
+        ${isCandidate?`<span class="badge b-warn">후보</span><span style="font-size:10px;font-family:var(--mono);color:var(--warn);font-weight:500">${issue.confidence}%</span>`:`<span class="badge ${issue.severity==='high'?'b-danger':issue.severity==='medium'?'b-warn':'b-gray'}">${issue.severity==='high'?'High':'Medium'}</span>`}
+        <div class="issue-title">${issue.title}</div>
+        ${issue.status==='in_progress'?'<span class="badge b-warn">In Progress</span>':issue.status==='open'?'<span class="badge b-gray">Open</span>':'<span class="badge b-success">Resolved</span>'}
+        ${hasTodo?'<span class="badge b-success" style="font-size:9px">Todo 생성됨</span>':''}
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+        <span class="badge b-gray">${issue.src||'자동 감지'}</span>
+        ${issue.days>0?`<span class="badge b-gray">${issue.days}일째</span>`:''}
+        ${issue.assignee?`<span class="badge b-gray">담당: ${issue.assignee}</span>`:'<span class="badge b-danger" style="font-size:9px">담당자 미지정</span>'}
+      </div>
+      <div class="issue-desc">${issue.desc}</div>
+      <div class="issue-footer">
+        <div style="font-size:10px;color:var(--text3)">AI 자동 탐지</div>
+        <div style="display:flex;gap:5px">
+          ${isCandidate?`<div class="tbtn primary" style="font-size:10px;padding:4px 8px;background:var(--danger);border-color:var(--danger)" onclick="event.stopPropagation();openConfirmIssue(${issue.id})">이슈 확정</div><div class="tbtn" style="font-size:10px;padding:4px 8px;color:var(--text3)" onclick="event.stopPropagation();doRemoveIssue(${issue.id})">무시</div>`:
+          issue.type==='resolved'?'':
+          `<div class="tbtn" style="font-size:10px;padding:4px 8px" onclick="event.stopPropagation();openTodoCreate(${issue.id})"><i class="ti ti-plus"></i> 대응 Todo 생성</div>`}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('i-conf-cnt').textContent=issues.filter(i=>i.type==='confirmed').length;
+  document.getElementById('i-cand-cnt').textContent=issues.filter(i=>i.type==='candidate').length;
+}
+
+function selectIssue(id){G.selectedIssueId=id;renderIssues();renderIssueDetail(id);}
+function renderIssueDetail(id){
+  const issue=issues.find(i=>i.id===id);if(!issue)return;
+  document.getElementById('issueDetailEmpty').style.display='none';
+  const dc=document.getElementById('issueDetailContent');
+  dc.style.display='block';dc.className='fade-up';
+  const hasTodo=G.createdTodosFromIssue.some(t=>t.issueId===id);
+  dc.innerHTML=`
+    <div style="font-size:12px;font-weight:500;color:var(--text);margin-bottom:10px;line-height:1.5">${issue.title}</div>
+    ${issue.chunk?`<div class="detail-section">출처 청크</div><div class="chunk-box"><div class="chunk-meta"><i class="ti ti-file-text" style="font-size:11px;color:var(--accent)"></i>${issue.src}</div>${issue.chunk}</div>`:''}
+    ${issue.domino.length?`<div class="detail-section">도미노 영향</div><div class="domino"><div class="domino-lbl">왜 위험한가</div>${issue.domino.map(d=>`<div>→ ${d}</div>`).join('')}<div class="domino-final" style="margin-top:4px">→ ${issue.dominoFinal}</div></div>`:''}
+    ${issue.history.length?`<div class="detail-section">상태 변화 이력</div>${issue.history.map(h=>`<div class="history-row"><div class="history-date">${h.date}</div><span class="badge ${h.s==='Open'?'b-gray':h.s==='Resolved'?'b-success':'b-warn'}">${h.s}</span><div class="${h.cls}" style="flex:1;font-size:10px;color:${h.cls?'inherit':'var(--text3)'}">${h.note}</div></div>`).join('')}`:''}
+    ${hasTodo?`<div class="detail-section">생성된 대응 Todo</div>${G.createdTodosFromIssue.filter(t=>t.issueId===id).map(t=>`<div style="background:var(--success-soft);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px;color:var(--success);display:flex;align-items:center;gap:6px;margin-bottom:4px"><i class="ti ti-checkbox" style="font-size:12px"></i>${t.title}</div>`).join('')}`:''}`;
+  const actions=document.getElementById('issueDetailActions');
+  actions.style.display='flex';
+  if(issue.type==='confirmed'&&issue.status!=='resolved'){
+    actions.innerHTML=`<div class="tbtn primary" onclick="openTodoCreate(${id})" style="justify-content:center"><i class="ti ti-plus"></i> 대응 Todo 생성</div><div style="display:flex;gap:5px;margin-top:4px"><div class="tbtn" style="flex:1;justify-content:center;color:var(--success)" onclick="resolveIssue(${id})"><i class="ti ti-check"></i> 해결 완료</div></div>`;
+  } else if(issue.type==='candidate'){
+    actions.innerHTML=`<div class="tbtn primary" onclick="openConfirmIssue(${id})" style="justify-content:center;background:var(--danger);border-color:var(--danger)"><i class="ti ti-alert-triangle"></i> 이슈 확정</div><div class="tbtn" onclick="doRemoveIssue(${id})" style="justify-content:center;color:var(--text3);margin-top:4px">무시</div>`;
+  } else { actions.style.display='none'; }
+}
+
+function hideIssueDetail(){document.getElementById('issueDetailEmpty').style.display='flex';document.getElementById('issueDetailContent').style.display='none';document.getElementById('issueDetailActions').style.display='none';}
+
+function openTodoCreate(issueId){
+  G.createIssueId=issueId;
+  const issue=issues.find(i=>i.id===issueId);
+  document.getElementById('tcModalSub').textContent=`이슈: ${issue.title.slice(0,40)}...`;
+  document.getElementById('tcModalFrom').textContent=`이 Todo는 "${issue.title.slice(0,30)}..." 이슈와 연결됩니다.`;
+  document.getElementById('tcTitle').value=issue.suggestTodo||'';
+  document.getElementById('tcAssignee').value=issue.suggestAssignee||'이성우';
+  document.getElementById('tcPriority').value=issue.suggestPriority||'high';
+  document.getElementById('todoCreateModal').classList.add('show');
+}
+
+function confirmTodoCreate(){
+  const title=document.getElementById('tcTitle').value.trim();
+  if(!title)return;
+  const assignee=document.getElementById('tcAssignee').value;
+  const priority=document.getElementById('tcPriority').value;
+  const due=document.getElementById('tcDue').value;
+  closeModal('todoCreateModal');
+  showTransition('이슈 기반 대응 Todo를 생성하고 있습니다');
+  setTimeout(()=>{
+    hideTransition();
+    G.createdTodosFromIssue.push({id:Date.now(),issueId:G.createIssueId,title,assignee,priority,dueDate:due,status:'pending'});
+    todos.unshift({id:Date.now()+1,title,src:`이슈 #${G.createIssueId}`,srcChunk:'이슈 연결',assignee,priority,confidence:null,status:'pending',type:'ai',chunk:null,grounds:['이슈 기반 생성'],risk:''});
+    document.getElementById('todoFromIssueBanner').style.display='inline-flex';
+    document.getElementById('todoBadge').style.display='inline-block';
+    renderIssues();
+    if(G.selectedIssueId===G.createIssueId)renderIssueDetail(G.createIssueId);
+    nav('todo');
+    showToast(`✅ "${title.slice(0,20)}..." Todo가 생성되었습니다.`,'success');
+    updateTodoCounts();
+  },1200);
+}
+
+function resolveIssue(id){const issue=issues.find(i=>i.id===id);issue.status='resolved';issue.type='resolved';renderIssues();hideIssueDetail();showToast('✅ 이슈가 해결 완료 처리되었습니다.','success');}
+function openConfirmIssue(id){G.confirmIssueId=id;const issue=issues.find(i=>i.id===id);document.getElementById('confirmIssueText').textContent=`"${issue.title}"을 확정 이슈로 전환합니다. 대응 Todo를 생성할 수 있습니다.`;document.getElementById('confirmIssueModal').classList.add('show');}
+function doConfirmIssue(){const issue=issues.find(i=>i.id===G.confirmIssueId);if(issue){issue.type='confirmed';closeModal('confirmIssueModal');switchIssueTab('confirmed');showToast('이슈가 확정되었습니다.','warn');}}
+function dismissIssue(){doRemoveIssue(G.confirmIssueId);closeModal('confirmIssueModal');}
+function doRemoveIssue(id){const idx=issues.findIndex(i=>i.id===id);if(idx!==-1)issues.splice(idx,1);renderIssues();hideIssueDetail();showToast('이슈 후보가 무시되었습니다.','info');}
+
+// ════════════════════════════════════════════════
+// 캘린더
+// ════════════════════════════════════════════════
+function renderCalendar(){
+  const grid=document.getElementById('calGrid');
+  grid.querySelectorAll('.cal-cell').forEach(c=>c.remove());
+  [27,28,29,30].forEach(d=>{const div=document.createElement('div');div.className='cal-cell other';div.innerHTML=`<div class="cal-date">${d}</div>`;grid.appendChild(div);});
+  for(let d=1;d<=31;d++){
+    const ev=G.calEvents.find(e=>e.d===d);
+    const isNew=G.newCalEvents.some(e=>e.calDate===d);
+    const isSelected=G.selectedCalDay===d;
+    const div=document.createElement('div');
+    div.className=`cal-cell${ev?.today?' today':''}${ev?.risk?' risk':''}${isNew?' new-event':''}${isSelected?' cal-selected':''}`;
+    div.innerHTML=`<div class="cal-date">${d}</div><div class="cal-tags">${ev?ev.tags.map(t=>`<span class="cal-tag ${t.c}">${t.t}</span>`).join(''):''}</div>${ev?.risk?'<div class="risk-dot"></div>':''}`;
+    div.addEventListener('click', ()=>openCalModal(d));
+    grid.appendChild(div);
+    if(d===31)for(let x=1;x<=4;x++){const e=document.createElement('div');e.className='cal-cell other';e.innerHTML=`<div class="cal-date">${x}</div>`;grid.appendChild(e);}
+  }
+}
+
+function showCalBanner(){
+  if(!G.newCalEvents.length)return;
+  const last=G.newCalEvents[G.newCalEvents.length-1];
+  const banner=document.getElementById('calEventBanner');
+  document.getElementById('calBannerText').innerHTML=`<strong>${last.person} · ${last.date} · ${last.type}</strong>이 캘린더에 추가되었습니다.`;
+  banner.style.display='flex';
+  const badge=document.getElementById('calUpdatedBadge');badge.style.display='inline-flex';setTimeout(()=>badge.style.display='none',3000);
+  const names=[...new Set(G.newCalEvents.map(e=>e.person))].join(', ');
+  document.getElementById('calAIText').textContent=`5/22(금) 마감 4건 집중. ${names} 부재 일정 추가됨. AI 리스크 재계산 완료.`;
+  G.newCalEvents.filter(e=>e.type!=='회의').forEach(e=>{const div=document.createElement('div');div.style.cssText='padding:6px 0;border-top:1px solid var(--border);font-size:11px';div.innerHTML=`<div style="font-size:10px;color:var(--success);font-family:var(--mono)">${e.date} ${e.person} ✦ 신규</div><div style="color:var(--text)">${e.type} — ${e.impact}</div>`;document.getElementById('calAbsenceList').appendChild(div);});
+}
+
+function registerCalEvent(parsed, calDate){
+  if(calDate){const ex=G.calEvents.find(e=>e.d===calDate);const nt={t:`${parsed.person} ${parsed.type}`,c:'ct-new'};if(ex)ex.tags.push(nt);else G.calEvents.push({d:calDate,tags:[nt]});G.newCalEvents.push({...parsed,calDate});}
+  document.getElementById('calBadge').style.display='inline-block';
+  if(G.currentScreen==='calendar')renderCalendar();
+}
+
+function renderKnowledgeAbsence(){
+  if(!G.newCalEvents.length)return;
+  const list=document.getElementById('knowledgeAbsence');
+  G.newCalEvents.filter(e=>e.type!=='회의').forEach(e=>{const div=document.createElement('div');div.style.cssText='background:var(--surface2);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px';div.innerHTML=`<div style="font-weight:500;color:var(--text);margin-bottom:2px">${e.person} <span style="font-size:9px;color:var(--success)">✦ 신규</span></div><div style="color:var(--text3);font-size:10px;font-family:var(--mono)">${e.date} ${e.type}</div><span class="badge b-warn" style="margin-top:4px;display:inline-block">${e.impact}</span>`;list.appendChild(div);});
+}
+
+function miniChat(text){
+  const input=document.getElementById('miniInput');const msg=text||input.value.trim();if(!msg)return;input.value='';
+  const log=document.getElementById('miniLog');
+  const u=document.createElement('div');u.className='mini-bubble mini-bubble-user';u.textContent=msg;log.appendChild(u);log.scrollTop=log.scrollHeight;
+  setTimeout(()=>{
+    const parsed=parseScheduleMsg(msg);
+    const reply=(msg.includes('부재')||msg.includes('출장'))?`✅ ${parsed.person} ${parsed.date} ${parsed.type}을 캘린더에 등록했습니다.`:'✅ 일정을 캘린더에 추가했습니다.';
+    const a=document.createElement('div');a.className='mini-bubble mini-bubble-ai';a.textContent=reply;log.appendChild(a);log.scrollTop=log.scrollHeight;
+    const dateMatch=msg.match(/(\d+)\/(\d+)/);if(dateMatch){registerCalEvent(parsed,parseInt(dateMatch[2]));renderCalendar();}
+    showToast(reply);
+  },300);
+}
+
+function openCalModal(d) {
+  G.selectedCalDay = d;
+  renderCalendar();
+  const ev = G.calEvents.find(e => e.d === d);
+  const tags = ev ? ev.tags : [];
+  document.getElementById('calModalDate').textContent = `5월 ${d}일`;
+  const list = document.getElementById('calModalList');
+  list.innerHTML = tags.length
+    ? tags.map((t, i) => `
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border-radius:var(--radius-sm)">
+          <span class="cal-tag ${t.c}" style="flex:1">${t.t}</span>
+          <div onclick="deleteCalTag(${d},${i})" style="cursor:pointer;color:var(--text3);font-size:14px;padding:2px 6px;border-radius:4px;border:1px solid var(--border)" title="삭제">✕</div>
+        </div>`).join('')
+    : `<div style="font-size:11px;color:var(--text3);text-align:center;padding:16px 0">등록된 일정이 없습니다.</div>`;
+  document.getElementById('calModalInput').value = '';
+  calSelectedColor = 'ct-info';
+  document.getElementById('calColorDot').style.background = 'var(--accent)';
+  document.getElementById('calColorLabel').textContent = '일반';
+  openModal('calModal');
+}
+
+let calSelectedColor = 'ct-info';
+
+function toggleColorPicker() {
+  const dd = document.getElementById('calColorDropdown');
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+
+function pickColor(value, label, color) {
+  calSelectedColor = value;
+  document.getElementById('calColorDot').style.background = color;
+  document.getElementById('calColorLabel').textContent = label;
+  document.getElementById('calColorDropdown').style.display = 'none';
+}
+
+function addCalTag() {
+  const d = G.selectedCalDay;
+  const text = document.getElementById('calModalInput').value.trim();
+  const color = calSelectedColor;
+  if (!text) return;
+  let ev = G.calEvents.find(e => e.d === d);
+  if (ev) {
+    ev.tags.push({t: text, c: color});
+  } else {
+    G.calEvents.push({d, tags: [{t: text, c: color}]});
+  }
+  renderCalendar();
+  openCalModal(d);
+  showToast(`5월 ${d}일 일정이 추가됐습니다.`, 'info');
+}
+
+function deleteCalTag(d, idx) {
+  const ev = G.calEvents.find(e => e.d === d);
+  if (!ev) return;
+  ev.tags.splice(idx, 1);
+  if (ev.tags.length === 0) G.calEvents = G.calEvents.filter(e => e.d !== d);
+  renderCalendar();
+  openCalModal(d);
+  showToast('일정이 삭제됐습니다.', 'info');
+}
+
+function parseScheduleMsg(msg){
+  const people=['이성우','김성호','김예은','박주원','김희진'];
+  const person=people.find(p=>msg.includes(p))||'미확인';
+  const dm=msg.match(/(\d+\/\d+|\d+월\s*\d+일)/);const date=dm?dm[0]:'날짜 미확인';
+  const type=msg.includes('출장')?'출장':msg.includes('휴가')?'휴가':msg.includes('회의')||msg.includes('미팅')?'회의':'부재';
+  return{person,date,type,impact:type==='회의'?'팀 진행상황 점검':`${person} 담당 업무 공백 예상`};
+}
+
+// ════════════════════════════════════════════════
+// AI Assistant (흐름 5)
+// ════════════════════════════════════════════════
+function sendMsg(text){
+  if(G.chatTyping)return;
+  const input=document.getElementById('chatInput');const msg=text||input.value.trim();if(!msg)return;
+  input.value='';input.style.height='auto';
+  appendChatMsg('user',msg);showTyping();
+  setTimeout(()=>{
+    removeTyping();
+    const res=chatResponses[msg];
+    if(res){
+      if(res.type==='schedule') showScheduleConfirm(msg,res);
+      else appendChatMsg('ai',res.text,res.src);
+    } else if(/부재|출장|휴가|회의|미팅|일정|추가/.test(msg)){
+      const parsed=parseScheduleMsg(msg);showScheduleConfirmRaw(msg,parsed);
+    } else {
+      appendChatMsg('ai','운영 데이터에서 관련 정보를 찾고 있습니다. 더 구체적으로 질문해주시면 정확한 답변을 드릴 수 있습니다.',null);
+    }
+  },900+Math.random()*400);
+}
+
+function showScheduleConfirm(msg,res){
+  const area=document.getElementById('chatArea');
+  const wrapper=document.createElement('div');wrapper.className='msg fade-up';
+  wrapper.innerHTML=`<div class="msg-av av-ai"><i class="ti ti-sparkles" style="font-size:13px"></i></div>
+  <div style="max-width:84%"><div class="bubble bubble-ai">일정 정보를 파싱했습니다. 아래 내용으로 캘린더에 등록할까요?</div>
+  <div class="confirm-card">
+    <div class="confirm-row"><div class="confirm-lbl">대상</div><div class="confirm-val">${res.parsed.person}</div></div>
+    <div class="confirm-row"><div class="confirm-lbl">날짜</div><div class="confirm-val">${res.parsed.date}</div></div>
+    <div class="confirm-row"><div class="confirm-lbl">유형</div><div class="confirm-val">${res.parsed.type}</div></div>
+    <div class="confirm-row"><div class="confirm-lbl">영향</div><div class="confirm-val" style="color:var(--warn)">${res.parsed.impact}</div></div>
+    <div class="confirm-actions">
+      <div class="tbtn primary" onclick="doRegisterCalEvent(this,'${res.parsed.person}','${res.parsed.date}','${res.parsed.type}','${res.parsed.impact}',${res.calDate||'null'})"><i class="ti ti-calendar-plus"></i> 캘린더 등록</div>
+      <div class="tbtn" onclick="this.closest('.confirm-card').innerHTML='<span style=font-size:11px;color:var(--text3)>등록 취소됨</span>'">취소</div>
+    </div>
+  </div></div>`;
+  area.appendChild(wrapper);area.scrollTop=area.scrollHeight;
+}
+
+function showScheduleConfirmRaw(msg,parsed){showScheduleConfirm(msg,{parsed,calDate:null});}
+
+function doRegisterCalEvent(btn,person,date,type,impact,calDate){
+  btn.closest('.confirm-card').innerHTML=`<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--success)"><i class="ti ti-circle-check" style="font-size:16px"></i><div><div style="font-weight:500">캘린더에 등록되었습니다</div><div style="font-size:10px;color:var(--text3);margin-top:2px">${person} · ${date} · ${type}</div></div><div class="tbtn" onclick="nav('calendar')" style="margin-left:auto;font-size:10px;padding:3px 8px;color:var(--accent)">캘린더 확인 →</div></div>`;
+  registerCalEvent({person,date,type,impact},calDate);
+  setTimeout(()=>{if(type!=='회의')appendChatMsg('ai',`인수인계 센터에도 "${person} ${date} ${type}"이 반영되었습니다. 업무 공백 대비 인수인계 문서를 생성하시겠어요?`,null,true);},600);
+  showToast(`캘린더에 등록되었습니다. ${person} · ${date}`);
+}
+
+function appendChatMsg(role,text,src=null,withBtn=false){
+  const area=document.getElementById('chatArea');const div=document.createElement('div');div.className=`msg ${role==='user'?'user':''} fade-up`;
+  if(role==='user'){div.innerHTML=`<div class="msg-av av-user"><i class="ti ti-user" style="font-size:13px"></i></div><div class="bubble bubble-user">${text}</div>`;}
+  else{div.innerHTML=`<div class="msg-av av-ai"><i class="ti ti-sparkles" style="font-size:13px"></i></div><div><div class="bubble bubble-ai" style="white-space:pre-line">${text}</div>${src?`<div class="src-tag"><i class="ti ti-file-text" style="font-size:11px"></i> 출처: ${src}</div>`:''}${withBtn?'<div style="margin-top:6px"><div class="tbtn" style="font-size:10px;padding:4px 10px;color:var(--accent)" onclick="nav(\'knowledge\')"><i class="ti ti-transfer"></i> 인수인계 문서 생성</div></div>':''}</div>`;}
+  area.appendChild(div);area.scrollTop=area.scrollHeight;
+}
+
+function showTyping(){G.chatTyping=true;document.getElementById('sendBtn').disabled=true;const area=document.getElementById('chatArea');const div=document.createElement('div');div.className='msg';div.id='typingIndicator';div.innerHTML=`<div class="msg-av av-ai"><i class="ti ti-sparkles" style="font-size:13px"></i></div><div class="bubble bubble-ai"><div class="typing"><span></span><span></span><span></span></div></div>`;area.appendChild(div);area.scrollTop=area.scrollHeight;}
+function removeTyping(){G.chatTyping=false;document.getElementById('sendBtn').disabled=false;const el=document.getElementById('typingIndicator');if(el)el.remove();}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,80)+'px';}
+
+// ════════════════════════════════════════════════
+// 인수인계 센터 — 3개 흐름
+// ════════════════════════════════════════════════
+let currentKType = 'onboarding';
+const kChecks = { onboarding:{}, absence:{}, offboard:{} };
+
+function selectKnowledgeType(type) {
+  currentKType = type;
+  ['onboarding','absence','offboard'].forEach(t => {
+    const btn = document.getElementById('kbtn-'+t);
+    if (!btn) return;
+    btn.removeAttribute('style');
+    if (t === type) {
+      btn.style.background = 'var(--accent-soft)';
+      btn.style.color = 'var(--accent)';
+      btn.style.borderColor = 'var(--accent)';
+    }
+  });
+  renderKnowledgeFlow(type);
+}
+
+function renderKnowledgeFlow(type) {
+  const flowBar = document.getElementById('knowledgeFlowSteps');
+  const hint = document.getElementById('knowledgeFlowHint');
+  const ctx = document.getElementById('knowledgeContextPanel');
+  const content = document.getElementById('knowledgeContent');
+
+  if (type === 'onboarding') {
+    flowBar.innerHTML = kFlowSteps(['프로젝트 파악','운영 상태 확인','환경 세팅','첫 업무 시작']);
+    hint.textContent = '신규 팀원이 독립적으로 업무 시작까지 걸리는 시간을 최소화합니다.';
+    ctx.innerHTML = kCtxOnboarding();
+    content.innerHTML = kContentOnboarding();
+  } else if (type === 'absence') {
+    flowBar.innerHTML = kFlowSteps(['맡은 업무 파악','업무 맥락 이해','처리 완료 보고']);
+    hint.textContent = '출장·휴가 기간 동안 업무 공백 없이 팀이 운영됩니다.';
+    ctx.innerHTML = kCtxAbsence();
+    content.innerHTML = kContentAbsence();
+  } else if (type === 'briefing') {
+    flowBar.innerHTML = kFlowSteps(['프로젝트 현황','주요 결정사항','리스크 현황','다음 액션']);
+    hint.textContent = '프로젝트 맥락을 빠르게 파악하고 즉시 기여할 수 있도록 지원합니다.';
+    ctx.innerHTML = `
+      <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4">프로젝트<br>브리핑</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:16px">AI가 운영 기록을 분석해 프로젝트 전체 맥락을 5분 안에 전달합니다.</div>
+      <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">브리핑 대상</div>
+      <div style="background:var(--accent-soft);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px;color:var(--accent);margin-bottom:12px">
+        <div style="font-weight:500">전체 팀원</div>
+        <div style="font-size:10px;margin-top:2px">프로젝트 합류자 · 이해관계자 등</div>
+      </div>
+      <div class="tbtn primary" style="font-size:11px;width:100%;justify-content:center"><i class="ti ti-wand"></i> AI 브리핑 생성</div>`;
+    content.innerHTML = `
+      <div class="kcard">
+        <div class="kcard-hd">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">1</div>
+          <div class="kcard-title">프로젝트 현황 요약</div>
+          <div class="kcard-sub">AI가 운영 로그 기반으로 자동 생성</div>
+          <i class="ti ti-chevron-down kcard-arrow"></i>
+        </div>
+        <div class="kcard-body">
+          <div class="kb-why"><i class="ti ti-info-circle" style="font-size:13px;flex-shrink:0"></i><div>운영 로그, 회의록, 이슈 기록을 분석해 현재 프로젝트 상태를 한눈에 보여줍니다.</div></div>
+          <div class="kb-item"><i class="ti ti-point"></i>전체 진행률 및 주차별 달성 현황</div>
+          <div class="kb-item"><i class="ti ti-point"></i>팀원별 역할 및 현재 담당 업무</div>
+          <div class="kb-item"><i class="ti ti-point"></i>완료된 주요 기능 목록</div>
+          <div style="margin-top:12px"><div class="tbtn primary" style="font-size:11px"><i class="ti ti-wand"></i> 현황 브리핑 생성</div></div>
+        </div>
+      </div>
+      <div class="kcard">
+        <div class="kcard-hd">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">2</div>
+          <div class="kcard-title">주요 결정사항</div>
+          <div class="kcard-sub">기술·운영 의사결정 히스토리</div>
+          <i class="ti ti-chevron-down kcard-arrow"></i>
+        </div>
+        <div class="kcard-body">
+          <div class="kb-item"><i class="ti ti-point"></i>기술 스택 선택 배경 및 근거</div>
+          <div class="kb-item"><i class="ti ti-point"></i>주요 아키텍처 변경 이력</div>
+          <div class="kb-item"><i class="ti ti-point"></i>팀 내 합의된 개발 컨벤션</div>
+          <div style="margin-top:12px"><div class="tbtn primary" style="font-size:11px"><i class="ti ti-wand"></i> 결정사항 브리핑 생성</div></div>
+        </div>
+      </div>
+      <div class="kcard">
+        <div class="kcard-hd">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">3</div>
+          <div class="kcard-title">리스크 현황</div>
+          <div class="kcard-sub">현재 진행 중인 이슈 및 블로커</div>
+          <i class="ti ti-chevron-down kcard-arrow"></i>
+        </div>
+        <div class="kcard-body">
+          <div class="kb-item"><i class="ti ti-point"></i>High Risk 이슈 목록 및 대응 현황</div>
+          <div class="kb-item"><i class="ti ti-point"></i>Blocked 상태 작업 및 해제 조건</div>
+          <div class="kb-item"><i class="ti ti-point"></i>일정 지연 가능성 항목</div>
+          <div style="margin-top:12px"><div class="tbtn primary" style="font-size:11px"><i class="ti ti-wand"></i> 리스크 브리핑 생성</div></div>
+        </div>
+      </div>`;
+  } else if (type === 'emergency') {
+    flowBar.innerHTML = kFlowSteps(['상황 파악','영향 범위','즉시 액션','보고']);
+    hint.textContent = '긴급 상황 발생 시 핵심 정보를 즉시 파악하고 대응합니다.';
+    ctx.innerHTML = `
+      <div style="font-size:13px;font-weight:700;color:var(--danger);margin-bottom:8px;line-height:1.4">긴급 상황<br>브리핑</div>
+      <div style="font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:16px">운영 장애·보안 이슈·서비스 중단 등 긴급 상황 발생 시 AI가 즉시 상황을 분석합니다.</div>
+      <div style="background:var(--danger-soft);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px;color:var(--danger);margin-bottom:12px">
+        <div style="font-weight:500">⚠ 현재 활성 긴급 이슈</div>
+        <div style="font-size:10px;margin-top:4px">Azure OpenAI API 타임아웃 (High)</div>
+      </div>
+      <div class="tbtn" style="font-size:11px;width:100%;justify-content:center;border-color:var(--danger);color:var(--danger)"><i class="ti ti-alert-triangle"></i> 긴급 브리핑 생성</div>`;
+    content.innerHTML = `
+      <div style="background:var(--danger-soft);border:1px solid rgba(224,62,62,.2);border-radius:var(--radius);padding:14px 16px">
+        <div style="font-size:12px;font-weight:500;color:var(--danger);margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="ti ti-alert-triangle"></i> 긴급 상황 대응 프로세스</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.7">긴급 상황 발생 시 아래 순서대로 진행하세요. AI가 각 단계에서 필요한 정보를 자동으로 수집합니다.</div>
+      </div>
+      <div class="kcard">
+        <div class="kcard-hd">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--danger-soft);color:var(--danger);border:2px solid var(--danger);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">1</div>
+          <div class="kcard-title">상황 파악</div>
+          <div class="kcard-sub">AI가 관련 운영 로그를 즉시 분석</div>
+          <i class="ti ti-chevron-down kcard-arrow"></i>
+        </div>
+        <div class="kcard-body">
+          <div class="kb-why"><i class="ti ti-info-circle" style="font-size:13px;flex-shrink:0"></i><div>운영 로그와 이슈 기록을 분석해 장애 원인과 발생 시점을 자동 추적합니다.</div></div>
+          <div class="kb-item"><i class="ti ti-point"></i>장애 발생 시점 및 최초 감지 경로</div>
+          <div class="kb-item"><i class="ti ti-point"></i>관련 서비스 및 컴포넌트 목록</div>
+          <div class="kb-item"><i class="ti ti-point"></i>유사 과거 이슈 및 해결 이력 조회</div>
+          <div style="margin-top:12px"><div class="tbtn" style="font-size:11px;border-color:var(--danger);color:var(--danger)"><i class="ti ti-wand"></i> 즉시 상황 분석</div></div>
+        </div>
+      </div>
+      <div class="kcard">
+        <div class="kcard-hd">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">2</div>
+          <div class="kcard-title">영향 범위 파악</div>
+          <div class="kcard-sub">어떤 기능·팀원·일정에 영향을 미치는지</div>
+          <i class="ti ti-chevron-down kcard-arrow"></i>
+        </div>
+        <div class="kcard-body">
+          <div class="kb-item"><i class="ti ti-point"></i>영향받는 기능 및 API 목록</div>
+          <div class="kb-item"><i class="ti ti-point"></i>Blocked 처리될 Todo/이슈 목록</div>
+          <div class="kb-item"><i class="ti ti-point"></i>일정 지연 예상 항목</div>
+        </div>
+      </div>
+      <div class="kcard">
+        <div class="kcard-hd">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">3</div>
+          <div class="kcard-title">즉시 액션</div>
+          <div class="kcard-sub">AI 추천 대응 방안</div>
+          <i class="ti ti-chevron-down kcard-arrow"></i>
+        </div>
+        <div class="kcard-body">
+          <div class="kb-item"><i class="ti ti-point"></i>담당자 즉시 알림 발송</div>
+          <div class="kb-item"><i class="ti ti-point"></i>임시 조치 방안 (과거 유사 이슈 기반)</div>
+          <div class="kb-item"><i class="ti ti-point"></i>에스컬레이션 기준 및 보고 경로</div>
+          <div style="margin-top:12px"><div class="tbtn" style="font-size:11px;border-color:var(--danger);color:var(--danger)"><i class="ti ti-wand"></i> 대응 방안 생성</div></div>
+        </div>
+      </div>`;
+  } else {
+    flowBar.innerHTML = kFlowSteps(['이어받을 업무 파악','맥락·결정사항 이해','개발 환경 세팅','인수 완료 확인']);
+    hint.textContent = '퇴직자의 운영 맥락과 지식이 조직에 남습니다.';
+    ctx.innerHTML = kCtxOffboard();
+    content.innerHTML = kContentOffboard();
+  }
+  // 체크리스트 이벤트 바인딩
+  document.querySelectorAll('.checklist-item').forEach(el => {
+    el.addEventListener('click', function() {
+      this.classList.toggle('checked');
+      const box = this.querySelector('.cl-box');
+      box.innerHTML = this.classList.contains('checked') ? '<i class="ti ti-check" style="font-size:10px"></i>' : '';
+    });
+  });
+  // kcard 토글 — accordion 방식 (한 번에 하나만 열림, 클릭해야만 열림)
+  function bindKcards() {
+    document.querySelectorAll('.kcard').forEach(el => el.classList.remove('open'));
+    const allCards = Array.from(document.querySelectorAll('#knowledgeContent .kcard'));
+
+    // 모든 숫자 원 회색으로 초기화
+    function resetCircles() {
+      document.querySelectorAll('.kcard .kcard-hd div[style*="border-radius:50%"]').forEach(c => {
+        c.style.background = 'var(--surface2)';
+        c.style.color = 'var(--text3)';
+        c.style.borderColor = 'var(--border2)';
+      });
+    }
+    resetCircles();
+
+    document.querySelectorAll('.kcard').forEach(el => {
+      el.querySelector('.kcard-hd').addEventListener('click', function() {
+        const parent = el.closest('#knowledgeContent, .content, .screen');
+        const isOpen = el.classList.contains('open');
+        if (parent) parent.querySelectorAll('.kcard').forEach(c => c.classList.remove('open'));
+        resetCircles();
+        const flowBar = document.getElementById('knowledgeFlowSteps');
+        const steps = flowBar ? flowBar.querySelectorAll('div[style*="border-radius:20px"]') : [];
+        steps.forEach(s => { s.style.background='var(--surface)'; s.style.color='var(--text3)'; s.style.borderColor='var(--border2)'; });
+        if (!isOpen) {
+          el.classList.add('open');
+          // 숫자 원 파란색
+          const circle = el.querySelector('.kcard-hd div[style*="border-radius:50%"]');
+          if (circle) { circle.style.background='var(--accent)'; circle.style.color='#fff'; circle.style.borderColor='var(--accent)'; }
+          // flowBar 해당 단계 활성화
+          const idx = allCards.indexOf(el);
+          steps.forEach((s, i) => {
+            s.style.background = i === idx ? 'var(--accent)' : 'var(--surface)';
+            s.style.color = i === idx ? '#fff' : 'var(--text3)';
+            s.style.borderColor = i === idx ? 'var(--accent)' : 'var(--border2)';
+          });
+          setTimeout(() => el.scrollIntoView({ behavior:'smooth', block:'nearest' }), 50);
+        }
+      });
+    });
+  }
+  bindKcards();
+}
+
+function kFlowSteps(steps, activeIndex = -1) {
+  return steps.map((s,i) => {
+    const isActive = i === activeIndex;
+    return `
+    <div style="display:flex;align-items:center;gap:4px">
+      <div style="font-size:10px;padding:3px 8px;border-radius:20px;border:1px solid ${isActive?'var(--accent)':'var(--border2)'};background:${isActive?'var(--accent)':'var(--surface)'};color:${isActive?'#fff':'var(--text3)'}">
+        ${isActive?'●':i+1}. ${s}
+      </div>
+      ${i<steps.length-1?'<span style="font-size:10px;color:var(--text3)">→</span>':''}
+    </div>`;
+  }).join('');
+}
+
+// ── 신규 입사자 온보딩 ──────────────────────────
+function kCtxOnboarding() {
+  return `
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4">신규 입사자<br>온보딩</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:16px">맥락 없이 투입되면 온보딩에 1~2주 낭비. OpsRadar가 현재 운영 상태를 자동 정리해 줍니다.</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">온보딩 진행률</div>
+    <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:25%;background:var(--success);border-radius:3px" id="onboardingBar"></div></div>
+    <div style="font-size:10px;color:var(--text3);margin-bottom:14px">1/4 단계 완료</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">대상 신규 팀원</div>
+    <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px">
+      <div style="font-weight:500;color:var(--text)">신규 팀원 (예정)</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px">입사일: 2026-06-01</div>
+      <span class="badge b-accent" style="margin-top:4px;display:inline-block">프론트엔드</span>
+    </div>`;
+}
+
+function kContentOnboarding() {
+  return `
+    <div class="kcard">
+      <div class="kcard-hd">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">1</div>
+        <div class="kcard-title">프로젝트 파악</div>
+        <div class="kcard-sub">서비스 정의·기술스택·팀 구성</div>
+        <i class="ti ti-chevron-down kcard-arrow"></i>
+      </div>
+      <div class="kcard-body">
+        <div class="kb-why"><i class="ti ti-info-circle" style="font-size:13px;flex-shrink:0"></i><div><strong>왜 중요한가:</strong> 프로젝트 전체 맥락을 모르면 개별 업무가 왜 필요한지 이해 못 함.</div></div>
+        <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">확인 항목</div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">OpsRadar 서비스 정의 — 운영 인텔리전스 AI 시스템</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">기술스택: FastAPI · PostgreSQL · FAISS · React · Azure OpenAI</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">팀 구성 및 역할 (PM·AI·인프라·백엔드·프론트)</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">8주 MVP 로드맵 및 현재 주차 확인</div></div>
+        <div style="margin-top:12px;display:flex;gap:6px">
+          <div class="tbtn primary" style="font-size:11px"><i class="ti ti-wand"></i> AI 요약 문서 생성</div>
+          <div class="tbtn" style="font-size:11px"><i class="ti ti-external-link"></i> 노션 문서</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kcard">
+      <div class="kcard-hd">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">2</div>
+        <div class="kcard-title">운영 상태 확인</div>
+        <div class="kcard-sub">현재 이슈·Todo·리스크 현황</div>
+        <i class="ti ti-chevron-down kcard-arrow"></i>
+      </div>
+      <div class="kcard-body">
+        <div class="kb-now"><i class="ti ti-alert-triangle" style="font-size:13px;flex-shrink:0"></i><div><strong>지금 당장 알아야 할 것:</strong> High Risk 이슈 2건 진행 중. Azure timeout·RAG 정확도 문제. 담당자 이성우.</div></div>
+        <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">현재 운영 현황</div>
+        <div class="kb-item"><i class="ti ti-alert-triangle" style="color:var(--danger)"></i><div><div style="font-weight:500;color:var(--danger)">High Risk 2건 미해결</div><div style="font-size:10px;color:var(--text3)">Azure timeout · RAG Blocked</div></div></div>
+        <div class="kb-item"><i class="ti ti-checkbox" style="color:var(--accent)"></i><div><div>Todo 승인 대기 8건</div><div style="font-size:10px;color:var(--text3)">팀장 검토 필요</div></div></div>
+        <div class="kb-item"><i class="ti ti-clock" style="color:var(--warn)"></i><div><div>이번 주 금요일 마감 4건 집중</div><div style="font-size:10px;color:var(--text3)">5/22 주의 구간</div></div></div>
+        <div style="margin-top:12px"><div class="tbtn primary" style="font-size:11px"><i class="ti ti-layout-dashboard"></i> Dashboard에서 확인 →</div></div>
+      </div>
+    </div>
+
+    <div class="kcard">
+      <div class="kcard-hd">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">3</div>
+        <div class="kcard-title">환경 세팅</div>
+        <div class="kcard-sub">개발환경·계정·접속정보</div>
+        <i class="ti ti-chevron-down kcard-arrow"></i>
+      </div>
+      <div class="kcard-body">
+        <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">세팅 체크리스트</div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">GitHub 계정 팀 레포 초대 (yeni0224/teamAZAG)</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">.env 파일 DATABASE_URL 설정 (리눅스 서버 IP)</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">psql -f schema.sql 실행 확인</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">FastAPI 로컬 실행 확인 (uvicorn)</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">노션 워크스페이스 접근 권한</div></div>
+      </div>
+    </div>
+
+    <div class="kcard">
+      <div class="kcard-hd">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">4</div>
+        <div class="kcard-title">첫 업무 시작</div>
+        <div class="kcard-sub">배정된 Todo · 참고 문서</div>
+        <i class="ti ti-chevron-down kcard-arrow"></i>
+      </div>
+      <div class="kcard-body">
+        <div class="kb-next"><i class="ti ti-arrow-right" style="font-size:13px;flex-shrink:0"></i><div><strong>첫 번째 할 것:</strong> Todo 화면에서 배정된 항목 확인 후 착수. 모르는 내용은 AI Assistant에 질문.</div></div>
+        <div class="kb-item"><i class="ti ti-file-text"></i>API 명세서 — 노션 DB 명세서 확인</div>
+        <div class="kb-item"><i class="ti ti-file-text"></i>더미 데이터 — dummy_data/sample_docs/ 참고</div>
+        <div class="kb-item"><i class="ti ti-message-dots"></i>AI Assistant — "내가 할 업무 알려줘" 질문</div>
+        <div style="margin-top:12px;display:flex;gap:6px">
+          <div class="tbtn primary" style="font-size:11px" onclick="nav('todo')"><i class="ti ti-checkbox"></i> 배정된 Todo 확인 →</div>
+          <div class="tbtn" style="font-size:11px" onclick="nav('chat')"><i class="ti ti-message-dots"></i> AI에게 질문</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── 부재자 인수인계 ────────────────────────────
+function kCtxAbsence() {
+  return `
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4">부재자 업무<br>인수인계</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:16px">내가 임시로 맡게 된 업무를 빠르게 파악하고 공백 없이 처리할 수 있도록 안내합니다.</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">내가 맡은 부재자 업무</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="background:var(--warn-soft);border:1px solid rgba(196,124,0,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px">
+        <div style="font-weight:500;color:var(--text);display:flex;align-items:center;gap:5px;margin-bottom:3px">이성우 업무 대리 <span class="badge b-warn" style="font-size:9px">진행중</span></div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">5/19 ~ 5/20 (2일)</div>
+        <div style="font-size:10px;color:var(--warn);margin-top:4px">RAG 파이프라인 담당</div>
+      </div>
+      <div style="background:var(--warn-soft);border:1px solid rgba(196,124,0,.15);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px">
+        <div style="font-weight:500;color:var(--text);display:flex;align-items:center;gap:5px;margin-bottom:3px">김희진 업무 대리 <span class="badge b-warn" style="font-size:9px">예정</span></div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">5/21 (1일)</div>
+        <div style="font-size:10px;color:var(--warn);margin-top:4px">PR 승인 대리</div>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <div class="tbtn primary" style="font-size:11px;width:100%;justify-content:center"><i class="ti ti-wand"></i> 내 인수 현황 AI 요약</div>
+    </div>`;
+}
+
+function kContentAbsence() {
+  return `
+    <div style="background:var(--accent-soft);border:1px solid rgba(66,99,235,.15);border-radius:var(--radius);padding:12px 14px;font-size:11px;color:var(--text2)">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-weight:500;color:var(--accent)"><i class="ti ti-sparkles" style="font-size:13px"></i> AI 분석 — 내가 받은 업무 요약</div>
+      이성우 부재로 <strong style="color:var(--danger)">RAG 파이프라인 작업 2건</strong>을 임시로 맡게 됐습니다. Azure timeout 이슈가 미해결 상태이며 금요일 마감이 있습니다. 아래 순서대로 확인하세요.
+    </div>
+
+    <div class="kcard">
+      <div class="kcard-hd">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--warn);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">1</div>
+        <div class="kcard-title">맡은 업무 파악</div>
+        <div class="kcard-sub">내가 처리해야 할 Todo · 이슈 목록</div>
+        <i class="ti ti-chevron-down kcard-arrow"></i>
+      </div>
+      <div class="kcard-body">
+        <div class="kb-now"><i class="ti ti-alert-triangle" style="font-size:13px;flex-shrink:0"></i><div><strong>지금 당장 처리해야 할 것:</strong> Azure timeout 재시도 로직 검토. 5/20 마감 Todo 2건 확인.</div></div>
+        <div style="font-size:11px;font-weight:500;color:var(--text);margin:8px 0 6px">인수받은 Todo</div>
+        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px;display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge b-danger">High</span>
+            <span style="color:var(--text)">Azure timeout 재시도 로직 개선</span>
+            <span style="font-size:10px;color:var(--text3);margin-left:auto;font-family:var(--mono)">5/19</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge b-warn">Mid</span>
+            <span style="color:var(--text)">FAISS 재인덱싱 테스트</span>
+            <span style="font-size:10px;color:var(--text3);margin-left:auto;font-family:var(--mono)">5/20</span>
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:6px">
+          <div class="tbtn primary" style="font-size:11px"><i class="ti ti-wand"></i> 전체 인수 목록 보기</div>
+          <div class="tbtn" style="font-size:11px" onclick="nav('todo')"><i class="ti ti-checkbox"></i> Todo로 이동</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kcard">
+      <div class="kcard-hd">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">2</div>
+        <div class="kcard-title">업무 맥락 이해</div>
+        <div class="kcard-sub">왜 중요한지 · 현재 상태 · 내가 할 것</div>
+        <i class="ti ti-chevron-down kcard-arrow"></i>
+      </div>
+      <div class="kcard-body">
+        <div class="kb-why"><i class="ti ti-info-circle" style="font-size:13px;flex-shrink:0"></i><div><strong>왜 중요한가:</strong> RAG 파이프라인이 멈추면 AI Assistant 전체가 동작하지 않습니다. 팀 핵심 기능입니다.</div></div>
+        <div class="kb-now"><i class="ti ti-alert-triangle" style="font-size:13px;flex-shrink:0"></i><div><strong>현재 상태:</strong> Korea Central 리전 전환 후 타임아웃 60% 감소. 재시도 로직 3회 설정 완료. 추가 검증 필요.</div></div>
+        <div class="kb-next"><i class="ti ti-arrow-right" style="font-size:13px;flex-shrink:0"></i><div><strong>내가 할 것:</strong> 재시도 로직 테스트 → 결과 팀 공유 → 이슈 상태 업데이트. 긴급 시 이성우에게 연락.</div></div>
+        <div style="font-size:11px;font-weight:500;color:var(--text);margin:8px 0 6px">참고 문서 (AI 추출)</div>
+        <div class="kb-item"><i class="ti ti-file-text"></i>issue_log_20260514_azure_timeout.txt</div>
+        <div class="kb-item"><i class="ti ti-file-text"></i>chat_logs_20260514_ai_pipeline.txt</div>
+        <div style="margin-top:10px"><div class="tbtn primary" style="font-size:11px"><i class="ti ti-wand"></i> 맥락 문서 AI 생성</div></div>
+      </div>
+    </div>
+
+    <div class="kcard">
+      <div class="kcard-hd">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">3</div>
+        <div class="kcard-title">처리 완료 보고</div>
+        <div class="kcard-sub">내가 처리한 내용 기록 및 원래 담당자 복귀 준비</div>
+        <i class="ti ti-chevron-down kcard-arrow"></i>
+      </div>
+      <div class="kcard-body">
+        <div class="kb-next"><i class="ti ti-arrow-right" style="font-size:13px;flex-shrink:0"></i><div><strong>복귀 전 인계:</strong> 내가 처리한 내용을 기록해두면 이성우 복귀 시 AI가 자동으로 브리핑 문서를 생성합니다.</div></div>
+        <div style="font-size:11px;font-weight:500;color:var(--text);margin:8px 0 6px">처리 완료 체크리스트</div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">Azure timeout 재시도 로직 테스트 완료 및 결과 공유</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">처리 내용 이슈 코멘트에 기록</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">미처리 항목 이성우 복귀 시 전달 예약</div></div>
+        <div style="margin-top:12px"><div class="tbtn primary" style="font-size:11px"><i class="ti ti-wand"></i> 처리 내용 인계 문서 생성</div></div>
+      </div>
+    </div>`;
+}
+
+// ── 담당자 변경/퇴직 인수인계 ────────────────────────────
+function kCtxOffboard() {
+  return `
+    <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4">담당자 변경/<br>퇴직 인수인계</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:16px">전임자의 업무·맥락·결정사항을 빠르게 파악하고 즉시 이어받을 수 있도록 안내합니다.</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">인수 파악 진행도</div>
+    <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:35%;background:var(--accent);border-radius:3px"></div></div>
+    <div style="font-size:10px;color:var(--text3);margin-bottom:14px">35% 파악 완료</div>
+    <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">전임자 정보</div>
+    <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px;margin-bottom:12px">
+      <div style="font-weight:500;color:var(--text)">이성우</div>
+      <div style="font-size:10px;color:var(--text3);margin-top:2px">AI 파이프라인 담당 → 담당자 변경</div>
+    </div>
+    <div class="tbtn primary" style="font-size:11px;width:100%;justify-content:center"><i class="ti ti-wand"></i> 전임자 업무 AI 분석</div>`;
+}
+
+function kContentOffboard() {
+  return `
+    <div style="background:var(--accent-soft);border:1px solid rgba(66,99,235,.15);border-radius:var(--radius);padding:12px 14px;font-size:11px;color:var(--text2)">
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;font-weight:500;color:var(--accent)"><i class="ti ti-sparkles" style="font-size:13px"></i> AI 분석 — 내가 이어받을 업무 요약</div>
+      이성우의 <strong style="color:var(--text)">AI 파이프라인 담당 업무</strong>를 인수받게 됩니다. 운영 로그 분석 결과 <strong style="color:var(--danger)">미완료 Todo 6건, 진행 중 이슈 2건</strong>이 있습니다. 아래 순서대로 파악하세요.
+    </div>
+
+    <div class="kcard">
+      <div class="kcard-hd">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">1</div>
+        <div class="kcard-title">이어받을 업무 전체 파악</div>
+        <div class="kcard-sub">AI가 전임자 운영 기록을 분석해 자동 추출</div>
+        <i class="ti ti-chevron-down kcard-arrow"></i>
+      </div>
+      <div class="kcard-body">
+        <div class="kb-why"><i class="ti ti-info-circle" style="font-size:13px;flex-shrink:0"></i><div>AI가 전임자의 회의록·이슈·채팅 로그를 분석해 이어받아야 할 업무를 자동으로 정리합니다.</div></div>
+        <div style="font-size:11px;font-weight:500;color:var(--text);margin:8px 0 6px">이어받을 주요 업무</div>
+        <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:8px 10px;display:flex;flex-direction:column;gap:6px;font-size:11px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge b-danger">High</span>
+            <span style="color:var(--text)">FastAPI + AI 파이프라인 연동</span>
+            <span style="font-size:10px;color:var(--text3);margin-left:auto">미완료</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge b-danger">High</span>
+            <span style="color:var(--text)">Azure timeout 재시도 로직 개선</span>
+            <span style="font-size:10px;color:var(--warn);margin-left:auto">진행중</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="badge b-warn">Mid</span>
+            <span style="color:var(--text)">FAISS 재인덱싱 테스트</span>
+            <span style="font-size:10px;color:var(--text3);margin-left:auto">미완료</span>
+          </div>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:6px">
+          <div class="tbtn primary" style="font-size:11px"><i class="ti ti-wand"></i> 전체 업무 목록 생성</div>
+          <div class="tbtn" style="font-size:11px" onclick="nav('todo')"><i class="ti ti-checkbox"></i> Todo로 이동</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="kcard">
+      <div class="kcard-hd">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">2</div>
+        <div class="kcard-title">업무 맥락 & 결정사항 이해</div>
+        <div class="kcard-sub">왜 이런 결정을 했는지 · 현재 상태 · 내가 할 것</div>
+        <i class="ti ti-chevron-down kcard-arrow"></i>
+      </div>
+      <div class="kcard-body">
+        <div class="kb-why"><i class="ti ti-info-circle" style="font-size:13px;flex-shrink:0"></i><div><strong>왜 FAISS를 썼는가:</strong> ChromaDB는 Windows에서 DLL 충돌 발생. faiss-cpu로 전환 후 안정적으로 동작 중.</div></div>
+        <div class="kb-now"><i class="ti ti-alert-triangle" style="font-size:13px;flex-shrink:0"></i><div><strong>현재 상태:</strong> 청크 700자, 임계값 0.41, top_k=3으로 최적화 완료. FastAPI 연동만 남은 상태.</div></div>
+        <div class="kb-next"><i class="ti ti-arrow-right" style="font-size:13px;flex-shrink:0"></i><div><strong>내가 먼저 할 것:</strong> ai_interface.py의 analyze_document() 확인 → FastAPI /documents/upload에 연결.</div></div>
+        <div style="font-size:11px;font-weight:500;color:var(--text);margin:8px 0 6px">핵심 참고 문서 (AI 추출)</div>
+        <div class="kb-item"><i class="ti ti-file-text"></i>handover_2026_05_13.txt — 기술스택·아키텍처 전반</div>
+        <div class="kb-item"><i class="ti ti-file-text"></i>project_status_2026_05_14.txt — 현재 이슈·TODO</div>
+        <div class="kb-item"><i class="ti ti-file-text"></i>issue_log_20260514_azure_timeout.txt — 미해결 이슈</div>
+        <div style="margin-top:10px"><div class="tbtn primary" style="font-size:11px"><i class="ti ti-wand"></i> 맥락 브리핑 문서 생성</div></div>
+      </div>
+    </div>
+
+    <div class="kcard">
+      <div class="kcard-hd">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">3</div>
+        <div class="kcard-title">개발 환경 접근 권한 확인</div>
+        <div class="kcard-sub">즉시 업무 시작을 위한 환경 세팅</div>
+        <i class="ti ti-chevron-down kcard-arrow"></i>
+      </div>
+      <div class="kcard-body">
+        <div class="kb-now"><i class="ti ti-alert-triangle" style="font-size:13px;flex-shrink:0"></i><div><strong>확인 필요:</strong> .env 파일의 API 키가 유효한지 확인하세요. 퇴직/변경 시 키 재발급이 필요할 수 있습니다.</div></div>
+        <div style="font-size:11px;font-weight:500;color:var(--text);margin:8px 0 6px">환경 세팅 체크리스트</div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">GitHub SeongWoo 브랜치 클론 및 접근 확인</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">pip install -r requirements.txt 완료</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">.env 파일 API 키 유효성 확인</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">python -m app.ai.embedder 실행 (FAISS DB 생성)</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">python -m app.ai.retriever 로 검색 테스트</div></div>
+      </div>
+    </div>
+
+    <div class="kcard">
+      <div class="kcard-hd">
+        <div style="width:28px;height:28px;border-radius:50%;background:var(--surface2);color:var(--text3);border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0">4</div>
+        <div class="kcard-title">인수 완료 확인</div>
+        <div class="kcard-sub">AI가 파악 현황을 자동 점검</div>
+        <i class="ti ti-chevron-down kcard-arrow"></i>
+      </div>
+      <div class="kcard-body">
+        <div class="kb-next"><i class="ti ti-arrow-right" style="font-size:13px;flex-shrink:0"></i><div>AI가 인수 파악 완성도를 자동 평가합니다. 놓친 업무·이슈가 있으면 추가로 안내합니다.</div></div>
+        <div style="margin-top:10px"><div class="tbtn primary" style="font-size:11px"><i class="ti ti-wand"></i> 인수 완성도 평가</div></div>
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════
+// 공통 유틸
+// ════════════════════════════════════════════════
+function closeModal(id){document.getElementById(id).classList.remove('show');}
+function openModal(id){document.getElementById(id).classList.add('show');}
+function showTransition(msg){document.getElementById('transitionMsg').textContent=msg;document.getElementById('transition').classList.add('show');}
+function hideTransition(){document.getElementById('transition').classList.remove('show');}
+
+function showToast(msg,type='success'){
+  const toast=document.getElementById('toast');const icon=document.getElementById('toastIcon');
+  document.getElementById('toastMsg').textContent=msg;
+  icon.className=`ti ${type==='success'?'ti-check':type==='warn'?'ti-x':'ti-info-circle'}`;
+  icon.style.color=type==='success'?'var(--success)':type==='warn'?'var(--danger)':'var(--accent)';
+  toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>toast.classList.remove('show'),2800);
+}
+
+// ── 초기화
+renderCalendar();
+updateTodoCounts();
+</script>
+<script>
+// ════════════════════════════════════════
+// API 연동
+// ════════════════════════════════════════
+const API = 'http://127.0.0.1:8000/api/v1';
+
+// ── Dashboard API 연동
+async function loadDashboardFromAPI() {
+  try {
+    const res = await fetch(`${API}/dashboard/summary`);
+    const data = await res.json();
+
+    // Todo 진행률
+    const rateEl = document.getElementById('db-todo-rate');
+    if (rateEl) rateEl.textContent = `${data.done_todos} / ${data.total_todos}`;
+
+    // 진행률 바
+    const barEl = document.getElementById('db-todo-bar');
+    if (barEl) barEl.style.width = `${data.todo_completion_rate}%`;
+
+    // Blocked
+    const blockedEl = document.getElementById('db-blocked');
+    if (blockedEl) blockedEl.textContent = `${data.blocked_count}건`;
+
+    // 승인 대기
+    const pendingEl = document.getElementById('db-pending');
+    if (pendingEl) pendingEl.textContent = `${data.pending_todos}건`;
+
+    console.log('✅ Dashboard 데이터 로드됨', data);
+  } catch(e) {
+    console.warn('⚠ Dashboard API 실패:', e);
+  }
+}
+
+// load 이벤트에 추가
+window.addEventListener('load', () => {
+  loadTodosFromAPI();
+  loadIssuesFromAPI();
+  loadDashboardFromAPI(); 
+  loadCalendarFromAPI();
+});
+
+// ── Todo API 연동 ──
+async function loadTodosFromAPI() {
+  try {
+    const res = await fetch(`${API}/todos/`);
+    const data = await res.json();
+
+    // API 데이터를 HTML 형식에 맞게 변환
+    const apiTodos = data.todos.map(t => ({
+      id: t.id,
+      title: t.title,
+      src: t.document_id || null,
+      srcChunk: null,
+      assignee: t.assignee || null,
+      priority: t.priority || 'medium',
+      confidence: t.confidence || null,
+      status: t.status || 'pending',
+      type: t.source || 'manual',
+      chunk: null,
+      grounds: ['DB에서 불러온 Todo'],
+      risk: ''
+    }));
+
+    // 기존 todos 배열에 API 데이터 추가
+    apiTodos.forEach(apiTodo => {
+      const exists = todos.find(t => t.id === apiTodo.id);
+      if (!exists) todos.unshift(apiTodo);
+    });
+
+    renderTodos();
+    updateTodoCounts();
+    console.log(`✅ Todo ${apiTodos.length}건 로드됨`);
+  } catch (e) {
+    console.warn('⚠ API 연결 실패, 더미 데이터 사용:', e);
+  }
+}
+
+// ── Todo 승인 API 연동 ──
+const originalApproveTodo = window.approveTodo;
+window.approveTodo = async function(id) {
+  try {
+    await fetch(`${API}/todos/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'in_progress' })
+    });
+    console.log(`✅ Todo ${id} 승인 API 완료`);
+  } catch (e) {
+    console.warn('⚠ 승인 API 실패:', e);
+  }
+  // 기존 UI 로직도 실행
+  const t = todos.find(x => x.id === id);
+  if (t) { t.status = 'approved'; showToast(`✅ "${t.title.slice(0,20)}..." 승인되었습니다.`, 'success'); afterTodoAction(id); }
+};
+
+// ── Todo 반려 API 연동 ──
+const originalRejectTodo = window.rejectTodo;
+window.rejectTodo = async function(id) {
+  try {
+    await fetch(`${API}/todos/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'rejected' })
+    });
+    console.log(`✅ Todo ${id} 반려 API 완료`);
+  } catch (e) {
+    console.warn('⚠ 반려 API 실패:', e);
+  }
+  const t = todos.find(x => x.id === id);
+  if (t) { t.status = 'rejected'; showToast('반려 처리되었습니다.', 'warn'); afterTodoAction(id); }
+};
+
+// ── Todo 수동 등록 API 연동 ──
+const originalSaveManual = window.saveManual;
+window.saveManual = async function() {
+  const title = document.getElementById('manualTitle').value.trim();
+  if (!title) return;
+  const assignee = document.getElementById('manualAssignee').value;
+  const priority = document.getElementById('manualPriority').value;
+
+  try {
+    const res = await fetch(`${API}/todos/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, assignee, priority })
+    });
+    const data = await res.json();
+    console.log('✅ Todo 생성 API 완료', data);
+  } catch (e) {
+    console.warn('⚠ 생성 API 실패:', e);
+  }
+
+  // 기존 UI 로직 실행
+  todos.unshift({
+    id: Date.now(), title, src: null, srcChunk: null,
+    assignee, priority, confidence: null,
+    status: 'pending', type: 'manual',
+    chunk: null, grounds: ['수동 등록'], risk: ''
+  });
+  closeModal('manualModal');
+  document.getElementById('manualTitle').value = '';
+  if (G.currentTodoTab !== 'ai') switchTodoTab('ai');
+  else renderTodos();
+  updateTodoCounts();
+  showToast('✅ Todo가 등록되었습니다.', 'success');
+};
+
+// ── 페이지 로드 시 API에서 Todo 불러오기 ──
+window.addEventListener('load', () => {
+  loadTodosFromAPI();
+  loadIssuesFromAPI();
+});
+
+// ════════════════════════════════════════
+// Issue API 연동
+// ════════════════════════════════════════
+
+async function loadIssuesFromAPI() {
+  try {
+    const res = await fetch(`${API}/issues/`);
+    const data = await res.json();
+
+    const apiIssues = data.issues.map(i => ({
+      id: i.id,
+      type: i.status === 'resolved' ? 'resolved' :
+            i.source === 'ai' ? 'candidate' : 'confirmed',
+      severity: i.risk_level || 'medium',
+      status: i.status || 'open',
+      confidence: i.confidence ? parseInt(i.confidence) : null,
+      title: i.title,
+      src: null,
+      assignee: i.assignee || null,
+      days: 0,
+      desc: i.description || '',
+      chunk: '',
+      history: [],
+      domino: [],
+      dominoFinal: '',
+      suggestTodo: null,
+      suggestAssignee: null,
+      suggestPriority: null
+    }));
+
+    // 기존 issues 배열에 API 데이터 추가
+    apiIssues.forEach(apiIssue => {
+      const exists = issues.find(i => i.id === apiIssue.id);
+      if (!exists) issues.unshift(apiIssue);
+    });
+
+    renderIssues();
+    console.log(`✅ Issue ${apiIssues.length}건 로드됨`);
+  } catch(e) {
+    console.warn('⚠ Issue API 실패, 더미 데이터 사용:', e);
+  }
+}
+
+// ── 이슈 확정 API 연동
+async function confirmIssueAPI(issueId) {
+  try {
+    await fetch(`${API}/issues/${issueId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        status: 'open',
+        risk_level: 'medium'
+      })
+    });
+    console.log(`✅ 이슈 ${issueId} 확정 API 완료`);
+  } catch(e) {
+    console.warn('⚠ 이슈 확정 API 실패:', e);
+  }
+}
+
+// ── 이슈 해결 API 연동
+async function resolveIssueAPI(issueId) {
+  try {
+    await fetch(`${API}/issues/${issueId}/resolve`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    console.log(`✅ 이슈 ${issueId} 해결 API 완료`);
+  } catch(e) {
+    console.warn('⚠ 이슈 해결 API 실패:', e);
+  }
+}
+
+// ── 이슈에서 Todo 생성 API 연동
+async function createTodoFromIssueAPI(issue) {
+  try {
+    const res = await fetch(`${API}/todos/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: issue.suggestTodo || `${issue.title} 대응`,
+        priority: issue.suggestPriority || 'medium',
+        assignee: issue.suggestAssignee || null
+      })
+    });
+    const data = await res.json();
+    console.log('✅ 이슈 → Todo 생성 API 완료', data);
+    showToast('✅ Todo가 생성되었습니다.', 'success');
+  } catch(e) {
+    console.warn('⚠ Todo 생성 API 실패:', e);
+  }
+}
+
+// ── 페이지 로드 시 Issue도 불러오기
+window.addEventListener('load', () => {
+  loadTodosFromAPI();
+  loadIssuesFromAPI();  // ← 추가
+});
+
+// ── Calendar API 연동
+async function loadCalendarFromAPI() {
+  try {
+    const res = await fetch(`${API}/calendar/`);
+    const data = await res.json();
+
+    // API 데이터를 캘린더 형식에 맞게 추가
+    data.events.forEach(e => {
+      const day = parseInt(e.event_date.split('-')[2]);
+      const existing = G.calEvents.find(c => c.d === day);
+      const tag = {
+        t: e.person ? `${e.person} ${e.title}` : e.title,
+        c: e.event_type === 'absence' ? 'ct-gray' :
+           e.event_type === 'deadline' ? 'ct-danger' :
+           e.event_type === 'meeting' ? 'ct-success' : 'ct-info'
+      };
+      if (existing) {
+        existing.tags.push(tag);
+      } else {
+        G.calEvents.push({ d: day, tags: [tag] });
+      }
+    });
+
+    renderCalendar();
+    console.log(`✅ Calendar ${data.events.length}건 로드됨`);
+  } catch(e) {
+    console.warn('⚠ Calendar API 실패:', e);
+  }
+}
+
+// ── 캘린더에서 일정 등록 API 연동
+async function saveCalendarEventAPI(title, date, type, person) {
+  try {
+    const res = await fetch(`${API}/calendar/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        event_date: `2026-05-${String(date).padStart(2,'0')}`,
+        event_type: type,
+        person
+      })
+    });
+    const data = await res.json();
+    console.log('✅ 일정 등록 API 완료', data);
+  } catch(e) {
+    console.warn('⚠ 일정 등록 API 실패:', e);
+  }
+}
+
+</script>
+</body>
+</html>
