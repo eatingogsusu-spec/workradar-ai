@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.api.api import api_router
 from app.core.config import settings
 from app.core.database import engine, Base
-import app.models  # ← 추가
+from app.models import document, todo, issue, calendar, report
 
 app = FastAPI(
     title="OpsRadar API",
@@ -19,16 +21,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(api_router, prefix="/api/v1")
+# 정적 파일 서빙
+app.mount("/static", StaticFiles(directory="frontend"), name="static")
 
+app.include_router(api_router, prefix="/api/v1")
 
 @app.on_event("startup")
 async def startup():
-    """서버 시작할 때 DB 테이블 자동 생성"""
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
-
+# 루트 → index.html 반환
 @app.get("/")
+def root():
+    return FileResponse("frontend/index.html")
+
+@app.get("/health")
 def health_check():
     return {"status": "ok", "service": "OpsRadar"}
