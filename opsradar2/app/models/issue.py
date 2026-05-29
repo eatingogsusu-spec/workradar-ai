@@ -1,21 +1,31 @@
-"""
-담당: 김성호
-"""
-from sqlalchemy import Column, String, DateTime, ForeignKey, Text
+"""Issue model aligned with the v4 OpsRadar schema."""
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
+
 from app.core.database import Base
 
 
 class Issue(Base):
     __tablename__ = "issues"
 
-    id = Column(String(36), primary_key=True)
+    id = Column(UUID(as_uuid=True), primary_key=True)
+    project_id = Column(UUID(as_uuid=True), ForeignKey("projects.id"), nullable=False)
+    assignee_member_id = Column(UUID(as_uuid=True), ForeignKey("project_members.id"), nullable=True)
+    reporter_member_id = Column(UUID(as_uuid=True), ForeignKey("project_members.id"), nullable=True)
+    source_document_id = Column(UUID(as_uuid=True), ForeignKey("documents.id"), nullable=True)
+    source_chunk_id = Column(UUID(as_uuid=True), ForeignKey("document_chunks.id"), nullable=True)
     title = Column(String(500), nullable=False)
-    description = Column(Text)
-    risk_level = Column(String(20))   # high | medium | low
-    status = Column(String(50))       # open | in_progress | resolved
-    source = Column(String(20))       # ai | manual
-    confidence = Column(String(10))   # AI 신뢰도 (후보 이슈용)
-    assignee = Column(String(100))
-    document_id = Column(String(36), ForeignKey("documents.id"), nullable=True)
-    created_at = Column(DateTime, server_default=func.now())
+    description = Column(Text, nullable=True)
+    severity = Column(String(20), default="medium")
+    status = Column(String(50), default="open")
+    source_type = Column(String(20), default="manual")
+    approval_status = Column(String(20), default="approved")
+    confidence_score = Column(Integer, nullable=True)
+    is_candidate = Column(Boolean, default=False)
+    risk_reason = Column(Text, nullable=True)
+    domino_chain = Column(Text, nullable=True)
+    due_at = Column(DateTime(timezone=True), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
