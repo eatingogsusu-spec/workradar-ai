@@ -1,0 +1,2 @@
+"""TeamAZAG backend package."""
+

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>Project AZAG ERD - 03 TODO / Issues</title>
+  <style>
+    body { margin: 0; background: #eef2f8; font-family: Arial, sans-serif; }
+    .wrap { width: 1380px; margin: 24px auto; background: white; border: 1px solid #cfd8ea; box-shadow: 0 20px 60px rgba(28,43,74,.12); }
+    @page { size: A3 landscape; margin: 8mm; }
+    @media print { body { background: white; } .wrap { width: 100%; margin: 0; border: 0; box-shadow: none; } svg { width: 100%; height: auto; } }
+  </style>
+</head>
+<body><div class="wrap"><svg xmlns="http://www.w3.org/2000/svg" width="1380" height="820" viewBox="0 0 1380 820">
+  <defs>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="#dce3f0"/></pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#1c2b4a" flood-opacity="0.10"/></filter>
+  </defs>
+  <style>
+    .canvas { fill: #fff; }
+    .grid { fill: url(#grid); }
+    .title { font: 700 27px Arial, sans-serif; fill: #182033; }
+    .subtitle { font: 400 13px Arial, sans-serif; fill: #69738d; }
+    .table-bg { fill: #fff; stroke: #cfd8ea; stroke-width: 1.2; filter: url(#shadow); }
+    .table-head, .table-head-square { fill: #f4f7fc; }
+    .table-head { stroke: #cfd8ea; stroke-width: 1.2; }
+    .table-title { font: 700 13px Arial, sans-serif; fill: #17213a; }
+    .table-count { font: 400 10px Arial, sans-serif; fill: #8a94aa; text-anchor: end; }
+    .col-name { font: 600 11px Arial, sans-serif; fill: #2c3650; }
+    .col-type { font: 400 10px Arial, sans-serif; fill: #8a94aa; text-anchor: end; }
+    .chip.pk { fill: #e8f1ff; stroke: #4f7cff; }
+    .chip.fk { fill: #fff3df; stroke: #d08000; }
+    .chip.uk { fill: #edf8f2; stroke: #1a9e6a; }
+    .chip-text { font: 700 8px Arial, sans-serif; fill: #31405f; text-anchor: middle; }
+    .rel { fill: none; stroke: #7588ad; stroke-width: 1.45; opacity: .72; }
+    .rel-dot { fill: #4f7cff; }
+    .crow { fill: none; stroke: #7588ad; stroke-width: 1.45; stroke-linecap: round; stroke-linejoin: round; }
+    .rel-label { font: 500 9px Arial, sans-serif; fill: #65728d; paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; }
+  </style>
+  <rect width="1380" height="820" class="canvas"/>
+  <rect width="1380" height="820" class="grid"/>
+  <text x="42" y="46" class="title">Project AZAG ERD · 03 TODO / Issues</text>
+  <text x="42" y="70" class="subtitle">Work tracking, evidence documents, issue logs</text>
+  <g>
+      <path d="M310,368 C545,354 545,276 780,262" class="rel"/>
+      <circle cx="310" cy="368" r="3.5" class="rel-dot"/>
+      <path d="M771,257 L780,262 L771,267" class="crow"/>
+      <text x="545" y="301" class="rel-label">tracks</text>
+    
+
+      <path d="M310,663 C545,663 545,262 780,262" class="rel"/>
+      <circle cx="310" cy="663" r="3.5" class="rel-dot"/>
+      <path d="M771,257 L780,262 L771,267" class="crow"/>
+      <text x="545" y="462" class="rel-label">assigned/creates/reviews</text>
+    
+
+      <path d="M650,246 C715,260 715,248 780,262" class="rel"/>
+      <circle cx="650" cy="246" r="3.5" class="rel-dot"/>
+      <path d="M771,257 L780,262 L771,267" class="crow"/>
+      <text x="715" y="268" class="rel-label">evidence</text>
+    
+
+      <path d="M650,583 C636,422 794,422 780,262" class="rel"/>
+      <circle cx="650" cy="583" r="3.5" class="rel-dot"/>
+      <path d="M771,257 L780,262 L771,267" class="crow"/>
+      <text x="701" y="422" class="rel-label">evidence</text>
+    
+
+      <path d="M310,368 C545,368 545,655 780,655" class="rel"/>
+      <circle cx="310" cy="368" r="3.5" class="rel-dot"/>
+      <path d="M771,650 L780,655 L771,660" class="crow"/>
+      <text x="545" y="511" class="rel-label">logs</text>
+    
+
+      <path d="M310,663 C545,677 545,641 780,655" class="rel"/>
+      <circle cx="310" cy="663" r="3.5" class="rel-dot"/>
+      <path d="M771,650 L780,655 L771,660" class="crow"/>
+      <text x="545" y="673" class="rel-label">reports/assigned</text>
+    
+
+      <path d="M650,246 C636,450 794,450 780,655" class="rel"/>
+      <circle cx="650" cy="246" r="3.5" class="rel-dot"/>
+      <path d="M771,650 L780,655 L771,660" class="crow"/>
+      <text x="701" y="450" class="rel-label">evidence</text>
+    </g>
+  <g>
+    <g class="table">
+      <rect x="70" y="230" width="240" height="276" rx="10" class="table-bg"/>
+      <rect x="70" y="230" width="240" height="34" rx="10" class="table-head"/>
+      <rect x="70" y="256" width="240" height="8" class="table-head-square"/>
+      <text x="86" y="253" class="table-title">PROJECTS</text>
+      <text x="294" y="253" class="table-count">10 cols</text>
+      <rect x="84" y="271" width="25" height="15" rx="4" class="chip pk"/><text x="96.5" y="282" class="chip-text">PK</text><text x="118" y="285" class="col-name">id</text><text x="294" y="285" class="col-type">uuid</text><rect x="84" y="294" width="25" height="15" rx="4" class="chip fk"/><text x="96.5" y="305" class="chip-text">FK</text><text x="118" y="308" class="col-name">team_id</text><text x="294" y="308" class="col-type">uuid</text><rect x="84" y="317" width="25" height="15" rx="4" class="chip fk"/><text x="96.5" y="328" class="chip-text">FK</text><text x="118" y="331" class="col-name">created_by</text><text x="294" y="331" class="col-type">uuid</text><text x="88" y="354" class="col-name">name</text><text x="294" y="354" class="col-type">string</text><text x="88" y="377" class="col-name">description</text><text x="294" y="377" class="col-type">text</text><text x="88" y="400" class="col-name">status</text><text x="294" y="400" class="col-type">string</text><text x="88" y="423" class="col-name">start_date</text><text x="294" y="423" class="col-type">date</text><text x="88" y="446" class="col-name">end_date</text><text x="294" y="446" class="col-type">date</text><text x="88" y="469" class="col-name">created_at</text><text x="294" y="469" class="col-type">timestamp</text><text x="88" y="492" class="col-name">updated_at</text><text x="294" y="492" class="col-type">timestamp</text>
+    </g>
+    
+
+    <g class="table">
+      <rect x="70" y="560" width="240" height="207" rx="10" class="table-bg"/>
+      <rect x="70" y="560" width="240" height="34" rx="10" class="table-head"/>
+      <rect x="70" y="586" width="240" height="8" class="table-head-square"/>
+      <text x="86" y="583" class="table-title">USERS</text>
+      <text x="294" y="583" class="table-count">7 cols</text>
+      <rect x="84" y="601" width="25" height="15" rx="4" class="chip pk"/><text x="96.5" y="612" class="chip-text">PK</text><text x="118" y="615" class="col-name">id</text><text x="294" y="615" class="col-type">uuid</text><text x="88" y="638" class="col-name">name</text><text x="294" y="638" class="col-type">string</text><rect x="84" y="647" width="25" height="15" rx="4" class="chip uk"/><text x="96.5" y="658" class="chip-text">UK</text><text x="118" y="661" class="col-name">email</text><text x="294" y="661" class="col-type">string</text><text x="88" y="684" class="col-name">password_hash</text><text x="294" y="684" class="col-type">text</text><text x="88" y="707" class="col-name">role</text><text x="294" y="707" class="col-type">string</text><text x="88" y="730" class="col-name">created_at</text><text x="294" y="730" class="col-type">timestamp</text><text x="88" y="753" class="col-name">updated_at</text><text x="294" y="753" class="col-type">timestamp</text>
+    </g>
+    
+
+    <g class="table">
+      <rect x="410" y="120" width="240" height="253" rx="10" class="table-bg"/>
+      <rect x="410" y="120" width="240" height="34" rx="10" class="table-head"/>
+      <rect x="410" y="146" width="240" height="8" class="table-head-square"/>
+      <text x="426" y="143" class="table-title">DOCUMENTS</text>
+      <text x="634" y="143" class="table-count">9 cols</text>
+      <rect x="424" y="161" width="25" height="15" rx="4" class="chip pk"/><text x="436.5" y="172" class="chip-text">PK</text><text x="458" y="175" class="col-name">id</text><text x="634" y="175" class="col-type">uuid</text><rect x="424" y="184" width="25" height="15" rx="4" class="chip fk"/><text x="436.5" y="195" class="chip-text">FK</text><text x="458" y="198" class="col-name">project_id</text><text x="634" y="198" class="col-type">uuid</text><rect x="424" y="207" width="25" height="15" rx="4" class="chip fk"/><text x="436.5" y="218" class="chip-text">FK</text><text x="458" y="221" class="col-name">uploaded_by</text><text x="634" y="221" class="col-type">uuid</text><text x="428" y="244" class="col-name">file_name</text><text x="634" y="244" class="col-type">string</text><text x="428" y="267" class="col-name">file_type</text><text x="634" y="267" class="col-type">string</text><text x="428" y="290" class="col-name">source_type</text><text x="634" y="290" class="col-type">string</text><text x="428" y="313" class="col-name">storage_path</text><text x="634" y="313" class="col-type">text</text><text x="428" y="336" class="col-name">status</text><text x="634" y="336" class="col-type">string</text><text x="428" y="359" class="col-name">uploaded_at</text><text x="634" y="359" class="col-type">timestamp</text>
+    </g>
+    
+
+    <g class="table">
+      <rect x="410" y="480" width="240" height="207" rx="10" class="table-bg"/>
+      <rect x="410" y="480" width="240" height="34" rx="10" class="table-head"/>
+      <rect x="410" y="506" width="240" height="8" class="table-head-square"/>
+      <text x="426" y="503" class="table-title">DOCUMENT_CHUNKS</text>
+      <text x="634" y="503" class="table-count">7 cols</text>
+      <rect x="424" y="521" width="25" height="15" rx="4" class="chip pk"/><text x="436.5" y="532" class="chip-text">PK</text><text x="458" y="535" class="col-name">id</text><text x="634" y="535" class="col-type">uuid</text><rect x="424" y="544" width="25" height="15" rx="4" class="chip fk"/><text x="436.5" y="555" class="chip-text">FK</text><text x="458" y="558" class="col-name">document_id</text><text x="634" y="558" class="col-type">uuid</text><rect x="424" y="567" width="25" height="15" rx="4" class="chip fk"/><text x="436.5" y="578" class="chip-text">FK</text><text x="458" y="581" class="col-name">project_id</text><text x="634" y="581" class="col-type">uuid</text><text x="428" y="604" class="col-name">content</text><text x="634" y="604" class="col-type">text</text><text x="428" y="627" class="col-name">chunk_index</text><text x="634" y="627" class="col-type">int</text><text x="428" y="650" class="col-name">page_number</text><text x="634" y="650" class="col-type">int</text><text x="428" y="673" class="col-name">created_at</text><text x="634" y="673" class="col-type">timestamp</text>
+    </g>
+    
+
+    <g class="table">
+      <rect x="780" y="90" width="240" height="345" rx="10" class="table-bg"/>
+      <rect x="780" y="90" width="240" height="34" rx="10" class="table-head"/>
+      <rect x="780" y="116" width="240" height="8" class="table-head-square"/>
+      <text x="796" y="113" class="table-title">TODOS</text>
+      <text x="1004" y="113" class="table-count">13 cols</text>
+      <rect x="794" y="131" width="25" height="15" rx="4" class="chip pk"/><text x="806.5" y="142" class="chip-text">PK</text><text x="828" y="145" class="col-name">id</text><text x="1004" y="145" class="col-type">uuid</text><rect x="794" y="154" width="25" height="15" rx="4" class="chip fk"/><text x="806.5" y="165" class="chip-text">FK</text><text x="828" y="168" class="col-name">project_id</text><text x="1004" y="168" class="col-type">uuid</text><rect x="794" y="177" width="25" height="15" rx="4" class="chip fk"/><text x="806.5" y="188" class="chip-text">FK</text><text x="828" y="191" class="col-name">assignee_id</text><text x="1004" y="191" class="col-type">uuid</text><rect x="794" y="200" width="25" height="15" rx="4" class="chip fk"/><text x="806.5" y="211" class="chip-text">FK</text><text x="828" y="214" class="col-name">created_by</text><text x="1004" y="214" class="col-type">uuid</text><rect x="794" y="223" width="25" height="15" rx="4" class="chip fk"/><text x="806.5" y="234" class="chip-text">FK</text><text x="828" y="237" class="col-name">source_document_id</text><text x="1004" y="237" class="col-type">uuid</text><rect x="794" y="246" width="25" height="15" rx="4" class="chip fk"/><text x="806.5" y="257" class="chip-text">FK</text><text x="828" y="260" class="col-name">source_chunk_id</text><text x="1004" y="260" class="col-type">uuid</text><rect x="794" y="269" width="25" height="15" rx="4" class="chip fk"/><text x="806.5" y="280" class="chip-text">FK</text><text x="828" y="283" class="col-name">reviewed_by</text><text x="1004" y="283" class="col-type">uuid</text><text x="798" y="306" class="col-name">title</text><text x="1004" y="306" class="col-type">string</text><text x="798" y="329" class="col-name">status</text><text x="1004" y="329" class="col-type">string</text><text x="798" y="352" class="col-name">priority</text><text x="1004" y="352" class="col-type">string</text><text x="798" y="375" class="col-name">source_type</text><text x="1004" y="375" class="col-type">string</text><text x="798" y="398" class="col-name">approval_status</text><text x="1004" y="398" class="col-type">string</text><text x="798" y="421" class="col-name">due_date</text><text x="1004" y="421" class="col-type">date</text>
+    </g>
+    
+
+    <g class="table">
+      <rect x="780" y="540" width="240" height="230" rx="10" class="table-bg"/>
+      <rect x="780" y="540" width="240" height="34" rx="10" class="table-head"/>
+      <rect x="780" y="566" width="240" height="8" class="table-head-square"/>
+      <text x="796" y="563" class="table-title">ISSUES</text>
+      <text x="1004" y="563" class="table-count">8 cols</text>
+      <rect x="794" y="581" width="25" height="15" rx="4" class="chip pk"/><text x="806.5" y="592" class="chip-text">PK</text><text x="828" y="595" class="col-name">id</text><text x="1004" y="595" class="col-type">uuid</text><rect x="794" y="604" width="25" height="15" rx="4" class="chip fk"/><text x="806.5" y="615" class="chip-text">FK</text><text x="828" y="618" class="col-name">project_id</text><text x="1004" y="618" class="col-type">uuid</text><rect x="794" y="627" width="25" height="15" rx="4" class="chip fk"/><text x="806.5" y="638" class="chip-text">FK</text><text x="828" y="641" class="col-name">reporter_id</text><text x="1004" y="641" class="col-type">uuid</text><rect x="794" y="650" width="25" height="15" rx="4" class="chip fk"/><text x="806.5" y="661" class="chip-text">FK</text><text x="828" y="664" class="col-name">assignee_id</text><text x="1004" y="664" class="col-type">uuid</text><rect x="794" y="673" width="25" height="15" rx="4" class="chip fk"/><text x="806.5" y="684" class="chip-text">FK</text><text x="828" y="687" class="col-name">source_document_id</text><text x="1004" y="687" class="col-type">uuid</text><text x="798" y="710" class="col-name">title</text><text x="1004" y="710" class="col-type">string</text><text x="798" y="733" class="col-name">severity</text><text x="1004" y="733" class="col-type">string</text><text x="798" y="756" class="col-name">status</text><text x="1004" y="756" class="col-type">string</text>
+    </g>
+    </g>
+</svg>
+</div></body>
+</html>

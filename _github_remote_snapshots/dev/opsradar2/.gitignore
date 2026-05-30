@@ -1,0 +1,19 @@
+# 환경변수 — 절대 커밋 금지
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+
+# 업로드 데이터
+data/

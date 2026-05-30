@@ -24,7 +24,6 @@ class Settings:
         "postgresql+asyncpg://user:password@localhost:5432/opsradar",
     )
     AI_PROVIDER: str = os.getenv("AI_PROVIDER", "disabled")
-    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
     AZURE_OPENAI_API_KEY: str = os.getenv("AZURE_OPENAI_API_KEY", "")
     AZURE_OPENAI_ENDPOINT: str = os.getenv("AZURE_OPENAI_ENDPOINT", "")
     AZURE_OPENAI_API_VERSION: str = os.getenv("AZURE_OPENAI_API_VERSION", "")

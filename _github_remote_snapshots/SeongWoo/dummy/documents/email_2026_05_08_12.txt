@@ -1,0 +1,82 @@
+===EMAIL_START===
+날짜: 2026-05-08
+발신: 김희진 <heejin@team-memory.com>
+수신: 이성우 <sungwoo@team-memory.com>
+제목: RAG 파이프라인 기술 스택 확인 요청
+
+안녕 성우야,
+
+저번에 얘기한 RAG 파이프라인 관련해서 몇 가지 확인하고 싶어.
+
+LangChain이랑 Chroma 조합으로 가는 거 맞지? OpenAI 임베딩 모델은 text-embedding-3-small로 결정한 거야?
+그리고 GPT 모델은 뭘로 쓸 건지도 알려줘. 이번 주 안으로 요구사항 정의서에 기술 스택 확정해서 넣어야 해서.
+
+회신 부탁해!
+
+희진
+===EMAIL_END===
+
+===EMAIL_START===
+날짜: 2026-05-08
+발신: 이성우 <sungwoo@team-memory.com>
+수신: 김희진 <heejin@team-memory.com>
+제목: Re: RAG 파이프라인 기술 스택 확인 요청
+
+희진아,
+
+응 맞아. LangChain + Chroma 조합으로 확정이야.
+임베딩은 text-embedding-3-small, GPT는 gpt-4o-mini로 시작하려고 해.
+비용 대비 성능이 제일 좋아서.
+
+나중에 정확도 부족하면 gpt-4o로 올리면 되니까 일단 mini로 가자.
+요구사항 정의서에 그렇게 넣어줘.
+
+그리고 API 키는 내가 이번 주 발급해서 .env.example로 공유할게.
+
+성우
+===EMAIL_END===
+
+===EMAIL_START===
+날짜: 2026-05-12
+발신: 김성호 <sungho@team-memory.com>
+수신: 이성우 <sungwoo@team-memory.com>
+제목: chunks 테이블 컬럼 협의 요청
+
+성우야,
+
+DB 스키마 짜다가 chunks 테이블 컬럼을 어떻게 해야 할지 모르겠어서 연락했어.
+chunker.py 완성되면 어떤 데이터가 저장되는지 알 수 있을 것 같은데,
+지금 네가 생각하는 청크 단위랑 메타데이터 구조 간단히 알려줄 수 있어?
+
+일단 내가 생각한 건 이래:
+- chunk_id (PK)
+- document_id (FK)
+- chunk_index (순서)
+- content (텍스트)
+- created_at
+
+이 정도면 될까? 빠진 거 있으면 알려줘.
+
+성호
+===EMAIL_END===
+
+===EMAIL_START===
+날짜: 2026-05-12
+발신: 이성우 <sungwoo@team-memory.com>
+수신: 김성호 <sungho@team-memory.com>
+제목: Re: chunks 테이블 협의 요청
+
+성호야,
+
+거의 다 맞는데 Chroma에 저장할 때 메타데이터도 같이 저장하니까
+MySQL chunks 테이블은 사실 간단하게 가도 돼.
+
+추가하면 좋을 컬럼:
+- token_count: 토큰 수 (나중에 비용 추적용)
+- doc_type: 문서 유형 (meeting/report/email 등)
+
+Chroma에 벡터랑 메타데이터 같이 저장되니까 MySQL은 가볍게 가자.
+내일 chunker.py 초안 완성되면 같이 보면서 맞추자.
+
+성우
+===EMAIL_END===
