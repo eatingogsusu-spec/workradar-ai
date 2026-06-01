@@ -1,7 +1,19 @@
 """Report business logic."""
 
+from app.repositories.report_repository import ReportRepository
 
-def generate_report(period: str, start_date: str, end_date: str) -> str:
-    """Generate an operations report draft for the requested period."""
-    raise NotImplementedError
+
+class ReportService:
+    def __init__(self, repo: ReportRepository):
+        self.repo = repo
+
+    async def generate_report(self, period: str) -> dict:
+        normalized_period = "monthly" if period == "monthly" else "weekly"
+        return await self.repo.generate(normalized_period)
+
+    async def update_report(self, report_id: str, content: str) -> bool:
+        return await self.repo.update(report_id, content)
+
+    async def list_reports(self) -> list[dict]:
+        return await self.repo.get_all()
 

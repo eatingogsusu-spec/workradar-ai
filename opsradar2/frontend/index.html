@@ -3165,12 +3165,28 @@ function renderReportDraft(data){
   G.selectedReportId = null;
   document.querySelectorAll('#reportList .report-item').forEach(item => item.classList.remove('active'));
 }
-function saveReport(report){
+async function saveReport(report){
   const editor = document.getElementById('reportEditor') || document.querySelector('#s-reports [contenteditable="true"]');
   const draft = report || G.currentReportDraft || createReportDraft(G.currentReportPeriod || 'weekly');
+  if(!window.opsRadarApi){ showToast('DB 연결을 준비 중입니다. 잠시 후 다시 시도해주세요.','warn'); return null; }
   const sections = normalizeReportSections(draft.sections);
-  const payload = {
-    id: draft.id || 'report-' + Date.now(),
+  const content = editor ? editor.innerHTML : (draft.html || '');
+  try{
+    let reportId = draft.apiId;
+    if(!reportId){
+      const generated = await window.opsRadarApi.request('/reports/generate', {
+        method:'POST',
+        body:JSON.stringify({ period:draft.type === 'monthly' ? 'monthly' : 'weekly' })
+      });
+      reportId = generated.report_id;
+    }
+    await window.opsRadarApi.request(`/reports/${reportId}`, {
+      method:'PATCH',
+      body:JSON.stringify({ content })
+    });
+    const payload = {
+    id: reportId,
+    apiId: reportId,
     type: draft.type || getActiveReportPeriod(),
     title: draft.title || getReportDefaultTitle(draft.type || getActiveReportPeriod()),
     period: draft.period || getReportPeriodRange(draft.type || getActiveReportPeriod()),
@@ -3182,18 +3198,19 @@ function saveReport(report){
     pendingTodos: Number(draft.pendingTodos || todos.filter(t=>t.status!=='done').length || 0),
     sections,
     docs: draft.docs || ['연결된 문서가 없습니다.'],
-    html: editor ? editor.innerHTML : (draft.html || '')
-  };
-  const reports = fetchReports().filter(item => item.id !== payload.id && !String(item.id || '').startsWith('sample-'));
-  reports.unshift(payload);
-  G.savedReports = reports;
-  persistReports(reports);
-  G.currentReportDraft = null;
-  G.selectedReportId = payload.id;
-  renderReportList();
-  renderReportDetail(payload);
-  showToast('보고서가 지난 보고서 목록에 저장되었습니다.','success');
-  return payload;
+    html: content
+    };
+    G.currentReportDraft = null;
+    G.selectedReportId = payload.id;
+    await window.opsRadarApi.loadReports();
+    renderReportDetail(payload);
+    showToast('보고서가 DB에 저장되었습니다.','success');
+    return payload;
+  }catch(error){
+    console.warn('Report save API failed', error);
+    showToast('보고서 저장에 실패했습니다.','warn');
+    return null;
+  }
 }
 function editReport(reportId){
   const report = fetchReports().find(item => item.id === reportId);
@@ -3617,7 +3634,31 @@ function switchTodoTab(tab){G.currentTodoTab=tab;G.selectedTodoId=null;document.
 function openEditModal(id){G.editTargetId=id;const t=todos.find(x=>x.id===id);document.getElementById('editTitle').value=t.title;document.getElementById('editAssignee').value=t.assignee||'담당자 A';document.getElementById('editModal').classList.add('show');}
 function saveEdit(){const t=todos.find(x=>x.id===G.editTargetId);t.title=document.getElementById('editTitle').value.trim();t.assignee=document.getElementById('editAssignee').value;closeModal('editModal');renderTodos();if(G.selectedTodoId===G.editTargetId)renderTodoDetail(G.editTargetId);showToast('수정되었습니다.','info');}
 function openManualModal(){document.getElementById('manualModal').classList.add('show');}
-function saveManual(){const title=document.getElementById('manualTitle').value.trim();if(!title)return;todos.unshift({id:Date.now(),title,src:null,srcChunk:null,assignee:document.getElementById('manualAssignee').value,priority:document.getElementById('manualPriority').value,confidence:null,status:'pending',type:'manual',chunk:null,grounds:['수동 등록'],risk:''});closeModal('manualModal');document.getElementById('manualTitle').value='';if(G.currentTodoTab!=='ai')switchTodoTab('ai');else renderTodos();updateTodoCounts();showToast('✅ Todo가 등록되었습니다.','success');}
+async function saveManual(){
+  const title=document.getElementById('manualTitle').value.trim();
+  if(!title)return;
+  if(!window.opsRadarApi){showToast('DB 연결을 준비 중입니다. 잠시 후 다시 시도해주세요.','warn');return;}
+  try{
+    await window.opsRadarApi.request('/todos',{
+      method:'POST',
+      body:JSON.stringify({
+        title,
+        assignee:document.getElementById('manualAssignee').value||null,
+        priority:document.getElementById('manualPriority').value||'medium',
+        source:'manual',
+        status:'pending'
+      })
+    });
+    closeModal('manualModal');
+    document.getElementById('manualTitle').value='';
+    if(G.currentTodoTab!=='ai')switchTodoTab('ai');
+    await window.opsRadarApi.loadTodos();
+    showToast('Todo가 DB에 등록되었습니다.','success');
+  }catch(error){
+    console.warn('Todo create API failed',error);
+    showToast('Todo 등록에 실패했습니다.','warn');
+  }
+}
 
 // ════════════════════════════════════════════════
 // 흐름 3 — 이슈 → 대응 Todo 생성
@@ -3693,7 +3734,7 @@ function openTodoCreate(issueId){
   document.getElementById('todoCreateModal').classList.add('show');
 }
 
-function confirmTodoCreate(){
+async function confirmTodoCreate(){
   const title=document.getElementById('tcTitle').value.trim();
   if(!title)return;
   const assignee=document.getElementById('tcAssignee').value;
@@ -3701,27 +3742,49 @@ function confirmTodoCreate(){
   const due=document.getElementById('tcDue').value;
   closeModal('todoCreateModal');
   showTransition('이슈 기반 대응 Todo를 생성하고 있습니다');
-  setTimeout(()=>{
-    hideTransition();
-    G.createdTodosFromIssue.push({id:Date.now(),issueId:G.createIssueId,title,assignee,priority,dueDate:due,status:'pending'});
-    todos.unshift({id:Date.now()+1,title,src:`이슈 #${G.createIssueId}`,srcChunk:'이슈 연결',assignee,priority,confidence:null,status:'pending',type:'ai',chunk:null,grounds:['이슈 기반 생성'],risk:''});
-    document.getElementById('todoFromIssueBanner').style.display='inline-flex';
-    document.getElementById('todoBadge').style.display='inline-block';
-    renderIssues();
-    if(G.selectedIssueId===G.createIssueId)renderIssueDetail(G.createIssueId);
-    nav('todo');
-    showToast(`✅ "${title.slice(0,20)}..." Todo가 생성되었습니다.`,'success');
-    addNotif(`이슈 기반 대응 Todo "${title.slice(0,20)}..."가 생성되었습니다.`, 'success');
-    showCtxBanner('todo', `이슈 #${G.createIssueId}에서 생성된 Todo가 최상단에 추가되었습니다.`);
-    updateTodoCounts();
+  setTimeout(async ()=>{
+    try{
+      const issue=issues.find(i=>i.id===G.createIssueId);
+      const apiIssueId=getIssueApiId(issue);
+      if(apiIssueId){
+        const res=await fetch(`/api/v1/issues/${apiIssueId}/todos`, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({title,assignee,priority,due_at:due||null,status:'pending'})
+        });
+        if(!res.ok)throw new Error(`Todo 저장 실패: ${res.status}`);
+        if(window.opsRadarApi)await window.opsRadarApi.reload();
+      }else{
+        todos.unshift({id:Date.now()+1,title,src:`이슈 #${G.createIssueId}`,srcChunk:'이슈 연결',assignee,priority,confidence:null,status:'pending',type:'manual',chunk:null,grounds:['이슈 기반 생성'],risk:''});
+      }
+      G.createdTodosFromIssue.push({id:Date.now(),issueId:G.createIssueId,title,assignee,priority,dueDate:due,status:'pending'});
+      document.getElementById('todoFromIssueBanner').style.display='inline-flex';
+      document.getElementById('todoBadge').style.display='inline-block';
+      renderIssues();
+      if(G.selectedIssueId===G.createIssueId)renderIssueDetail(G.createIssueId);
+      nav('todo');
+      showToast(`"${title.slice(0,20)}..." Todo가 생성되었습니다.`,'success');
+      addNotif(`이슈 기반 대응 Todo "${title.slice(0,20)}..."가 생성되었습니다.`, 'success');
+      showCtxBanner('todo', `이슈 #${G.createIssueId}에서 생성된 Todo가 최상단에 추가되었습니다.`);
+      updateTodoCounts();
+    }catch(e){
+      alert('Todo 저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }finally{
+      hideTransition();
+    }
   },1200);
 }
 
-function resolveIssue(id){const issue=issues.find(i=>i.id===id);issue.status='resolved';issue.type='resolved';renderIssues();hideIssueDetail();showToast('✅ 이슈가 해결 완료 처리되었습니다.','success');}
+function getIssueApiId(issue){
+  if(!issue)return null;
+  if(issue.apiId)return issue.apiId;
+  return typeof issue.id==='string'&&/^[0-9a-f-]{36}$/i.test(issue.id)?issue.id:null;
+}
+async function resolveIssue(id){const issue=issues.find(i=>i.id===id);const apiId=getIssueApiId(issue);if(apiId){const res=await fetch(`/api/v1/issues/${apiId}/resolve`,{method:'PATCH'});if(!res.ok){showToast('이슈 저장에 실패했습니다.','warn');return;}}issue.status='resolved';issue.type='resolved';renderIssues();hideIssueDetail();showToast('이슈가 해결 완료 처리되었습니다.','success');}
 function openConfirmIssue(id){G.confirmIssueId=id;const issue=issues.find(i=>i.id===id);document.getElementById('confirmIssueText').textContent=`"${issue.title}"을 확정 이슈로 전환합니다. 대응 Todo를 생성할 수 있습니다.`;document.getElementById('confirmIssueModal').classList.add('show');}
-function doConfirmIssue(){const issue=issues.find(i=>i.id===G.confirmIssueId);if(issue){issue.type='confirmed';closeModal('confirmIssueModal');switchIssueTab('confirmed');showToast('이슈가 확정되었습니다.','warn');}}
-function dismissIssue(){doRemoveIssue(G.confirmIssueId);closeModal('confirmIssueModal');}
-function doRemoveIssue(id){const idx=issues.findIndex(i=>i.id===id);if(idx!==-1)issues.splice(idx,1);renderIssues();hideIssueDetail();showToast('이슈 후보가 무시되었습니다.','info');}
+async function doConfirmIssue(){const issue=issues.find(i=>i.id===G.confirmIssueId);if(issue){const apiId=getIssueApiId(issue);if(apiId){const res=await fetch(`/api/v1/issues/${apiId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({approval_status:'approved'})});if(!res.ok){showToast('이슈 저장에 실패했습니다.','warn');return;}}issue.type='confirmed';closeModal('confirmIssueModal');switchIssueTab('confirmed');showToast('이슈가 확정되었습니다.','warn');}}
+async function dismissIssue(){await doRemoveIssue(G.confirmIssueId);closeModal('confirmIssueModal');}
+async function doRemoveIssue(id){const idx=issues.findIndex(i=>i.id===id);const issue=idx===-1?null:issues[idx];const apiId=getIssueApiId(issue);if(apiId){const res=await fetch(`/api/v1/issues/${apiId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({approval_status:'rejected'})});if(!res.ok){showToast('이슈 저장에 실패했습니다.','warn');return;}}if(idx!==-1)issues.splice(idx,1);renderIssues();hideIssueDetail();showToast('이슈 후보가 무시되었습니다.','info');}
 function persistIssues(){
   try{ localStorage.setItem('opsradar_issues', JSON.stringify(issues)); }catch(e){}
 }
@@ -3769,24 +3832,22 @@ async function createIssue(issueData){
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify(body)
     });
-    if(res.ok){
-      const saved = await res.json().catch(()=>body);
-      return toIssueModel({...body, ...saved});
-    }
-  }catch(e){}
-  return toIssueModel(body);
+    if(!res.ok)throw new Error(`이슈 저장 실패: ${res.status}`);
+    const saved = await res.json();
+    return toIssueModel({...body, ...saved});
+  }catch(e){
+    throw e;
+  }
 }
 async function fetchIssues(){
   try{
     const res = await fetch('/api/v1/issues');
     if(res.ok){
       const data = await res.json();
-      const list = Array.isArray(data) ? data : (data.items || data.results || []);
-      if(list.length){
-        issues.splice(0, issues.length, ...list.map(toIssueModel));
-        persistIssues();
-        return issues;
-      }
+      const list = Array.isArray(data) ? data : (data.issues || data.items || data.results || []);
+      issues.splice(0, issues.length, ...list.map(toIssueModel));
+      persistIssues();
+      return issues;
     }
   }catch(e){}
   try{
@@ -5066,29 +5127,46 @@ function openCalModal(d) {
   const label = document.getElementById('calColorLabel'); if(label) label.textContent = '일반';
   openModal('calModal');
 }
-function addCalTag() {
+async function addCalTag() {
   ensureCalendarState();
   const d = G.selectedCalDay;
   const input = document.getElementById('calModalInput');
   const text = input ? input.value.trim() : '';
   const color = calSelectedColor || 'ct-info';
   if (!text || !d) return;
-  let ev = findCalEventForDay(d, G.currentCalYear, G.currentCalMonth);
-  if (ev) ev.tags.push({t: text, c: color});
-  else G.calEvents.push({d, y: G.currentCalYear, m: G.currentCalMonth, tags: [{t: text, c: color}]});
-  renderCalendar(G.currentCalYear, G.currentCalMonth);
-  openCalModal(d);
-  showToast(`${G.currentCalMonth + 1}월 ${d}일 일정이 추가되었습니다.`, 'info');
+  if(!window.opsRadarCreateCalendarEvent || !window.opsRadarApi){showToast('DB 연결을 준비 중입니다. 잠시 후 다시 시도해주세요.','warn');return;}
+  try{
+    await window.opsRadarCreateCalendarEvent({title:text,day:d,year:G.currentCalYear,month:G.currentCalMonth,color});
+    await window.opsRadarApi.loadCalendar();
+    renderCalendar(G.currentCalYear, G.currentCalMonth);
+    openCalModal(d);
+    showToast(`${G.currentCalMonth + 1}월 ${d}일 일정이 DB에 추가되었습니다.`, 'info');
+  }catch(error){
+    console.warn('Calendar create API failed',error);
+    showToast('캘린더 등록에 실패했습니다.','warn');
+  }
 }
-function deleteCalTag(d, idx) {
+async function deleteCalTag(d, idx) {
   ensureCalendarState();
   const ev = findCalEventForDay(d, G.currentCalYear, G.currentCalMonth);
   if (!ev) return;
-  ev.tags.splice(idx, 1);
-  if (ev.tags.length === 0) G.calEvents = G.calEvents.filter(e => e !== ev);
-  renderCalendar(G.currentCalYear, G.currentCalMonth);
-  openCalModal(d);
-  showToast('일정이 삭제되었습니다.', 'info');
+  const tag=ev.tags[idx];
+  try{
+    if(tag?.apiId){
+      if(!window.opsRadarApi){showToast('DB 연결을 준비 중입니다. 잠시 후 다시 시도해주세요.','warn');return;}
+      await window.opsRadarApi.request(`/calendar/${tag.apiId}`,{method:'DELETE'});
+      await window.opsRadarApi.loadCalendar();
+    }else{
+      ev.tags.splice(idx,1);
+      if(ev.tags.length===0)G.calEvents=G.calEvents.filter(e=>e!==ev);
+    }
+    renderCalendar(G.currentCalYear,G.currentCalMonth);
+    openCalModal(d);
+    showToast('일정이 삭제되었습니다.','info');
+  }catch(error){
+    console.warn('Calendar delete API failed',error);
+    showToast('캘린더 삭제에 실패했습니다.','warn');
+  }
 }
 function registerCalEvent(parsed, calDate){
   ensureCalendarState();
@@ -5661,5 +5739,6 @@ setTimeout(initOpsRadarSkin, 0);</script>
   }, 0);
 })();
 </script>
+<script src="/static/api-integration.js"></script>
 </body>
 </html>

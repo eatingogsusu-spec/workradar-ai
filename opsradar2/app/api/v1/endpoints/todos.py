@@ -35,8 +35,7 @@ async def create_todo(body: dict, db: AsyncSession = Depends(get_db)):
 @router.patch("/{todo_id}")
 async def update_todo(todo_id: str, body: dict, db: AsyncSession = Depends(get_db)):
     service = TodoService(TodoRepository(db))
-    if "status" in body:
-        updated = await service.update_todo_status(todo_id, body["status"])
-        if not updated:
-            raise HTTPException(404, "todo not found")
+    updated = await service.update_todo(todo_id, body)
+    if not updated:
+        raise HTTPException(404, "todo not found")
     return {"status": "success", "todo_id": todo_id}

@@ -3,15 +3,18 @@ Issue 스키마
 담당: 박주원
 """
 from pydantic import BaseModel
-from typing import Optional
+from typing import Literal, Optional
 from datetime import datetime
 
 
 class IssueCreate(BaseModel):
     title: str
     description: Optional[str] = None
-    risk_level: str = "medium"
+    severity: Literal["low", "medium", "high", "critical"] = "medium"
+    status: Literal["open", "in_progress", "blocked", "resolved"] = "open"
     assignee: Optional[str] = None
+    domino_impact: Optional[str] = None
+    source_document: Optional[str] = None
 
 
 class IssueUpdate(BaseModel):
