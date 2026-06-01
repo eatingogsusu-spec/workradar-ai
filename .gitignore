@@ -258,6 +258,9 @@ tempCodeRunnerFile.py
 # Ruff stuff:
 .ruff_cache/
 
+# Local GitHub snapshots
+_github_remote_snapshots/
+
 # PyPI configuration file
 .pypirc
 
