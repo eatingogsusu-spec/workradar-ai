@@ -1,7 +1,8 @@
 -- Dashboard query examples aligned with the latest OpsRadar ERD.
--- Bind parameters: :project_id, :limit, :from_at, :to_at
+-- Bind parameters:
+--   :project_id, :limit, :from_at, :to_at
 
--- Project-level Todo status counts.
+-- 1. Project-level Todo status counts.
 SELECT
   status,
   COUNT(*) AS todo_count
@@ -10,16 +11,26 @@ WHERE project_id = :project_id
 GROUP BY status
 ORDER BY status;
 
--- High risk issue count.
+-- 2. Project-level Issue status counts.
+SELECT
+  status,
+  COUNT(*) AS issue_count
+FROM issues
+WHERE project_id = :project_id
+  AND approval_status IN ('approved', 'confirmed')
+GROUP BY status
+ORDER BY status;
+
+-- 3. High risk issue count.
 SELECT
   COUNT(*) AS high_risk_issue_count
 FROM issues
 WHERE project_id = :project_id
   AND severity IN ('high', 'critical')
   AND status IN ('open', 'in_progress', 'blocked')
-  AND approval_status = 'confirmed';
+  AND approval_status IN ('approved', 'confirmed');
 
--- Pending AI Todo approval queue.
+-- 4. Pending AI Todo approval queue.
 SELECT
   t.id,
   t.title,
@@ -38,13 +49,14 @@ WHERE t.project_id = :project_id
 ORDER BY t.confidence_score DESC NULLS LAST, t.created_at DESC
 LIMIT :limit;
 
--- Recent operational issues.
+-- 5. Recent operational issues.
 SELECT
   i.id,
   i.title,
   i.severity,
   i.status,
   i.source_type,
+  i.approval_status,
   i.confidence_score,
   i.created_at,
   u.name AS assignee_name
@@ -52,13 +64,18 @@ FROM issues i
 LEFT JOIN project_members pm ON pm.id = i.assignee_member_id
 LEFT JOIN users u ON u.id = pm.user_id
 WHERE i.project_id = :project_id
-  AND i.approval_status = 'confirmed'
+  AND i.approval_status IN ('approved', 'confirmed')
 ORDER BY
-  CASE i.severity WHEN 'critical' THEN 1 WHEN 'high' THEN 2 WHEN 'medium' THEN 3 ELSE 4 END,
+  CASE i.severity
+    WHEN 'critical' THEN 1
+    WHEN 'high' THEN 2
+    WHEN 'medium' THEN 3
+    ELSE 4
+  END,
   i.created_at DESC
 LIMIT :limit;
 
--- Recent uploaded documents.
+-- 6. Recent uploaded documents.
 SELECT
   d.id,
   d.file_name,
@@ -77,7 +94,7 @@ GROUP BY d.id, u.name
 ORDER BY d.created_at DESC
 LIMIT :limit;
 
--- Calendar events in a period.
+-- 7. Calendar events in a period.
 SELECT
   ce.id,
   ce.title,
@@ -95,7 +112,7 @@ WHERE ce.project_id = :project_id
   AND ce.starts_at < :to_at
 ORDER BY ce.starts_at ASC;
 
--- Weekly reports.
+-- 8. Weekly reports.
 SELECT
   id,
   week_start,
@@ -107,7 +124,7 @@ WHERE project_id = :project_id
 ORDER BY week_start DESC
 LIMIT :limit;
 
--- Monthly reports.
+-- 9. Monthly reports.
 SELECT
   id,
   month_start,
@@ -117,4 +134,34 @@ SELECT
 FROM monthly_reports
 WHERE project_id = :project_id
 ORDER BY month_start DESC
+LIMIT :limit;
+
+-- 10. Latest handoff report.
+SELECT
+  id,
+  project_id,
+  from_member_id,
+  to_member_id,
+  handoff_type,
+  content,
+  created_at
+FROM handoff_reports
+WHERE project_id = :project_id
+ORDER BY created_at DESC
+LIMIT 1;
+
+-- 11. Chat messages.
+SELECT
+  cm.id,
+  cm.project_id,
+  cm.member_id,
+  cm.role,
+  cm.content,
+  cm.created_at,
+  u.name AS member_name
+FROM chat_messages cm
+LEFT JOIN project_members pm ON pm.id = cm.member_id
+LEFT JOIN users u ON u.id = pm.user_id
+WHERE cm.project_id = :project_id
+ORDER BY cm.created_at ASC
 LIMIT :limit;

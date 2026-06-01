@@ -496,6 +496,7 @@ html,body{width:100%;max-width:100%;min-width:0;overflow-x:hidden}body{min-heigh
             <div><span class="ops-stat-num success">0</span><span class="ops-stat-label">완료</span></div>
             <div><span class="ops-stat-num blue">0</span><span class="ops-stat-label">진행중</span></div>
             <div><span class="ops-stat-num warn" id="db-blocked">0</span><span class="ops-stat-label">Blocked</span></div>
+
           </div>
           <div class="ops-progress-stack">
             <div style="width:0%;background:var(--success)" title="완료"></div>
@@ -589,7 +590,7 @@ html,body{width:100%;max-width:100%;min-width:0;overflow-x:hidden}body{min-heigh
       운영 기록 파일을 업로드하면 AI가 자동으로 업무 항목을 추출하고 위험 이슈를 탐지합니다.
     </div>
     <div id="uploadSection">
-      <div class="upload-zone" id="uploadZone" ondragover="ondov(event)" ondragleave="ondl(event)" ondrop="ondrop(event)">
+      <div class="upload-zone" id="uploadZone" ondragover="ondov(event)" ondragleave="ondl(event)" ondrop="handleUploadDrop(event)">
         <input type="file" accept=".txt,.pdf,.csv,.docx" multiple onchange="onFileSelect(event)">
         <i class="ti ti-cloud-upload" style="font-size:30px;color:var(--text3);display:block;margin-bottom:10px"></i>
         <p style="font-size:12px;color:var(--text2)">파일을 드래그하거나 클릭하여 업로드</p>
@@ -2579,6 +2580,825 @@ body::before{display:none}
   border:1px solid var(--border-primary)!important;
   border-radius:8px!important;
 }
+
+.og-num{
+  background:linear-gradient(135deg,var(--accent),#8b5cf6);
+}
+.ctx-banner{
+  background:rgba(109,140,255,.12);
+  border-bottom:1px solid rgba(109,140,255,.20);
+  color:#c7d2fe;
+}
+.issue-quick-todo{
+  border-color:rgba(109,140,255,.45);
+  color:#c7d2fe;
+  background:rgba(109,140,255,.12);
+  border-radius:999px;
+}
+.kflow-step{
+  background:rgba(255,255,255,.045);
+  border-color:var(--border);
+}
+.kflow-step.active{
+  background:linear-gradient(135deg,var(--accent),#8b5cf6);
+  border-color:rgba(157,177,255,.55);
+}
+.kflow-step.done{
+  background:rgba(55,211,153,.13);
+  border-color:rgba(55,211,153,.30);
+}
+.kcard-hd{
+  padding:16px 18px;
+}
+.kcard-hd:hover{background:rgba(109,140,255,.08)}
+.kcard-title{color:#fff;font-size:13px;font-weight:800}
+.kcard-sub,.kcard-arrow{color:#8793aa}
+.kcard-body{border-top-color:var(--border)}
+.kb-why,.kb-now,.kb-next{
+  border:1px solid transparent;
+  border-radius:12px;
+}
+.kb-why{border-color:rgba(246,179,75,.22)}
+.kb-now{border-color:rgba(255,95,115,.22)}
+.kb-next{border-color:rgba(55,211,153,.22)}
+.kstep:not(:last-child)::after{background:rgba(148,163,184,.18)}
+.kstep-circle{
+  background:#101827;
+  border-color:var(--border2);
+}
+.kstep-circle.active{
+  background:linear-gradient(135deg,var(--accent),#8b5cf6);
+}
+.kstep-circle.done{
+  background:var(--success);
+}
+.cl-box{
+  background:rgba(255,255,255,.04);
+  border-color:var(--border2);
+}
+@media (max-width:1100px){
+  :root{--sb-w:210px}
+  .two-col,.three-col{grid-template-columns:1fr!important}
+  .detail-panel,.cal-side{width:220px}
+}
+@media (max-width:760px){
+  body{overflow:auto}
+  body>div[style*="display:flex"]{flex-direction:column;min-height:100vh}
+  .sidebar{width:100%;height:auto;max-height:260px}
+  .sb-nav{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:8px;max-height:190px}
+  .sb-section{grid-column:1/-1;padding:10px 8px 4px}
+  .main{min-height:70vh}
+  .topbar{align-items:flex-start;gap:10px;flex-wrap:wrap}
+  .content{padding:14px}
+  .body-wrap{flex-direction:column;overflow:auto}
+  .detail-panel,.cal-side{width:100%;border-left:0;border-top:1px solid var(--border)}
+  .cal-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+
+<style>
+/* OpsRadar brighter override: visual-only layer */
+:root{
+  --bg:#e8eef8;
+  --surface:#ffffff;
+  --surface2:#f4f7fc;
+  --border:rgba(42,57,85,.12);
+  --border2:rgba(42,57,85,.22);
+  --text:#172033;
+  --text2:#526179;
+  --text3:#8a96aa;
+  --accent:#4f6dff;
+  --accent-soft:rgba(79,109,255,.10);
+  --danger:#e5485d;
+  --danger-soft:rgba(229,72,93,.10);
+  --warn:#b9780f;
+  --warn-soft:rgba(185,120,15,.11);
+  --success:#168a5e;
+  --success-soft:rgba(22,138,94,.10);
+}
+html{background:var(--bg)}
+body{
+  background:
+    radial-gradient(circle at 15% -10%,rgba(79,109,255,.20),transparent 34%),
+    radial-gradient(circle at 92% 0,rgba(124,58,237,.13),transparent 30%),
+    linear-gradient(180deg,#f3f6fb 0%,#e8eef8 48%,#edf2f9 100%);
+  color:var(--text);
+}
+body::before{
+  background-image:linear-gradient(rgba(42,57,85,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(42,57,85,.045) 1px,transparent 1px);
+  opacity:.8;
+}
+.sidebar{
+  background:linear-gradient(180deg,rgba(255,255,255,.94),rgba(243,247,252,.92));
+  border-right:1px solid rgba(42,57,85,.13);
+  box-shadow:14px 0 42px rgba(42,57,85,.10);
+}
+.sb-logo{border-bottom:1px solid var(--border)}
+.sb-logo-name{color:#172033}
+.sb-logo-tag{color:#6172ff}
+.sb-section{color:#8a96aa}
+.sb-item{
+  color:#526179;
+}
+.sb-item i{color:#7d8aa0}
+.sb-item:hover{
+  background:rgba(79,109,255,.075);
+  color:#172033;
+}
+.sb-item:hover i{color:#4f6dff}
+.sb-item.active{
+  background:linear-gradient(135deg,rgba(79,109,255,.13),rgba(124,58,237,.09));
+  color:#21304f;
+  box-shadow:inset 0 0 0 1px rgba(79,109,255,.22),0 10px 26px rgba(79,109,255,.10);
+}
+.sb-item.active i{color:#4f6dff}
+.sb-footer{
+  background:rgba(79,109,255,.035);
+  border-top:1px solid var(--border);
+}
+.sb-avatar{
+  background:linear-gradient(135deg,rgba(79,109,255,.15),rgba(22,138,94,.10));
+  color:#3044a2;
+  border:1px solid rgba(79,109,255,.20);
+}
+.main{
+  background:rgba(255,255,255,.20);
+}
+.topbar{
+  background:rgba(255,255,255,.78);
+  border-bottom:1px solid var(--border);
+  box-shadow:0 12px 34px rgba(42,57,85,.08);
+}
+.topbar-title,
+.card-hd-l,
+.issue-title,
+.kcard-title,
+.detail-section,
+.onboarding-guide h3,
+.modal-title{
+  color:#172033;
+}
+.card,
+.issue-card,
+.kcard,
+.ki-item,
+.onboarding-guide{
+  background:linear-gradient(180deg,rgba(255,255,255,.98),rgba(248,251,255,.96));
+  border:1px solid rgba(42,57,85,.12);
+  box-shadow:0 16px 42px rgba(42,57,85,.10);
+}
+.chip,.tbtn,.ab,.sq,.notif-btn{
+  background:rgba(255,255,255,.72)!important;
+  border-color:rgba(42,57,85,.15)!important;
+  color:#526179;
+}
+.tbtn:hover,.ab:hover,.sq:hover{
+  background:rgba(79,109,255,.09)!important;
+  border-color:rgba(79,109,255,.34)!important;
+  color:#21304f;
+}
+.tbtn.primary,.ab-approve,.send-btn,.mini-send,.float-ai-btn{
+  background:linear-gradient(135deg,#4f6dff,#7c3aed)!important;
+  color:white!important;
+  border-color:rgba(79,109,255,.34)!important;
+  box-shadow:0 12px 28px rgba(79,109,255,.18);
+}
+.b-danger,.ct-danger{
+  background:rgba(229,72,93,.10);
+  color:#c92f45;
+  border-color:rgba(229,72,93,.22);
+}
+.b-warn,.ct-warn{
+  background:rgba(185,120,15,.11);
+  color:#915b08;
+  border-color:rgba(185,120,15,.22);
+}
+.b-success,.ct-success{
+  background:rgba(22,138,94,.10);
+  color:#0f704b;
+  border-color:rgba(22,138,94,.22);
+}
+.b-accent,.ct-info{
+  background:rgba(79,109,255,.10);
+  color:#304fd6;
+  border-color:rgba(79,109,255,.22);
+}
+.upload-zone{
+  background:linear-gradient(180deg,rgba(79,109,255,.08),rgba(255,255,255,.88));
+  border-color:rgba(79,109,255,.30);
+}
+.upload-zone:hover,.upload-zone.dragover{
+  background:linear-gradient(180deg,rgba(79,109,255,.12),rgba(255,255,255,.94));
+  border-color:#4f6dff;
+}
+.chunk-box,
+.detail-cell,
+.file-row,
+.mini-bubble-ai,
+.bubble-ai,
+.confirm-card,
+.og-step,
+.domino-item{
+  background:rgba(244,247,252,.88);
+  border-color:rgba(42,57,85,.12);
+  color:#526179;
+}
+.chunk-meta,.detail-label,.detail-empty,.history-date,.tl-date,.kcard-sub,.kcard-arrow,.form-label,.modal-sub{
+  color:#8a96aa;
+}
+.chunk-hl{
+  background:rgba(79,109,255,.12);
+  color:#304fd6;
+}
+.todo-table th,
+.cal-dow,
+.tabs,
+.mini-chat-hd,
+.mini-input-row,
+.chat-input-bar{
+  background:rgba(244,247,252,.86);
+  color:#8a96aa;
+  border-color:var(--border);
+}
+.todo-row:hover{background:rgba(79,109,255,.055)}
+.todo-row.selected{
+  background:rgba(79,109,255,.10);
+  box-shadow:inset 3px 0 0 var(--accent);
+}
+.todo-title,.tl-text{color:#172033}
+.detail-panel,.cal-side{
+  background:rgba(255,255,255,.92);
+}
+.risk-box,.domino{
+  background:rgba(229,72,93,.08);
+  border-color:rgba(229,72,93,.18);
+}
+.issue-card:hover{
+  box-shadow:0 20px 46px rgba(42,57,85,.13);
+}
+.issue-card.candidate{
+  background:linear-gradient(180deg,rgba(185,120,15,.09),rgba(255,255,255,.96));
+}
+.issue-desc,.onboarding-guide p,.kb-item{
+  color:#526179;
+}
+.cal-grid{
+  background:rgba(42,57,85,.10);
+  border-color:var(--border);
+}
+.cal-cell{
+  background:rgba(255,255,255,.92);
+}
+.cal-cell:hover{
+  background:rgba(79,109,255,.07);
+}
+.cal-cell.today{
+  background:linear-gradient(180deg,rgba(79,109,255,.12),rgba(255,255,255,.95));
+}
+.cal-cell.risk{
+  background:linear-gradient(180deg,rgba(229,72,93,.09),rgba(255,255,255,.95));
+}
+.cal-date{color:#172033}
+.chat-area{
+  background:radial-gradient(circle at top right,rgba(79,109,255,.08),transparent 36%);
+}
+.av-ai{
+  background:rgba(79,109,255,.10);
+  color:#304fd6;
+  border-color:rgba(79,109,255,.22);
+}
+.av-user{
+  background:rgba(42,57,85,.06);
+  color:#526179;
+  border-color:var(--border);
+}
+.bubble-user,.mini-bubble-user{
+  background:linear-gradient(135deg,#4f6dff,#7c3aed);
+}
+.src-tag{
+  background:rgba(79,109,255,.09);
+  border-color:rgba(79,109,255,.18);
+  color:#304fd6;
+}
+.chat-input,.mini-input,.form-input{
+  background:rgba(255,255,255,.82);
+  color:#172033;
+  border-color:rgba(42,57,85,.14);
+}
+.modal{
+  background:linear-gradient(180deg,#ffffff,#f7faff);
+  border-color:rgba(42,57,85,.14);
+  box-shadow:0 28px 90px rgba(42,57,85,.22);
+}
+.modal-overlay{
+  background:rgba(20,30,50,.42);
+}
+.toast{
+  background:#172033;
+  color:white;
+  border-color:rgba(79,109,255,.22);
+}
+.notif-panel{
+  background:linear-gradient(180deg,#ffffff,#f7faff)!important;
+  border-color:rgba(42,57,85,.14)!important;
+  box-shadow:0 22px 70px rgba(42,57,85,.18)!important;
+}
+.notif-item{
+  background:rgba(244,247,252,.92)!important;
+}
+.kflow-step,
+.kstep-circle,
+.cl-box{
+  background:rgba(255,255,255,.88);
+  border-color:rgba(42,57,85,.16);
+}
+.kcard-hd:hover{
+  background:rgba(79,109,255,.06);
+}
+.kb-why{background:rgba(185,120,15,.10)}
+.kb-now{background:rgba(229,72,93,.09)}
+.kb-next{background:rgba(22,138,94,.09)}
+</style>
+
+<style>
+/* Figma OpsRadar style reference override: CSS-only, preserves DOM and JS */
+:root{
+  --font-size:16px;
+  --font-family:'Inter','Noto Sans KR',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --bg-primary:#20242d;
+  --bg-secondary:#252a34;
+  --bg-tertiary:#2d3340;
+  --surface:#252a34;
+  --surface-elevated:#2d3340;
+  --text-primary:#f2f4f8;
+  --text-secondary:#a8b0bd;
+  --text-tertiary:#737c8c;
+  --border-primary:#3d4450;
+  --border-secondary:#4a5260;
+  --accent-blue:#586cf6;
+  --accent-blue-soft:rgba(88,108,246,.12);
+  --accent-purple:#8764f6;
+  --accent-purple-soft:rgba(135,100,246,.12);
+  --danger:#e75652;
+  --danger-soft:rgba(231,86,82,.12);
+  --warning:#d9a441;
+  --warning-soft:rgba(217,164,65,.12);
+  --success:#40b879;
+  --success-soft:rgba(64,184,121,.12);
+  --bg:var(--bg-primary);
+  --surface2:var(--bg-tertiary);
+  --border:var(--border-primary);
+  --border2:var(--border-secondary);
+  --text:var(--text-primary);
+  --text2:var(--text-secondary);
+  --text3:var(--text-tertiary);
+  --accent:var(--accent-blue);
+  --accent-soft:var(--accent-blue-soft);
+  --danger:#e75652;
+  --danger-soft:rgba(231,86,82,.12);
+  --warn:var(--warning);
+  --warn-soft:var(--warning-soft);
+  --success:#40b879;
+  --success-soft:rgba(64,184,121,.12);
+  --sb-w:224px;
+  --radius:8px;
+  --radius-sm:6px;
+}
+html{font-size:var(--font-size);background:var(--bg-primary)}
+body{
+  font-family:var(--font-family);
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  letter-spacing:0;
+}
+body::before{display:none}
+.sidebar{
+  width:var(--sb-w);
+  background:var(--bg-secondary);
+  border-right:1px solid var(--border-primary);
+  box-shadow:none;
+}
+.sb-logo{
+  padding:20px 24px;
+  border-bottom:1px solid var(--border-primary);
+}
+.sb-logo-name{
+  color:var(--accent-blue);
+  font-size:18px;
+  font-weight:650;
+  letter-spacing:-.01em;
+}
+.sb-logo-name::before{display:none}
+.sb-logo-tag{
+  color:var(--text-tertiary);
+  font-size:10px;
+  margin-top:2px;
+}
+.sb-nav{padding:16px 0}
+.sb-section{
+  color:var(--text-tertiary);
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.08em;
+  padding:0 16px 8px;
+  margin-top:10px;
+}
+.sb-item{
+  margin:0;
+  padding:10px 16px;
+  border-radius:0;
+  border-left:2px solid transparent;
+  color:var(--text-secondary);
+  font-size:14px;
+  font-weight:500;
+  gap:12px;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+.sb-item i{
+  color:currentColor;
+  font-size:16px;
+}
+.sb-item:hover{
+  background:var(--bg-tertiary)!important;
+  color:var(--text-primary);
+  transform:none;
+}
+.sb-item.active{
+  background:var(--accent-blue-soft)!important;
+  color:var(--accent-blue);
+  border-left-color:var(--accent-blue);
+  font-weight:600;
+}
+.sb-footer{
+  padding:16px;
+  border-top:1px solid var(--border-primary);
+  background:var(--bg-secondary);
+}
+.sb-avatar{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:var(--accent-blue-soft);
+  color:var(--accent-blue);
+  border:0;
+}
+.main{background:var(--bg-primary)}
+.topbar{
+  min-height:57px;
+  padding:16px 24px;
+  background:var(--surface);
+  border-bottom:1px solid var(--border-primary);
+  box-shadow:none;
+  backdrop-filter:none;
+}
+.topbar-title{
+  color:var(--text-primary);
+  font-size:16px;
+  font-weight:650;
+}
+.content{
+  padding:24px;
+  gap:20px;
+}
+.card,
+.issue-card,
+.kcard,
+.ki-item,
+.onboarding-guide{
+  background:var(--surface);
+  border:1px solid var(--border-primary);
+  border-radius:8px;
+  box-shadow:none;
+}
+.card{padding:20px}
+.card-hd-l{
+  color:var(--text-primary);
+  font-size:14px;
+  font-weight:650;
+}
+.card-hd-l i{color:var(--accent-blue)}
+.chip{
+  background:var(--bg-tertiary)!important;
+  border:1px solid var(--border-primary)!important;
+  color:var(--text-secondary);
+  border-radius:6px;
+  padding:6px 12px;
+}
+.tbtn,.ab,.sq{
+  background:var(--bg-tertiary)!important;
+  border:1px solid var(--border-primary)!important;
+  color:var(--text-secondary);
+  border-radius:8px;
+  font-weight:500;
+  box-shadow:none;
+}
+.tbtn:hover,.ab:hover,.sq:hover{
+  background:var(--surface-elevated)!important;
+  border-color:var(--border-secondary)!important;
+  color:var(--text-primary);
+  transform:none;
+}
+.tbtn.primary,.ab-approve,.send-btn,.mini-send{
+  background:var(--accent-blue)!important;
+  color:white!important;
+  border-color:var(--accent-blue)!important;
+  box-shadow:none!important;
+}
+.badge{
+  border-radius:999px;
+  border:0;
+  padding:3px 8px;
+  font-weight:600;
+}
+.b-danger,.ct-danger{
+  background:var(--danger-soft);
+  color:var(--danger);
+}
+.b-warn,.ct-warn{
+  background:var(--warning-soft);
+  color:var(--warning);
+}
+.b-success,.ct-success{
+  background:var(--success-soft);
+  color:var(--success);
+}
+.b-accent,.ct-info{
+  background:var(--accent-blue-soft);
+  color:var(--accent-blue);
+}
+.b-gray,.ct-gray{
+  background:var(--bg-tertiary);
+  color:var(--text-tertiary);
+  border:1px solid var(--border-primary);
+}
+.tabs{
+  background:var(--surface);
+  border-bottom:1px solid var(--border-primary);
+  padding:0 20px;
+}
+.tab{
+  color:var(--text-secondary);
+  padding:13px 16px;
+  font-size:14px;
+  font-weight:500;
+}
+.tab.active{
+  color:var(--accent-blue);
+  border-bottom-color:var(--accent-blue);
+  font-weight:650;
+}
+.row,.tl-row,.history-row,.detail-item,.kb-item,.checklist-item,.confirm-row{
+  border-bottom-color:var(--border-primary);
+}
+.upload-zone{
+  background:var(--surface);
+  border:2px dashed var(--border-primary);
+  border-radius:8px;
+  padding:48px 24px;
+  box-shadow:none;
+}
+.upload-zone:hover,.upload-zone.dragover{
+  background:var(--accent-blue-soft);
+  border-color:var(--accent-blue);
+}
+.upload-zone.done{
+  background:var(--success-soft);
+  border-color:var(--success);
+}
+.flow-step{padding:12px 0}
+.flow-step:not(:last-child)::after{
+  background:var(--border-primary);
+  left:13px;
+  top:38px;
+}
+.flow-icon{
+  width:28px;
+  height:28px;
+  border:1px solid var(--border-primary);
+  box-shadow:none;
+}
+.fi-wait{background:var(--bg-tertiary);color:var(--text-tertiary)}
+.fi-active{background:var(--accent-blue-soft);color:var(--accent-blue);border-color:var(--accent-blue)}
+.fi-done{background:var(--success-soft);color:var(--success);border-color:var(--success)}
+.flow-title{
+  color:var(--text-primary);
+  font-size:13px;
+  font-weight:600;
+}
+.flow-sub{color:var(--text-tertiary);font-size:11px}
+.chunk-box{
+  background:var(--bg-tertiary);
+  border:1px solid var(--border-primary);
+  border-left:2px solid var(--accent-blue);
+  border-radius:8px;
+  color:var(--text-secondary);
+  line-height:1.75;
+}
+.chunk-meta{color:var(--text-tertiary)}
+.chunk-hl{
+  background:var(--accent-blue-soft);
+  color:var(--accent-blue);
+  border-radius:4px;
+  padding:1px 4px;
+}
+.todo-table th{
+  background:var(--bg-tertiary);
+  color:var(--text-tertiary);
+  border-bottom:1px solid var(--border-primary);
+}
+.todo-table td{border-bottom-color:var(--border-primary)}
+.todo-row:hover{background:var(--bg-tertiary)}
+.todo-row.selected{
+  background:var(--accent-blue-soft);
+  box-shadow:inset 2px 0 0 var(--accent-blue);
+}
+.todo-title{color:var(--text-primary);font-weight:600}
+.todo-src{color:var(--text-tertiary)}
+.detail-panel,.cal-side{
+  background:var(--surface);
+  border-left:1px solid var(--border-primary);
+}
+.detail-cell,.file-row,.og-step,.notif-item{
+  background:var(--bg-tertiary)!important;
+  border:1px solid var(--border-primary)!important;
+  border-radius:8px;
+}
+.detail-label,.detail-empty,.history-date,.tl-date,.kcard-sub,.kcard-arrow,.form-label,.modal-sub{
+  color:var(--text-tertiary);
+}
+.detail-section,.todo-title,.tl-text,.kcard-title,.issue-title,.modal-title,.onboarding-guide h3{
+  color:var(--text-primary);
+}
+.risk-box,.domino{
+  background:var(--danger-soft);
+  border:1px solid rgba(231,86,82,.24);
+  color:var(--danger);
+  border-radius:8px;
+}
+.issue-card{
+  padding:16px;
+  transition:background .15s,border-color .15s;
+}
+.issue-card:hover{
+  background:var(--surface-elevated);
+  border-color:var(--border-secondary);
+  box-shadow:none;
+  transform:none;
+}
+.issue-card.selected{
+  border-color:var(--accent-blue);
+  box-shadow:0 0 0 1px var(--accent-blue);
+}
+.issue-card.candidate{
+  background:var(--warning-soft);
+  border:1px dashed var(--warning);
+}
+.issue-title{
+  font-size:14px;
+  font-weight:650;
+}
+.issue-desc{color:var(--text-secondary)}
+.history-no-change{color:var(--warning)}
+.history-warn{color:var(--danger)}
+.cal-grid{
+  background:var(--border-primary);
+  border:1px solid var(--border-primary);
+  border-radius:8px;
+}
+.cal-dow{
+  background:var(--bg-tertiary);
+  color:var(--text-tertiary);
+  padding:9px 0;
+  font-weight:600;
+}
+.cal-cell{
+  background:var(--surface);
+  min-height:76px;
+  padding:7px;
+}
+.cal-cell:hover{background:var(--bg-tertiary)}
+.cal-cell.today{background:var(--accent-blue-soft)}
+.cal-cell.risk{background:var(--danger-soft)}
+.cal-cell.cal-selected{
+  outline:2px solid var(--accent-blue);
+  background:var(--accent-blue-soft)!important;
+}
+.cal-date{
+  color:var(--text-primary);
+  font-weight:650;
+}
+.cal-tag{
+  border-radius:999px;
+  padding:2px 7px;
+}
+.risk-dot{
+  background:var(--danger);
+  box-shadow:none;
+}
+.chat-area{
+  padding:24px;
+  background:var(--bg-primary);
+}
+.msg-av{
+  width:36px;
+  height:36px;
+  border-radius:8px;
+}
+.av-ai{
+  background:var(--accent-blue-soft);
+  color:var(--accent-blue);
+  border:0;
+}
+.av-user{
+  background:var(--bg-tertiary);
+  color:var(--text-secondary);
+  border:0;
+}
+.bubble{
+  border-radius:8px;
+  padding:12px 16px;
+  font-size:14px;
+  line-height:1.72;
+}
+.bubble-ai,.mini-bubble-ai{
+  background:var(--surface);
+  border:1px solid var(--border-primary);
+  color:var(--text-primary);
+}
+.bubble-user,.mini-bubble-user{
+  background:var(--accent-blue);
+  color:#fff;
+}
+.src-tag{
+  background:transparent;
+  border:0;
+  color:var(--accent-blue);
+  padding:0;
+}
+.confirm-card{
+  background:var(--surface);
+  border:1px solid var(--border-primary);
+  border-radius:8px;
+}
+.chat-input-bar,.mini-chat-hd,.mini-input-row{
+  background:var(--surface);
+  border-color:var(--border-primary);
+}
+.chat-input,.mini-input,.form-input{
+  background:var(--bg-tertiary);
+  border:1px solid var(--border-primary);
+  color:var(--text-primary);
+  border-radius:8px;
+}
+.chat-input:focus,.mini-input:focus,.form-input:focus{
+  border-color:var(--accent-blue);
+  box-shadow:0 0 0 2px rgba(88,108,246,.18);
+}
+.modal-overlay{
+  background:rgba(10,13,18,.68);
+  backdrop-filter:blur(6px);
+}
+.modal{
+  background:var(--surface);
+  border:1px solid var(--border-primary);
+  border-radius:8px;
+  box-shadow:0 22px 70px rgba(0,0,0,.42);
+}
+.toast{
+  background:var(--surface-elevated);
+  color:var(--text-primary);
+  border:1px solid var(--border-primary);
+  border-radius:8px;
+}
+.screen-transition{
+  background:rgba(32,36,45,.72);
+  backdrop-filter:blur(8px);
+}
+.tl-dot{box-shadow:none}
+.d-danger{background:var(--danger)}
+.d-warn{background:var(--warning)}
+.d-success{background:var(--success)}
+.d-info{background:var(--accent-blue)}
+.d-gray{background:var(--text-tertiary)}
+.tl-risk{
+  background:var(--danger-soft);
+  border:0;
+  color:var(--danger);
+  border-radius:8px;
+}
+.domino-item{
+  background:var(--bg-tertiary);
+  border:1px solid var(--border-primary);
+  border-radius:8px;
+}
+.domino-lbl,.domino-final{color:var(--danger)}
+.notif-btn{
+  background:var(--bg-tertiary)!important;
+  border:1px solid var(--border-primary)!important;
+  border-radius:8px!important;
+}
+
 .notif-panel{
   background:var(--surface-elevated)!important;
   border:1px solid var(--border-primary)!important;
@@ -3165,12 +3985,35 @@ function renderReportDraft(data){
   G.selectedReportId = null;
   document.querySelectorAll('#reportList .report-item').forEach(item => item.classList.remove('active'));
 }
-function saveReport(report){
+async function saveReport(report){
   const editor = document.getElementById('reportEditor') || document.querySelector('#s-reports [contenteditable="true"]');
   const draft = report || G.currentReportDraft || createReportDraft(G.currentReportPeriod || 'weekly');
+  if(!window.opsRadarApi){
+    showToast('DB 연결을 준비 중입니다. 잠시 후 다시 시도해주세요.','warn');
+    return null;
+  }
+
   const sections = normalizeReportSections(draft.sections);
-  const payload = {
-    id: draft.id || 'report-' + Date.now(),
+  const content = editor ? editor.innerHTML : (draft.html || '');
+
+  try{
+    let reportId = draft.apiId;
+    if(!reportId){
+      const generated = await window.opsRadarApi.request('/reports/generate', {
+        method:'POST',
+        body:JSON.stringify({ period:draft.type === 'monthly' ? 'monthly' : 'weekly' })
+      });
+      reportId = generated.report_id;
+    }
+
+    await window.opsRadarApi.request(`/reports/${reportId}`, {
+      method:'PATCH',
+      body:JSON.stringify({ content })
+    });
+
+    const payload = {
+      id: reportId,
+      apiId: reportId,
     type: draft.type || getActiveReportPeriod(),
     title: draft.title || getReportDefaultTitle(draft.type || getActiveReportPeriod()),
     period: draft.period || getReportPeriodRange(draft.type || getActiveReportPeriod()),
@@ -3182,18 +4025,19 @@ function saveReport(report){
     pendingTodos: Number(draft.pendingTodos || todos.filter(t=>t.status!=='done').length || 0),
     sections,
     docs: draft.docs || ['연결된 문서가 없습니다.'],
-    html: editor ? editor.innerHTML : (draft.html || '')
-  };
-  const reports = fetchReports().filter(item => item.id !== payload.id && !String(item.id || '').startsWith('sample-'));
-  reports.unshift(payload);
-  G.savedReports = reports;
-  persistReports(reports);
-  G.currentReportDraft = null;
-  G.selectedReportId = payload.id;
-  renderReportList();
-  renderReportDetail(payload);
-  showToast('보고서가 지난 보고서 목록에 저장되었습니다.','success');
-  return payload;
+    html: content
+    };
+    G.currentReportDraft = null;
+    G.selectedReportId = payload.id;
+    await window.opsRadarApi.loadReports();
+    renderReportDetail(payload);
+    showToast('보고서가 DB에 저장되었습니다.','success');
+    return payload;
+  }catch(error){
+    console.warn('Report save API failed', error);
+    showToast('보고서 저장에 실패했습니다.','warn');
+    return null;
+  }
 }
 function editReport(reportId){
   const report = fetchReports().find(item => item.id === reportId);
@@ -3321,7 +4165,7 @@ setTimeout(bindRemainingActionButtons, 0);
 // ════════════════════════════════════════════════
 function ondov(e){e.preventDefault();document.getElementById('uploadZone').classList.add('dragover')}
 function ondl(e){document.getElementById('uploadZone').classList.remove('dragover')}
-function ondrop(e){e.preventDefault();document.getElementById('uploadZone').classList.remove('dragover');handleFiles(Array.from(e.dataTransfer.files))}
+function handleUploadDrop(e){e.preventDefault();document.getElementById('uploadZone').classList.remove('dragover');handleFiles(Array.from(e.dataTransfer.files))}
 function onFileSelect(e){handleFiles(Array.from(e.target.files))}
 
 function getUploadErrorMessage(reason){
@@ -3617,7 +4461,31 @@ function switchTodoTab(tab){G.currentTodoTab=tab;G.selectedTodoId=null;document.
 function openEditModal(id){G.editTargetId=id;const t=todos.find(x=>x.id===id);document.getElementById('editTitle').value=t.title;document.getElementById('editAssignee').value=t.assignee||'담당자 A';document.getElementById('editModal').classList.add('show');}
 function saveEdit(){const t=todos.find(x=>x.id===G.editTargetId);t.title=document.getElementById('editTitle').value.trim();t.assignee=document.getElementById('editAssignee').value;closeModal('editModal');renderTodos();if(G.selectedTodoId===G.editTargetId)renderTodoDetail(G.editTargetId);showToast('수정되었습니다.','info');}
 function openManualModal(){document.getElementById('manualModal').classList.add('show');}
-function saveManual(){const title=document.getElementById('manualTitle').value.trim();if(!title)return;todos.unshift({id:Date.now(),title,src:null,srcChunk:null,assignee:document.getElementById('manualAssignee').value,priority:document.getElementById('manualPriority').value,confidence:null,status:'pending',type:'manual',chunk:null,grounds:['수동 등록'],risk:''});closeModal('manualModal');document.getElementById('manualTitle').value='';if(G.currentTodoTab!=='ai')switchTodoTab('ai');else renderTodos();updateTodoCounts();showToast('✅ Todo가 등록되었습니다.','success');}
+async function saveManual(){
+  const title=document.getElementById('manualTitle').value.trim();
+  if(!title)return;
+  if(!window.opsRadarApi){showToast('DB 연결을 준비 중입니다. 잠시 후 다시 시도해주세요.','warn');return;}
+  try{
+    await window.opsRadarApi.request('/todos',{
+      method:'POST',
+      body:JSON.stringify({
+        title,
+        assignee:document.getElementById('manualAssignee').value||null,
+        priority:document.getElementById('manualPriority').value||'medium',
+        source:'manual',
+        status:'pending'
+      })
+    });
+    closeModal('manualModal');
+    document.getElementById('manualTitle').value='';
+    if(G.currentTodoTab!=='ai')switchTodoTab('ai');
+    await window.opsRadarApi.loadTodos();
+    showToast('Todo가 DB에 등록되었습니다.','success');
+  }catch(error){
+    console.warn('Todo create API failed',error);
+    showToast('Todo 등록에 실패했습니다.','warn');
+  }
+}
 
 // ════════════════════════════════════════════════
 // 흐름 3 — 이슈 → 대응 Todo 생성
@@ -3693,7 +4561,7 @@ function openTodoCreate(issueId){
   document.getElementById('todoCreateModal').classList.add('show');
 }
 
-function confirmTodoCreate(){
+async function confirmTodoCreate(){
   const title=document.getElementById('tcTitle').value.trim();
   if(!title)return;
   const assignee=document.getElementById('tcAssignee').value;
@@ -3701,27 +4569,51 @@ function confirmTodoCreate(){
   const due=document.getElementById('tcDue').value;
   closeModal('todoCreateModal');
   showTransition('이슈 기반 대응 Todo를 생성하고 있습니다');
-  setTimeout(()=>{
-    hideTransition();
-    G.createdTodosFromIssue.push({id:Date.now(),issueId:G.createIssueId,title,assignee,priority,dueDate:due,status:'pending'});
-    todos.unshift({id:Date.now()+1,title,src:`이슈 #${G.createIssueId}`,srcChunk:'이슈 연결',assignee,priority,confidence:null,status:'pending',type:'ai',chunk:null,grounds:['이슈 기반 생성'],risk:''});
-    document.getElementById('todoFromIssueBanner').style.display='inline-flex';
-    document.getElementById('todoBadge').style.display='inline-block';
-    renderIssues();
-    if(G.selectedIssueId===G.createIssueId)renderIssueDetail(G.createIssueId);
-    nav('todo');
-    showToast(`✅ "${title.slice(0,20)}..." Todo가 생성되었습니다.`,'success');
-    addNotif(`이슈 기반 대응 Todo "${title.slice(0,20)}..."가 생성되었습니다.`, 'success');
-    showCtxBanner('todo', `이슈 #${G.createIssueId}에서 생성된 Todo가 최상단에 추가되었습니다.`);
-    updateTodoCounts();
+  setTimeout(async ()=>{
+    try{
+      const issue=issues.find(i=>i.id===G.createIssueId);
+      const apiIssueId=getIssueApiId(issue);
+      if(apiIssueId){
+        const res=await fetch(`/api/v1/issues/${apiIssueId}/todos`, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({title,assignee,priority,due_at:due||null,status:'pending'})
+        });
+        if(!res.ok)throw new Error(`Todo 저장 실패: ${res.status}`);
+        if(window.opsRadarApi)await window.opsRadarApi.reload();
+      }else{
+        todos.unshift({id:Date.now()+1,title,src:`이슈 #${G.createIssueId}`,srcChunk:'이슈 연결',assignee,priority,confidence:null,status:'pending',type:'manual',chunk:null,grounds:['이슈 기반 생성'],risk:''});
+      }
+      G.createdTodosFromIssue.push({id:Date.now(),issueId:G.createIssueId,title,assignee,priority,dueDate:due,status:'pending'});
+      document.getElementById('todoFromIssueBanner').style.display='inline-flex';
+      document.getElementById('todoBadge').style.display='inline-block';
+      renderIssues();
+      if(G.selectedIssueId===G.createIssueId)renderIssueDetail(G.createIssueId);
+      nav('todo');
+      showToast(`"${title.slice(0,20)}..." Todo가 생성되었습니다.`,'success');
+      addNotif(`이슈 기반 대응 Todo "${title.slice(0,20)}..."가 생성되었습니다.`, 'success');
+      showCtxBanner('todo', `이슈 #${G.createIssueId}에서 생성된 Todo가 최상단에 추가되었습니다.`);
+      updateTodoCounts();
+    }catch(e){
+      alert('Todo 저장에 실패했습니다. 잠시 후 다시 시도해주세요.');
+    }finally{
+      hideTransition();
+    }
   },1200);
 }
 
-function resolveIssue(id){const issue=issues.find(i=>i.id===id);issue.status='resolved';issue.type='resolved';renderIssues();hideIssueDetail();showToast('✅ 이슈가 해결 완료 처리되었습니다.','success');}
+function getIssueApiId(issue){
+  if(!issue)return null;
+  if(issue.apiId)return issue.apiId;
+  return typeof issue.id==='string'&&/^[0-9a-f-]{36}$/i.test(issue.id)?issue.id:null;
+}
+async function resolveIssue(id){const issue=issues.find(i=>i.id===id);const apiId=getIssueApiId(issue);if(apiId){const res=await fetch(`/api/v1/issues/${apiId}/resolve`,{method:'PATCH'});if(!res.ok){showToast('이슈 저장에 실패했습니다.','warn');return;}}issue.status='resolved';issue.type='resolved';renderIssues();hideIssueDetail();showToast('이슈가 해결 완료 처리되었습니다.','success');}
 function openConfirmIssue(id){G.confirmIssueId=id;const issue=issues.find(i=>i.id===id);document.getElementById('confirmIssueText').textContent=`"${issue.title}"을 확정 이슈로 전환합니다. 대응 Todo를 생성할 수 있습니다.`;document.getElementById('confirmIssueModal').classList.add('show');}
-function doConfirmIssue(){const issue=issues.find(i=>i.id===G.confirmIssueId);if(issue){issue.type='confirmed';closeModal('confirmIssueModal');switchIssueTab('confirmed');showToast('이슈가 확정되었습니다.','warn');}}
-function dismissIssue(){doRemoveIssue(G.confirmIssueId);closeModal('confirmIssueModal');}
-function doRemoveIssue(id){const idx=issues.findIndex(i=>i.id===id);if(idx!==-1)issues.splice(idx,1);renderIssues();hideIssueDetail();showToast('이슈 후보가 무시되었습니다.','info');}
+
+async function doConfirmIssue(){const issue=issues.find(i=>i.id===G.confirmIssueId);if(issue){const apiId=getIssueApiId(issue);if(apiId){const res=await fetch(`/api/v1/issues/${apiId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({approval_status:'approved'})});if(!res.ok){showToast('이슈 저장에 실패했습니다.','warn');return;}}issue.type='confirmed';closeModal('confirmIssueModal');switchIssueTab('confirmed');showToast('이슈가 확정되었습니다.','warn');}}
+async function dismissIssue(){await doRemoveIssue(G.confirmIssueId);closeModal('confirmIssueModal');}
+async function doRemoveIssue(id){const idx=issues.findIndex(i=>i.id===id);const issue=idx===-1?null:issues[idx];const apiId=getIssueApiId(issue);if(apiId){const res=await fetch(`/api/v1/issues/${apiId}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({approval_status:'rejected'})});if(!res.ok){showToast('이슈 저장에 실패했습니다.','warn');return;}}if(idx!==-1)issues.splice(idx,1);renderIssues();hideIssueDetail();showToast('이슈 후보가 무시되었습니다.','info');}
+
 function persistIssues(){
   try{ localStorage.setItem('opsradar_issues', JSON.stringify(issues)); }catch(e){}
 }
@@ -3769,24 +4661,22 @@ async function createIssue(issueData){
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify(body)
     });
-    if(res.ok){
-      const saved = await res.json().catch(()=>body);
-      return toIssueModel({...body, ...saved});
-    }
-  }catch(e){}
-  return toIssueModel(body);
+    if(!res.ok) throw new Error(`이슈 저장 실패: ${res.status}`);
+    const saved = await res.json();
+    return toIssueModel({...body, ...saved});
+  }catch(e){
+    throw e;
+  }
 }
 async function fetchIssues(){
   try{
     const res = await fetch('/api/v1/issues');
     if(res.ok){
       const data = await res.json();
-      const list = Array.isArray(data) ? data : (data.items || data.results || []);
-      if(list.length){
-        issues.splice(0, issues.length, ...list.map(toIssueModel));
-        persistIssues();
-        return issues;
-      }
+      const list = Array.isArray(data) ? data : (data.issues || data.items || data.results || []);
+      issues.splice(0, issues.length, ...list.map(toIssueModel));
+      persistIssues();
+      return issues;
     }
   }catch(e){}
   try{
@@ -5066,29 +5956,70 @@ function openCalModal(d) {
   const label = document.getElementById('calColorLabel'); if(label) label.textContent = '일반';
   openModal('calModal');
 }
-function addCalTag() {
+
+async function addCalTag() {
   ensureCalendarState();
   const d = G.selectedCalDay;
   const input = document.getElementById('calModalInput');
   const text = input ? input.value.trim() : '';
   const color = calSelectedColor || 'ct-info';
   if (!text || !d) return;
-  let ev = findCalEventForDay(d, G.currentCalYear, G.currentCalMonth);
-  if (ev) ev.tags.push({t: text, c: color});
-  else G.calEvents.push({d, y: G.currentCalYear, m: G.currentCalMonth, tags: [{t: text, c: color}]});
-  renderCalendar(G.currentCalYear, G.currentCalMonth);
-  openCalModal(d);
-  showToast(`${G.currentCalMonth + 1}월 ${d}일 일정이 추가되었습니다.`, 'info');
+  if(!window.opsRadarCreateCalendarEvent || !window.opsRadarApi){
+    showToast('DB 연결을 준비 중입니다. 잠시 후 다시 시도해주세요.','warn');
+    return;
+  }
+
+  try{
+    await window.opsRadarCreateCalendarEvent({
+      title:text,
+      day:d,
+      year:G.currentCalYear,
+      month:G.currentCalMonth,
+      color
+    });
+
+    await window.opsRadarApi.loadCalendar();
+    renderCalendar(G.currentCalYear, G.currentCalMonth);
+    openCalModal(d);
+    showToast(`${G.currentCalMonth + 1}월 ${d}일 일정이 DB에 추가되었습니다.`, 'info');
+  }catch(error){
+    console.warn('Calendar create API failed',error);
+    showToast('캘린더 등록에 실패했습니다.','warn');
+  }
 }
-function deleteCalTag(d, idx) {
+
+async function deleteCalTag(d, idx) {
   ensureCalendarState();
+
   const ev = findCalEventForDay(d, G.currentCalYear, G.currentCalMonth);
   if (!ev) return;
-  ev.tags.splice(idx, 1);
-  if (ev.tags.length === 0) G.calEvents = G.calEvents.filter(e => e !== ev);
-  renderCalendar(G.currentCalYear, G.currentCalMonth);
-  openCalModal(d);
-  showToast('일정이 삭제되었습니다.', 'info');
+
+  const tag = ev.tags[idx];
+
+  try{
+    if(tag?.apiId){
+      if(!window.opsRadarApi){
+        showToast('DB 연결을 준비 중입니다. 잠시 후 다시 시도해주세요.','warn');
+        return;
+      }
+
+      await window.opsRadarApi.request(`/calendar/${tag.apiId}`,{method:'DELETE'});
+      await window.opsRadarApi.loadCalendar();
+    }else{
+      ev.tags.splice(idx,1);
+      if(ev.tags.length === 0){
+        G.calEvents = G.calEvents.filter(e => e !== ev);
+      }
+    }
+
+    renderCalendar(G.currentCalYear,G.currentCalMonth);
+    openCalModal(d);
+    showToast('일정이 삭제되었습니다.','info');
+  }catch(error){
+    console.warn('Calendar delete API failed',error);
+    showToast('캘린더 삭제에 실패했습니다.','warn');
+  }
+}
 }
 function registerCalEvent(parsed, calDate){
   ensureCalendarState();
@@ -5661,5 +6592,6 @@ setTimeout(initOpsRadarSkin, 0);</script>
   }, 0);
 })();
 </script>
+<script src="/static/api-integration.js"></script>
 </body>
 </html>

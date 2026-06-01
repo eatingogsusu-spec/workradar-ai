@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, date
+from datetime import date, datetime
 
 from sqlalchemy import Date, DateTime, ForeignKey, Index, Integer, String, Text, UniqueConstraint, text
 from sqlalchemy.dialects.postgresql import UUID
@@ -13,11 +13,28 @@ class Base(DeclarativeBase):
 
 
 def uuid_pk() -> Mapped[uuid.UUID]:
-    return mapped_column(UUID(as_uuid=True), primary_key=True, server_default=text("gen_random_uuid()"))
+    return mapped_column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("gen_random_uuid()"),
+    )
 
 
 def now_col() -> Mapped[datetime]:
-    return mapped_column(DateTime(timezone=True), nullable=False, server_default=text("now()"))
+    return mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+    )
+
+
+def updated_at_col() -> Mapped[datetime]:
+    return mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=text("now()"),
+        onupdate=text("now()"),
+    )
 
 
 class Team(Base):
@@ -26,7 +43,7 @@ class Team(Base):
     id: Mapped[uuid.UUID] = uuid_pk()
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = now_col()
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=text("now()"), onupdate=text("now()"))
+    updated_at: Mapped[datetime] = updated_at_col()
 
 
 class User(Base):
@@ -37,12 +54,16 @@ class User(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    team_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("teams.id", ondelete="CASCADE"), nullable=False)
+    team_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("teams.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     email: Mapped[str] = mapped_column(String(255), nullable=False)
     role: Mapped[str] = mapped_column(String(50), nullable=False, server_default="member")
     created_at: Mapped[datetime] = now_col()
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=text("now()"), onupdate=text("now()"))
+    updated_at: Mapped[datetime] = updated_at_col()
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
@@ -51,12 +72,16 @@ class Project(Base):
     __table_args__ = (Index("idx_projects_team_id", "team_id"),)
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    team_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("teams.id", ondelete="CASCADE"), nullable=False)
+    team_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("teams.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(String(1000))
     status: Mapped[str] = mapped_column(String(50), nullable=False, server_default="active")
     created_at: Mapped[datetime] = now_col()
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=text("now()"), onupdate=text("now()"))
+    updated_at: Mapped[datetime] = updated_at_col()
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
@@ -70,9 +95,21 @@ class ProjectMember(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    team_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("teams.id", ondelete="CASCADE"), nullable=False)
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    team_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("teams.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     role: Mapped[str] = mapped_column(String(50), nullable=False, server_default="member")
     status: Mapped[str] = mapped_column(String(50), nullable=False, server_default="active")
     joined_at: Mapped[datetime] = now_col()
@@ -87,15 +124,22 @@ class Document(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    uploaded_by_member_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("project_members.id", ondelete="SET NULL"))
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    uploaded_by_member_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("project_members.id", ondelete="SET NULL"),
+    )
     file_name: Mapped[str] = mapped_column(String(255), nullable=False)
     file_type: Mapped[str] = mapped_column(String(50), nullable=False)
     storage_uri: Mapped[str] = mapped_column(String(1000), nullable=False)
     content_hash: Mapped[str | None] = mapped_column(String(128))
     status: Mapped[str] = mapped_column(String(50), nullable=False, server_default="uploaded")
     created_at: Mapped[datetime] = now_col()
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=text("now()"), onupdate=text("now()"))
+    updated_at: Mapped[datetime] = updated_at_col()
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
 
 
@@ -107,7 +151,11 @@ class DocumentChunk(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    document_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("documents.id", ondelete="CASCADE"), nullable=False)
+    document_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("documents.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     chunk_index: Mapped[int] = mapped_column(Integer, nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     token_count: Mapped[int | None] = mapped_column(Integer)
@@ -123,7 +171,11 @@ class FaissIndex(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     index_path: Mapped[str] = mapped_column(String(1000), nullable=False)
     embedding_model: Mapped[str] = mapped_column(String(100), nullable=False)
     embedding_dimension: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -142,8 +194,16 @@ class ChunkEmbedding(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    chunk_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("document_chunks.id", ondelete="CASCADE"), nullable=False)
-    faiss_index_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("faiss_indexes.id", ondelete="CASCADE"), nullable=False)
+    chunk_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("document_chunks.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    faiss_index_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("faiss_indexes.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     vector_external_id: Mapped[int] = mapped_column(Integer, nullable=False)
     embedding_model: Mapped[str] = mapped_column(String(100), nullable=False)
     embedding_dimension: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -160,9 +220,19 @@ class EmbeddingJob(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    document_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("documents.id", ondelete="SET NULL"))
-    faiss_index_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("faiss_indexes.id", ondelete="SET NULL"))
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    document_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("documents.id", ondelete="SET NULL"),
+    )
+    faiss_index_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("faiss_indexes.id", ondelete="SET NULL"),
+    )
     job_type: Mapped[str] = mapped_column(String(50), nullable=False, server_default="document_embedding")
     status: Mapped[str] = mapped_column(String(50), nullable=False, server_default="queued")
     error_message: Mapped[str | None] = mapped_column(Text)
@@ -180,9 +250,19 @@ class Todo(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    assignee_member_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("project_members.id", ondelete="SET NULL"))
-    source_chunk_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("document_chunks.id", ondelete="SET NULL"))
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    assignee_member_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("project_members.id", ondelete="SET NULL"),
+    )
+    source_chunk_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("document_chunks.id", ondelete="SET NULL"),
+    )
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     status: Mapped[str] = mapped_column(String(50), nullable=False, server_default="pending")
     priority: Mapped[str] = mapped_column(String(50), nullable=False, server_default="medium")
@@ -191,7 +271,7 @@ class Todo(Base):
     confidence_score: Mapped[int | None] = mapped_column(Integer)
     due_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = now_col()
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=text("now()"), onupdate=text("now()"))
+    updated_at: Mapped[datetime] = updated_at_col()
 
 
 class Issue(Base):
@@ -203,9 +283,19 @@ class Issue(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    assignee_member_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("project_members.id", ondelete="SET NULL"))
-    source_chunk_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("document_chunks.id", ondelete="SET NULL"))
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    assignee_member_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("project_members.id", ondelete="SET NULL"),
+    )
+    source_chunk_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("document_chunks.id", ondelete="SET NULL"),
+    )
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     severity: Mapped[str] = mapped_column(String(50), nullable=False, server_default="medium")
     status: Mapped[str] = mapped_column(String(50), nullable=False, server_default="open")
@@ -213,7 +303,7 @@ class Issue(Base):
     approval_status: Mapped[str] = mapped_column(String(50), nullable=False, server_default="confirmed")
     confidence_score: Mapped[int | None] = mapped_column(Integer)
     created_at: Mapped[datetime] = now_col()
-    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=text("now()"), onupdate=text("now()"))
+    updated_at: Mapped[datetime] = updated_at_col()
 
 
 class IssueHistory(Base):
@@ -224,9 +314,16 @@ class IssueHistory(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    issue_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("issues.id", ondelete="CASCADE"), nullable=False)
+    issue_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("issues.id", ondelete="CASCADE"),
+        nullable=False,
+    )
     status: Mapped[str] = mapped_column(String(50), nullable=False)
-    changed_by_member_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("project_members.id", ondelete="SET NULL"))
+    changed_by_member_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("project_members.id", ondelete="SET NULL"),
+    )
     note: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = now_col()
 
@@ -239,9 +336,19 @@ class CalendarEvent(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    member_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("project_members.id", ondelete="SET NULL"))
-    source_chunk_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("document_chunks.id", ondelete="SET NULL"))
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    member_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("project_members.id", ondelete="SET NULL"),
+    )
+    source_chunk_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("document_chunks.id", ondelete="SET NULL"),
+    )
     event_type: Mapped[str] = mapped_column(String(50), nullable=False, server_default="other")
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     source_type: Mapped[str] = mapped_column(String(50), nullable=False, server_default="manual")
@@ -259,8 +366,15 @@ class WeeklyReport(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    created_by_member_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("project_members.id", ondelete="SET NULL"))
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    created_by_member_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("project_members.id", ondelete="SET NULL"),
+    )
     week_start: Mapped[date] = mapped_column(Date, nullable=False)
     week_end: Mapped[date] = mapped_column(Date, nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
@@ -276,8 +390,15 @@ class MonthlyReport(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    created_by_member_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("project_members.id", ondelete="SET NULL"))
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    created_by_member_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("project_members.id", ondelete="SET NULL"),
+    )
     month_start: Mapped[date] = mapped_column(Date, nullable=False)
     month_end: Mapped[date] = mapped_column(Date, nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
@@ -290,9 +411,19 @@ class HandoffReport(Base):
     __table_args__ = (Index("idx_handoff_reports_project_created", "project_id", "created_at"),)
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    from_member_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("project_members.id", ondelete="SET NULL"))
-    to_member_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("project_members.id", ondelete="SET NULL"))
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    from_member_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("project_members.id", ondelete="SET NULL"),
+    )
+    to_member_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("project_members.id", ondelete="SET NULL"),
+    )
     handoff_type: Mapped[str] = mapped_column(String(50), nullable=False, server_default="project")
     content: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = now_col()
@@ -306,8 +437,15 @@ class ChatMessage(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    member_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("project_members.id", ondelete="SET NULL"))
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    member_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("project_members.id", ondelete="SET NULL"),
+    )
     role: Mapped[str] = mapped_column(String(50), nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime] = now_col()
@@ -321,9 +459,19 @@ class AISummary(Base):
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
-    document_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("documents.id", ondelete="SET NULL"))
-    project_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
-    source_faiss_index_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("faiss_indexes.id", ondelete="SET NULL"))
+    document_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("documents.id", ondelete="SET NULL"),
+    )
+    project_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("projects.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    source_faiss_index_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("faiss_indexes.id", ondelete="SET NULL"),
+    )
     todo_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
     issue_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")
     blocked_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0")

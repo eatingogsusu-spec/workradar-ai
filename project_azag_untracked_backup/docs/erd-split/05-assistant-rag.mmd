@@ -1,0 +1,70 @@
+erDiagram
+  PROJECTS ||--o{ CHAT_MESSAGES : contains
+  USERS ||--o{ CHAT_MESSAGES : sends
+  PROJECTS ||--o{ DOCUMENTS : contains
+  DOCUMENTS ||--o{ DOCUMENT_CHUNKS : splits
+  DOCUMENT_CHUNKS ||--o{ CHUNK_EMBEDDINGS : indexes
+
+  PROJECTS {
+    uuid id PK
+    uuid team_id FK
+    uuid created_by FK
+    string name
+    text description
+    string status
+    date start_date
+    date end_date
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  USERS {
+    uuid id PK
+    string name
+    string email UK
+    text password_hash
+    string role
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  CHAT_MESSAGES {
+    uuid id PK
+    uuid project_id FK
+    uuid user_id FK
+    string role
+    text content
+    json sources_json
+    timestamp created_at
+  }
+
+  DOCUMENTS {
+    uuid id PK
+    uuid project_id FK
+    uuid uploaded_by FK
+    string file_name
+    string file_type
+    string source_type
+    text storage_path
+    string status
+    timestamp uploaded_at
+  }
+
+  DOCUMENT_CHUNKS {
+    uuid id PK
+    uuid document_id FK
+    uuid project_id FK
+    text content
+    int chunk_index
+    int page_number
+    timestamp created_at
+  }
+
+  CHUNK_EMBEDDINGS {
+    uuid id PK
+    uuid chunk_id FK
+    string vector_store
+    string vector_id
+    string embedding_model
+    timestamp created_at
+  }

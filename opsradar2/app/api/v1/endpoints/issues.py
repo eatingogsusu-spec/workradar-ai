@@ -7,9 +7,17 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.repositories.issue_repository import IssueRepository
+from app.repositories.todo_repository import TodoRepository
+from app.schemas.issue import IssueCreate
 from app.services.issue_service import IssueService
 
 router = APIRouter()
+
+
+@router.post("")
+async def create_issue(body: IssueCreate, db: AsyncSession = Depends(get_db)):
+    service = IssueService(IssueRepository(db))
+    return await service.create_issue(body.model_dump())
 
 
 @router.get("")
@@ -42,5 +50,11 @@ async def resolve_issue(issue_id: str, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/{issue_id}/todos")
-async def create_todo_from_issue(issue_id: str):
-    return {"status": "not_implemented", "linked_issue_id": issue_id}
+async def create_todo_from_issue(issue_id: str, body: dict, db: AsyncSession = Depends(get_db)):
+    if not body.get("title"):
+        raise HTTPException(400, "title is required")
+    service = IssueService(IssueRepository(db), TodoRepository(db))
+    todo_id = await service.create_todo_from_issue(issue_id, body)
+    if not todo_id:
+        raise HTTPException(404, "issue not found")
+    return {"status": "success", "todo_id": todo_id, "linked_issue_id": issue_id}

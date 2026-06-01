@@ -1,0 +1,43 @@
+erDiagram
+  TEAMS ||--o{ PROJECTS : has
+  USERS ||--o{ PROJECTS : creates
+  PROJECTS ||--o{ PROJECT_MEMBERS : has
+  USERS ||--o{ PROJECT_MEMBERS : joins
+
+  USERS {
+    uuid id PK
+    string name
+    string email UK
+    text password_hash
+    string role
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  TEAMS {
+    uuid id PK
+    string name
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  PROJECTS {
+    uuid id PK
+    uuid team_id FK
+    uuid created_by FK
+    string name
+    text description
+    string status
+    date start_date
+    date end_date
+    timestamp created_at
+    timestamp updated_at
+  }
+
+  PROJECT_MEMBERS {
+    uuid id PK
+    uuid project_id FK
+    uuid user_id FK
+    string role
+    timestamp joined_at
+  }

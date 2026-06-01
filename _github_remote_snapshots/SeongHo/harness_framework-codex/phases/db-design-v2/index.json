@@ -1,0 +1,21 @@
+{
+  "project": "TeamMemory",
+  "phase": "db-design-v2",
+  "steps": [
+    {
+      "step": 0,
+      "name": "project-docs",
+      "status": "pending"
+    },
+    {
+      "step": 1,
+      "name": "db-schema",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "seed-and-queries",
+      "status": "pending"
+    }
+  ]
+}

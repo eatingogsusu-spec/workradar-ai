@@ -276,5 +276,9 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
+# Local PostgreSQL verification cluster
+db/local_pgdata_teamazag/
+db/local_pg_teamazag.log
+
 # Streamlit
 .streamlit/secrets.toml

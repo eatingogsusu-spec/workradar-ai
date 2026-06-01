@@ -1,0 +1,59 @@
+문서 유형: 주간 업무 보고서
+작성자: 이성우
+기간: 2026년 5월 11일 ~ 5월 17일 (2주차)
+작성일: 2026년 5월 13일
+
+---
+
+[이번 주 목표]
+- LangChain 청킹 코드 초안 작성 (feat/sungwoo-rag 브랜치)
+- 더미 데이터 구조 설계 및 생성
+- OpenAI API 키 발급 및 팀 공유
+
+---
+
+[완료된 작업]
+1. 로컬 개발 환경 세팅 완료
+   - Python 3.11 가상환경 구성
+   - LangChain 0.1.x, ChromaDB 0.4.x 설치
+   - 패키지 버전 requirements.txt에 정리 완료
+
+2. 더미 데이터 구조 설계
+   - AI 파이프라인 테스트용 더미 문서 종류 정의
+   - 회의록 텍스트 파일 작성 중 (4/6 완료)
+   - seed/ 폴더 JSON 구조 설계 완료
+
+3. RAG 파이프라인 구조 설계
+   - chunker → embedder → retriever → summarizer 흐름 확정
+   - 각 모듈 인터페이스 정의 완료
+
+---
+
+[진행 중인 작업]
+1. chunker.py 작성 중
+   - RecursiveCharacterTextSplitter 기반으로 작성 예정
+   - chunk_size=500, chunk_overlap=50으로 초안 설정
+   - 예상 완료: 5월 15일
+
+2. 회의록 더미 텍스트 파일 생성
+   - 6개 중 4개 완성, 2개 추가 작성 필요
+   - 예상 완료: 5월 14일
+
+---
+
+[이슈 / 블로커]
+1. OpenAI API 키 미발급 (우선순위: 높음)
+   - 오늘 중 발급 예정
+   - .env.example 파일 작성 후 팀 공유
+
+2. chunks 테이블 스키마 미확정
+   - chunker.py 완성 후 김성호와 협의 예정
+   - 블로커는 아님, 병렬 진행 가능
+
+---
+
+[다음 주 계획 (3주차)]
+- embedder.py 작성 (Chroma 저장)
+- retriever.py 작성 (RAG 검색)
+- chunker + embedder End-to-End 테스트
+- 3주차 목표: 문서 → 청킹 → Chroma 저장까지 동작 확인

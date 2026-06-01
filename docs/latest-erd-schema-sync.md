@@ -1,6 +1,6 @@
 # Latest ERD Schema Sync
 
-This branch now treats `opsradar_erd_postgresql_faiss.html` as the DB source of truth.
+This branch treats `opsradar_erd_postgresql_faiss.html` as the DB design reference, and the executable PostgreSQL source of truth is `schema.postgresql.sql`.
 
 ## Tables
 
@@ -26,14 +26,14 @@ This branch now treats `opsradar_erd_postgresql_faiss.html` as the DB source of 
 ## Important Naming Decisions
 
 - Member-scoped references use `project_members.id`.
-- Todo state uses `status` with `pending`, `in_progress`, `blocked`, `completed`.
-- Issue risk uses `severity` with `low`, `medium`, `high`, `critical`.
+- Todo state uses `status` with `pending`, `in_progress`, `blocked`, and `completed`.
+- Issue risk uses `severity` with `low`, `medium`, `high`, and `critical`.
 - Calendar timestamps use `starts_at` and `ends_at`.
 - FAISS vectors are not stored in PostgreSQL. PostgreSQL stores `faiss_indexes` and `chunk_embeddings.vector_external_id`.
 
 ## API Scope
 
-The FastAPI app keeps only the existing read-oriented surface stable:
+The FastAPI app keeps the current read-oriented surface stable:
 
 - project list
 - dashboard summary

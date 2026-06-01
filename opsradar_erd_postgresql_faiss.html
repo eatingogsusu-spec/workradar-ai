@@ -1,0 +1,280 @@
+
+<style>
+#erd-wrap { padding: 1rem 0; }
+#erd-wrap svg { display: block; }
+</style>
+<div id="erd-wrap"></div>
+<script type="module">
+import mermaid from 'https://esm.sh/mermaid@11/dist/mermaid.esm.min.mjs';
+const dark = matchMedia('(prefers-color-scheme: dark)').matches;
+await document.fonts.ready;
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'base',
+  fontFamily: '"Anthropic Sans", sans-serif',
+  themeVariables: {
+    darkMode: dark,
+    fontSize: '12px',
+    fontFamily: '"Anthropic Sans", sans-serif',
+    lineColor: dark ? '#9c9a92' : '#73726c',
+    textColor: dark ? '#c2c0b6' : '#3d3d3a',
+    primaryColor: dark ? '#2a2a28' : '#f4f4f0',
+    primaryBorderColor: dark ? '#5a5a54' : '#b0aea6',
+    primaryTextColor: dark ? '#c2c0b6' : '#3d3d3a',
+  },
+});
+
+const diagram = `erDiagram
+  teams {
+    uuid id PK
+    varchar name
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  users {
+    uuid id PK
+    uuid team_id FK
+    varchar name
+    varchar email UK
+    varchar role
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+  projects {
+    uuid id PK
+    uuid team_id FK
+    varchar name
+    varchar description
+    varchar status
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+  project_members {
+    uuid id PK
+    uuid team_id FK
+    uuid project_id FK
+    uuid user_id FK
+    varchar role
+    varchar status
+    timestamptz joined_at
+  }
+  documents {
+    uuid id PK
+    uuid project_id FK
+    uuid uploaded_by_member_id FK
+    varchar file_name
+    varchar file_type
+    varchar storage_uri
+    varchar content_hash
+    varchar status
+    timestamptz created_at
+    timestamptz updated_at
+    timestamptz deleted_at
+  }
+  document_chunks {
+    uuid id PK
+    uuid document_id FK
+    int chunk_index
+    text content
+    int token_count
+    varchar content_hash
+    timestamptz created_at
+  }
+  faiss_indexes {
+    uuid id PK
+    uuid project_id FK
+    varchar index_path
+    varchar embedding_model
+    int embedding_dimension
+    int version
+    varchar status
+    timestamptz created_at
+    timestamptz activated_at
+  }
+  chunk_embeddings {
+    uuid id PK
+    uuid chunk_id FK
+    uuid faiss_index_id FK
+    int vector_external_id
+    varchar embedding_model
+    int embedding_dimension
+    timestamptz created_at
+  }
+  embedding_jobs {
+    uuid id PK
+    uuid project_id FK
+    uuid document_id FK
+    uuid faiss_index_id FK
+    varchar job_type
+    varchar status
+    text error_message
+    timestamptz started_at
+    timestamptz finished_at
+  }
+  todos {
+    uuid id PK
+    uuid project_id FK
+    uuid assignee_member_id FK
+    uuid source_chunk_id FK
+    varchar title
+    varchar status
+    varchar priority
+    varchar source_type
+    varchar approval_status
+    int confidence_score
+    timestamptz due_at
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  issues {
+    uuid id PK
+    uuid project_id FK
+    uuid assignee_member_id FK
+    uuid source_chunk_id FK
+    varchar title
+    varchar severity
+    varchar status
+    varchar source_type
+    varchar approval_status
+    int confidence_score
+    timestamptz created_at
+    timestamptz updated_at
+  }
+  issue_history {
+    uuid id PK
+    uuid issue_id FK
+    varchar status
+    uuid changed_by_member_id FK
+    text note
+    timestamptz created_at
+  }
+  calendar_events {
+    uuid id PK
+    uuid project_id FK
+    uuid member_id FK
+    uuid source_chunk_id FK
+    varchar event_type
+    varchar title
+    varchar source_type
+    varchar approval_status
+    timestamptz starts_at
+    timestamptz ends_at
+    timestamptz created_at
+  }
+  weekly_reports {
+    uuid id PK
+    uuid project_id FK
+    uuid created_by_member_id FK
+    date week_start
+    date week_end
+    text content
+    int progress_rate
+    timestamptz created_at
+  }
+  monthly_reports {
+    uuid id PK
+    uuid project_id FK
+    uuid created_by_member_id FK
+    date month_start
+    date month_end
+    text content
+    int progress_rate
+    timestamptz created_at
+  }
+  handoff_reports {
+    uuid id PK
+    uuid project_id FK
+    uuid from_member_id FK
+    uuid to_member_id FK
+    varchar handoff_type
+    text content
+    timestamptz created_at
+  }
+  chat_messages {
+    uuid id PK
+    uuid project_id FK
+    uuid member_id FK
+    varchar role
+    text content
+    timestamptz created_at
+  }
+  ai_summaries {
+    uuid id PK
+    uuid document_id FK
+    uuid project_id FK
+    uuid source_faiss_index_id FK
+    int todo_count
+    int issue_count
+    int blocked_count
+    text summary
+    timestamptz created_at
+  }
+
+  teams ||--o{ users : "has"
+  teams ||--o{ projects : "owns"
+  teams ||--o{ project_members : "scopes"
+  projects ||--o{ project_members : "has"
+  users ||--o{ project_members : "joins"
+  projects ||--o{ documents : "contains"
+  project_members ||--o{ documents : "uploads"
+  documents ||--o{ document_chunks : "splits_into"
+  projects ||--o{ faiss_indexes : "indexes"
+  faiss_indexes ||--o{ chunk_embeddings : "stores_vectors"
+  document_chunks ||--o{ chunk_embeddings : "embedded_as"
+  projects ||--o{ embedding_jobs : "queues"
+  documents ||--o{ embedding_jobs : "processed_by"
+  faiss_indexes ||--o{ embedding_jobs : "builds"
+  projects ||--o{ todos : "tracks"
+  project_members ||--o{ todos : "assigned"
+  document_chunks ||--o{ todos : "sources"
+  projects ||--o{ issues : "tracks"
+  project_members ||--o{ issues : "assigned"
+  document_chunks ||--o{ issues : "sources"
+  issues ||--o{ issue_history : "logged_in"
+  project_members ||--o{ issue_history : "changed_by"
+  projects ||--o{ calendar_events : "has"
+  project_members ||--o{ calendar_events : "for"
+  document_chunks ||--o{ calendar_events : "sources"
+  projects ||--o{ weekly_reports : "generates"
+  project_members ||--o{ weekly_reports : "creates"
+  projects ||--o{ monthly_reports : "generates"
+  project_members ||--o{ monthly_reports : "creates"
+  projects ||--o{ handoff_reports : "generates"
+  project_members ||--o{ handoff_reports : "from"
+  project_members ||--o{ handoff_reports : "to"
+  projects ||--o{ chat_messages : "contains"
+  project_members ||--o{ chat_messages : "sends"
+  documents ||--o{ ai_summaries : "summarized_by"
+  projects ||--o{ ai_summaries : "has"
+  faiss_indexes ||--o{ ai_summaries : "uses_index"
+`;
+
+const { svg } = await mermaid.render('erd-svg', diagram);
+document.getElementById('erd-wrap').innerHTML = svg;
+
+document.querySelectorAll('#erd-wrap svg.erDiagram .node').forEach(node => {
+  const firstPath = node.querySelector('path[d]');
+  if (!firstPath) return;
+  const d = firstPath.getAttribute('d');
+  const nums = d.match(/-?[\d.]+/g)?.map(Number);
+  if (!nums || nums.length < 8) return;
+  const xs = [nums[0], nums[2], nums[4], nums[6]];
+  const ys = [nums[1], nums[3], nums[5], nums[7]];
+  const x = Math.min(...xs), y = Math.min(...ys);
+  const w = Math.max(...xs) - x, h = Math.max(...ys) - y;
+  const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  rect.setAttribute('x', x); rect.setAttribute('y', y);
+  rect.setAttribute('width', w); rect.setAttribute('height', h);
+  rect.setAttribute('rx', '8');
+  for (const a of ['fill', 'stroke', 'stroke-width', 'class', 'style']) {
+    if (firstPath.hasAttribute(a)) rect.setAttribute(a, firstPath.getAttribute(a));
+  }
+  firstPath.replaceWith(rect);
+});
+
+document.querySelectorAll('#erd-wrap svg.erDiagram .row-rect-odd path, #erd-wrap svg.erDiagram .row-rect-even path').forEach(p => {
+  p.setAttribute('stroke', 'none');
+});
+</script>

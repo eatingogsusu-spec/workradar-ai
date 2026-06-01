@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 import sys
 from pathlib import Path
 from types import FrameType
@@ -21,11 +20,6 @@ class DiagnosticServer(Server):
 
 
 if __name__ == "__main__":
-    os.environ.setdefault(
-        "DATABASE_URL",
-        "postgresql+asyncpg://user:password@localhost:5432/opsradar",
-    )
-
     config = uvicorn.Config(
         "app.main:app",
         host="127.0.0.1",
