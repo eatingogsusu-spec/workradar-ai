@@ -1,5 +1,5 @@
 (function () {
-  const API = window.OPSRADAR_API_BASE || "http://127.0.0.1:8010/api/v1";
+  const API = window.OPSRADAR_API_BASE || "http://127.0.0.1:8000/api/v1";
   const idMap = new Map();
   let nextUiId = 100000;
 

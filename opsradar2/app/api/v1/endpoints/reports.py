@@ -45,7 +45,7 @@ async def generate_report(body: dict | None = None, db: AsyncSession = Depends(g
             f"기간: {week_start} ~ {week_end}",
             f"Todo 진행: 완료 {summary['done_todos']}건 / 전체 {summary['total_todos']}건",
             f"진행 중 또는 대기 Todo: {summary['active_todos']}건",
-            f"미해결 이슈: {summary['open_issues']}건, High Risk: {summary['high_issues']}건",
+            f"미해결 이슈: {summary['open_issues']}건 / High Risk: {summary['high_issues']}건",
             f"다가오는 캘린더 일정: {summary['upcoming_events']}건",
             "다음 액션: 담당자 미지정 항목 확인, 마감 일정 점검, 인수인계 체크리스트 최신화",
         ]

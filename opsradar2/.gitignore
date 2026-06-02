@@ -6,7 +6,9 @@ __pycache__/
 *.pyc
 *.pyo
 .venv/
+.venv-codex/
 venv/
+.claude/
 
 # IDE
 .vscode/
