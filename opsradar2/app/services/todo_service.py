@@ -17,3 +17,6 @@ class TodoService:
 
     async def update_todo_status(self, todo_id: str, status: str) -> bool:
         return await self.repo.update_status(todo_id, status)
+
+    async def update_todo(self, todo_id: str, data: dict) -> bool:
+        return await self.repo.update(todo_id, data)

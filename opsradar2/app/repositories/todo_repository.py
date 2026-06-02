@@ -54,7 +54,7 @@ class TodoRepository:
                 """
                 INSERT INTO todos (
                   id, project_id, assignee_member_id, title, status, priority,
-                  source_type, approval_status, confidence_score, due_at,
+                  source_type, approval_status, confidence_score, due_at, linked_issue_id,
                   created_at, updated_at
                 )
                 SELECT
@@ -68,6 +68,7 @@ class TodoRepository:
                   COALESCE(:approval_status, 'approved'),
                   :confidence,
                   CAST(:due_at AS timestamptz),
+                  CAST(:linked_issue_id AS uuid),
                   now(),
                   now()
                 FROM (
@@ -92,6 +93,7 @@ class TodoRepository:
                 "approval_status": data.get("approval_status"),
                 "confidence": data.get("confidence"),
                 "due_at": data.get("due_at"),
+                "linked_issue_id": data.get("linked_issue_id"),
                 "assignee": data.get("assignee"),
             },
         )
@@ -99,15 +101,41 @@ class TodoRepository:
         return result.scalar_one()
 
     async def update_status(self, todo_id: str, status: str) -> bool:
+        return await self.update(todo_id, {"status": status})
+
+    async def update(self, todo_id: str, data: dict) -> bool:
+        allowed = {
+            key: value
+            for key, value in data.items()
+            if key in {"title", "status", "priority", "approval_status"}
+        }
+        assignments = [f"{key} = :{key}" for key in allowed]
+        params = {"todo_id": todo_id, **allowed}
+        if "assignee" in data:
+            assignments.append(
+                """
+                assignee_member_id = (
+                  SELECT pm.id
+                  FROM project_members pm
+                  JOIN users u ON u.id = pm.user_id
+                  WHERE pm.project_id = todos.project_id
+                    AND u.name = :assignee
+                  LIMIT 1
+                )
+                """
+            )
+            params["assignee"] = data["assignee"]
+        if not assignments:
+            return True
         result = await self.db.execute(
             text(
-                """
+                f"""
                 UPDATE todos
-                SET status = :status, updated_at = now()
+                SET {", ".join(assignments)}, updated_at = now()
                 WHERE id = CAST(:todo_id AS uuid)
                 """
             ),
-            {"todo_id": todo_id, "status": status},
+            params,
         )
         await self.db.commit()
         return result.rowcount > 0

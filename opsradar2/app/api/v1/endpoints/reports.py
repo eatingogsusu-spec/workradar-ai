@@ -1,21 +1,13 @@
-"""Report API for the local v4 OpsRadar database."""
+"""Report API."""
 
-from datetime import date, timedelta
-
-from fastapi import APIRouter, Depends
-from sqlalchemy import text
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.repositories.report_repository import ReportRepository
+from app.services.report_service import ReportService
 
 router = APIRouter()
-
-
-def _week_range() -> tuple[str, str]:
-    today = date.today()
-    start = today - timedelta(days=today.weekday())
-    end = start + timedelta(days=6)
-    return start.isoformat(), end.isoformat()
 
 
 @router.post("/generate")
@@ -98,34 +90,19 @@ async def generate_report(body: dict | None = None, db: AsyncSession = Depends(g
     }
 
 
+
 @router.patch("/{report_id}")
 async def update_report(report_id: str, body: dict, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        text(
-            """
-            UPDATE weekly_reports
-            SET content = COALESCE(:content, content), created_at = now()
-            WHERE id = CAST(:report_id AS uuid)
-            RETURNING id::text
-            """
-        ),
-        {"report_id": report_id, "content": body.get("content")},
-    )
-    await db.commit()
-    return {"status": "success" if result.scalar_one_or_none() else "not_found", "report_id": report_id}
+    content = body.get("content")
+    if content is None:
+        raise HTTPException(400, "content is required")
+    updated = await ReportService(ReportRepository(db)).update_report(report_id, content)
+    if not updated:
+        raise HTTPException(404, "report not found")
+    return {"status": "success", "report_id": report_id}
 
 
 @router.get("")
 async def get_reports(db: AsyncSession = Depends(get_db)):
-    rows = await db.execute(
-        text(
-            """
-            SELECT id::text AS id, 'weekly' AS period, week_start::text, week_end::text,
-                   content, progress_rate, created_at
-            FROM weekly_reports
-            ORDER BY created_at DESC
-            LIMIT 20
-            """
-        )
-    )
-    return {"reports": [dict(row) for row in rows.mappings().all()]}
+    reports = await ReportService(ReportRepository(db)).list_reports()
+    return {"reports": reports}

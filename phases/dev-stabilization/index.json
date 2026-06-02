@@ -5,17 +5,23 @@
     {
       "step": 0,
       "name": "api-contract-audit",
-      "status": "pending"
+      "status": "completed",
+      "summary": "Documented the frontend-facing /api/v1 contract, persisted paths, and explicit document and knowledge placeholders in docs/API_CONTRACT.md.",
+      "completed_at": "2026-06-01T15:19:04+09:00"
     },
     {
       "step": 1,
       "name": "service-repository-wiring",
-      "status": "pending"
+      "status": "completed",
+      "summary": "Connected Todo, issue, issue-follow-up Todo, calendar, and report persistence through async repositories and services; added focused service tests.",
+      "completed_at": "2026-06-01T15:19:04+09:00"
     },
     {
       "step": 2,
       "name": "verification-and-handoff",
-      "status": "pending"
+      "status": "completed",
+      "summary": "Updated setup and verification instructions, synced safe ERD indexes, and verified compile, tests, Harness validation, remote azag_db schema, persistence round trips, and HTTP integration.",
+      "completed_at": "2026-06-01T15:19:04+09:00"
     }
   ]
 }
