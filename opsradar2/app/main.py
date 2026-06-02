@@ -6,6 +6,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.api.api import api_router
+from app.core.config import settings
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,7 +15,7 @@ FRONTEND = ROOT / "frontend"
 app = FastAPI(
     title="OpsRadar API",
     version="1.0.0",
-    description="운영 인텔리전스 AI 백엔드 API",
+    description="OpsRadar operations intelligence API",
 )
 
 app.add_middleware(
@@ -25,7 +26,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+@app.middleware("http")
+async def disable_frontend_cache(request, call_next):
+    response = await call_next(request)
+    if request.url.path == "/" or request.url.path.startswith("/static/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
+
+
 app.mount("/static", StaticFiles(directory=FRONTEND), name="static")
+
 app.include_router(api_router, prefix="/api/v1")
 
 
@@ -36,4 +47,9 @@ def root():
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "service": "OpsRadar", "app": "opsradar2"}
+    return {
+        "status": "ok",
+        "service": "OpsRadar",
+        "app": "opsradar2",
+        "db_schema": settings.DB_SCHEMA,
+    }

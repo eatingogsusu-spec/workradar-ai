@@ -1,5 +1,5 @@
 (function () {
-  const API = window.OPSRADAR_API_BASE || "http://127.0.0.1:8000/api/v1";
+  const API = window.OPSRADAR_API_BASE || "/api/v1";
   const idMap = new Map();
   let nextUiId = 100000;
 
@@ -10,12 +10,27 @@
   }
 
   async function request(path, options = {}) {
-    const res = await fetch(`${API}${path}`, {
-      headers: { "Content-Type": "application/json", ...(options.headers || {}) },
-      ...options,
-    });
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    return res.status === 204 ? null : res.json();
+    const method = (options.method || "GET").toUpperCase();
+    const attempts = method === "GET" ? 2 : 1;
+    let lastError;
+
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
+      try {
+        const res = await fetch(`${API}${path}`, {
+          headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+          ...options,
+        });
+        if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+        return res.status === 204 ? null : res.json();
+      } catch (error) {
+        lastError = error;
+        if (attempt + 1 < attempts) {
+          await new Promise((resolve) => setTimeout(resolve, 200));
+        }
+      }
+    }
+
+    throw lastError;
   }
 
   function replaceArray(target, values) {
@@ -108,11 +123,13 @@
 
   function normalizeCalendarEvent(event) {
     const date = String(event.event_date || "");
-    const day = Number(date.split("-")[2]);
-    if (!day) return null;
+    const [year, month, day] = date.split("-").map(Number);
+    if (!year || !month || !day) return null;
     return {
       apiId: event.id,
       d: day,
+      y: year,
+      m: month - 1,
       tags: [{
         apiId: event.id,
         t: event.person ? `${event.person} ${event.title}` : event.title,
@@ -125,11 +142,12 @@
     if (!window.G) return;
     const byDay = new Map();
     events.map(normalizeCalendarEvent).filter(Boolean).forEach((event) => {
-      const existing = byDay.get(event.d);
+      const key = `${event.y}-${event.m}-${event.d}`;
+      const existing = byDay.get(key);
       if (existing) existing.tags.push(...event.tags);
-      else byDay.set(event.d, event);
+      else byDay.set(key, event);
     });
-    G.calEvents = Array.from(byDay.values());
+    window.G.calEvents = Array.from(byDay.values());
   }
 
   async function loadDashboardFromAPI() {
@@ -165,12 +183,21 @@
     if (typeof renderCalendar === "function") renderCalendar();
   }
 
-  window.opsRadarCreateCalendarEvent = async function ({ title, day, color }) {
+  window.opsRadarCreateCalendarEvent = async function ({ title, day, month, year, color }) {
+    const target = new Date(
+      year ?? window.G?.currentCalYear ?? new Date().getFullYear(),
+      month ?? window.G?.currentCalMonth ?? new Date().getMonth(),
+      day,
+    );
     const created = await request("/calendar/", {
       method: "POST",
       body: JSON.stringify({
         title,
-        event_date: `2026-05-${String(day).padStart(2, "0")}`,
+        event_date: [
+          target.getFullYear(),
+          String(target.getMonth() + 1).padStart(2, "0"),
+          String(target.getDate()).padStart(2, "0"),
+        ].join("-"),
         event_type: calendarTypeFromColor(color),
       }),
     });
@@ -179,6 +206,7 @@
 
   window.opsRadarApi = {
     request,
+    loadCalendar: loadCalendarFromAPI,
     reload: () => Promise.allSettled([
       loadDashboardFromAPI(),
       loadTodosFromAPI(),
@@ -251,27 +279,18 @@
     }
   }
 
-  function patchCalendarActions() {
-    if (typeof deleteCalTag === "function") {
-      const original = deleteCalTag;
-      window.deleteCalTag = deleteCalTag = async function (day, index) {
-        const tag = window.G?.calEvents?.find((x) => x.d === day)?.tags[index];
-        if (tag?.apiId) {
-          try { await request(`/calendar/${tag.apiId}`, { method: "DELETE" }); }
-          catch (error) { console.warn("Calendar delete API failed", error); }
-        }
-        original(day, index);
-      };
-    }
-  }
-
-  window.addEventListener("load", () => {
+  function initialize() {
     patchTodoActions();
     patchCreateActions();
-    patchCalendarActions();
     window.opsRadarApi.reload().then((results) => {
       const rejected = results.filter((r) => r.status === "rejected");
       if (rejected.length) console.warn("Some OpsRadar API loads failed", rejected);
     });
-  });
+  }
+
+  if (document.readyState === "loading") {
+    window.addEventListener("DOMContentLoaded", initialize, { once: true });
+  } else {
+    initialize();
+  }
 })();

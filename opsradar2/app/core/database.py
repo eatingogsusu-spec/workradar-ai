@@ -11,7 +11,13 @@ from app.core.config import settings
 if sys.platform.startswith("win") and hasattr(asyncio, "WindowsSelectorEventLoopPolicy"):
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-engine = create_async_engine(settings.DATABASE_URL, echo=False)
+engine = create_async_engine(
+    settings.DATABASE_URL,
+    echo=False,
+    pool_pre_ping=True,
+    pool_recycle=300,
+    connect_args={"server_settings": {"search_path": f"{settings.DB_SCHEMA},public"}},
+)
 
 AsyncSessionLocal = sessionmaker(
     bind=engine,

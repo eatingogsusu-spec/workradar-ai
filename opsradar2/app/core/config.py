@@ -23,6 +23,7 @@ class Settings:
         "DATABASE_URL",
         "postgresql+asyncpg://user:password@localhost:5432/opsradar",
     )
+    DB_SCHEMA: str = os.getenv("DB_SCHEMA", "public")
     AI_PROVIDER: str = os.getenv("AI_PROVIDER", "disabled")
     AZURE_OPENAI_API_KEY: str = os.getenv("AZURE_OPENAI_API_KEY", "")
     AZURE_OPENAI_ENDPOINT: str = os.getenv("AZURE_OPENAI_ENDPOINT", "")

@@ -2806,6 +2806,7 @@ const G = {
   newCalEvents: [],
   analysisHistory: [],
 };
+window.G = G;
 
 // ── Todo 데이터
 const todos = [];
@@ -3926,12 +3927,25 @@ function miniChat(text){
   const input=document.getElementById('miniInput');const msg=text||input.value.trim();if(!msg)return;input.value='';
   const log=document.getElementById('miniLog');
   const u=document.createElement('div');u.className='mini-bubble mini-bubble-user';u.textContent=msg;log.appendChild(u);log.scrollTop=log.scrollHeight;
-  setTimeout(()=>{
+  setTimeout(async ()=>{
     const parsed=parseScheduleMsg(msg);
     const reply=(msg.includes('부재')||msg.includes('외부 일정'))?`✅ ${parsed.person} ${parsed.date} ${parsed.type}을 캘린더에 등록했습니다.`:'✅ 일정을 캘린더에 추가했습니다.';
-    const a=document.createElement('div');a.className='mini-bubble mini-bubble-ai';a.textContent=reply;log.appendChild(a);log.scrollTop=log.scrollHeight;
-    const dateMatch=msg.match(/(\d+)\/(\d+)/);if(dateMatch){registerCalEvent(parsed,parseInt(dateMatch[2]));renderCalendar();}
-    showToast(reply);
+    const dateMatch=msg.match(/(\d+)\/(\d+)/);
+    try{
+      if(!dateMatch || !window.opsRadarCreateCalendarEvent || !window.opsRadarApi) throw new Error('Calendar API is not ready');
+      const month=Number(dateMatch[1])-1;
+      const day=Number(dateMatch[2]);
+      await window.opsRadarCreateCalendarEvent({title:`${parsed.person} ${parsed.type}`,day,month,year:G.currentCalYear,color:parsed.type==='부재'?'ct-gray':'ct-info'});
+      await window.opsRadarApi.loadCalendar();
+      G.newCalEvents.push({...parsed,calDate:day,y:G.currentCalYear,m:month});
+      renderCalendar(G.currentCalYear,G.currentCalMonth);
+      const a=document.createElement('div');a.className='mini-bubble mini-bubble-ai';a.textContent=reply;log.appendChild(a);log.scrollTop=log.scrollHeight;
+      showToast(reply);
+    }catch(error){
+      console.warn('Mini calendar create API failed',error);
+      const a=document.createElement('div');a.className='mini-bubble mini-bubble-ai';a.textContent='일정 등록에 실패했습니다. DB 연결을 확인해주세요.';log.appendChild(a);log.scrollTop=log.scrollHeight;
+      showToast('캘린더 등록에 실패했습니다.','warn');
+    }
   },300);
 }
 
@@ -4148,14 +4162,14 @@ function renderCurrentChatMessages(){
   if(latestAssistant) updateChatContextPanel(`${G.lastChatPrompt || ''} ${latestAssistant.content}`, latestAssistant.src || null);
 }
 function startNewChat(){ createNewChatSession(true); }
-function sendMsg(text){
+async function sendMsg(text){
   if(G.chatTyping)return;
   getCurrentChatSession();
   const input=document.getElementById('chatInput');const msg=text||input.value.trim();if(!msg)return;
   input.value='';input.style.height='auto';
   G.lastChatPrompt = msg;
   appendChatMsg('user',msg);showTyping();
-  setTimeout(()=>{
+  const renderLocalReply=()=>{
     removeTyping();
     const res=chatResponses[msg];
     if(res){
@@ -4166,7 +4180,20 @@ function sendMsg(text){
     } else {
       appendChatMsg('ai','운영 데이터에서 관련 정보를 찾고 있습니다. 더 구체적으로 질문해주시면 정확한 답변을 드릴 수 있습니다.',null);
     }
-  },900+Math.random()*400);
+  };
+  if(chatResponses[msg] || /부재|외부 일정|휴가|회의|미팅|일정|추가/.test(msg)){
+    setTimeout(renderLocalReply,900+Math.random()*400);
+    return;
+  }
+  try{
+    const data=await window.opsRadarApi.request('/chat',{method:'POST',body:JSON.stringify({message:msg})});
+    removeTyping();
+    appendChatMsg('ai',data.answer||'AI 응답이 비어 있습니다.',null);
+  }catch(error){
+    removeTyping();
+    console.warn('AI chat API failed',error);
+    appendChatMsg('ai','AI 연결에 실패했습니다. Azure OpenAI 설정과 서버 로그를 확인해주세요.',null);
+  }
 }
 function inferChatContext(text, src){
   const docs = src ? [src] : (/위험|이슈|Risk|리스크|장애|API|DB/i.test(text) ? ['운영 로그 분석 결과', '이슈 관리 현황'] : ['운영 데이터 인덱스']);
@@ -4231,11 +4258,23 @@ function showScheduleConfirm(msg,res){
   enforceChatLimit();document.getElementById('chatArea').scrollTop=document.getElementById('chatArea').scrollHeight;
 }
 function showScheduleConfirmRaw(msg,parsed){showScheduleConfirm(msg,{parsed,calDate:null});}
-function doRegisterCalEvent(btn,person,date,type,impact,calDate){
-  btn.closest('.confirm-card').innerHTML=`<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--success)"><i class="ti ti-circle-check" style="font-size:16px"></i><div><div style="font-weight:500">캘린더에 등록되었습니다</div><div style="font-size:10px;color:var(--text3);margin-top:2px">${escapeHtml(person)} · ${escapeHtml(date)} · ${escapeHtml(type)}</div></div><div class="tbtn" onclick="nav('calendar')" style="margin-left:auto;font-size:10px;padding:3px 8px;color:var(--accent)">캘린더 확인 →</div></div>`;
-  registerCalEvent({person,date,type,impact},calDate);
-  setTimeout(()=>{if(type!=='회의')appendChatMsg('ai',`인수인계 센터에도 "${person} ${date} ${type}"이 반영되었습니다. 업무 공백 대비 인수인계 문서를 생성하시겠어요?`,null,true);},600);
-  showToast(`캘린더에 등록되었습니다. ${person} · ${date}`);
+async function doRegisterCalEvent(btn,person,date,type,impact,calDate){
+  const dateMatch=String(date||'').match(/(\d+)\/(\d+)/);
+  const month=dateMatch?Number(dateMatch[1])-1:G.currentCalMonth;
+  const day=calDate||(dateMatch?Number(dateMatch[2]):null);
+  try{
+    if(!day || !window.opsRadarCreateCalendarEvent || !window.opsRadarApi) throw new Error('Calendar API is not ready');
+    await window.opsRadarCreateCalendarEvent({title:`${person} ${type}`,day,month,year:G.currentCalYear,color:type==='부재'?'ct-gray':'ct-info'});
+    await window.opsRadarApi.loadCalendar();
+    G.newCalEvents.push({person,date,type,impact,calDate:day,y:G.currentCalYear,m:month});
+    renderCalendar(G.currentCalYear,G.currentCalMonth);
+    btn.closest('.confirm-card').innerHTML=`<div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--success)"><i class="ti ti-circle-check" style="font-size:16px"></i><div><div style="font-weight:500">캘린더에 등록되었습니다</div><div style="font-size:10px;color:var(--text3);margin-top:2px">${escapeHtml(person)} · ${escapeHtml(date)} · ${escapeHtml(type)}</div></div><div class="tbtn" onclick="nav('calendar')" style="margin-left:auto;font-size:10px;padding:3px 8px;color:var(--accent)">캘린더 확인 →</div></div>`;
+    setTimeout(()=>{if(type!=='회의')appendChatMsg('ai',`인수인계 센터에도 "${person} ${date} ${type}"이 반영되었습니다. 업무 공백 대비 인수인계 문서를 생성하시겠어요?`,null,true);},600);
+    showToast(`캘린더에 등록되었습니다. ${person} · ${date}`);
+  }catch(error){
+    console.warn('Chat calendar create API failed',error);
+    showToast('캘린더 등록에 실패했습니다.','warn');
+  }
 }
 function appendChatMsg(role,text,src=null,withBtn=false){
   const area=document.getElementById('chatArea');const div=document.createElement('div');div.className=`msg ${role==='user'?'user':''} fade-up`;div.dataset.chatItem='true';
@@ -4955,13 +4994,14 @@ function addAISuggestEvent(title, reason) {
 
 // Calendar month navigation repair
 function ensureCalendarState(){
-  if(typeof G.currentCalYear !== 'number') G.currentCalYear = 2026;
-  if(typeof G.currentCalMonth !== 'number') G.currentCalMonth = 4;
+  const now = new Date();
+  if(typeof G.currentCalYear !== 'number') G.currentCalYear = now.getFullYear();
+  if(typeof G.currentCalMonth !== 'number') G.currentCalMonth = now.getMonth();
 }
 function eventMatchesMonth(ev, year, month){
   if(!ev) return false;
-  const evYear = typeof ev.y === 'number' ? ev.y : (typeof ev.year === 'number' ? ev.year : 2026);
-  const rawMonth = typeof ev.m === 'number' ? ev.m : (typeof ev.month === 'number' ? ev.month : 4);
+  const evYear = typeof ev.y === 'number' ? ev.y : (typeof ev.year === 'number' ? ev.year : G.currentCalYear);
+  const rawMonth = typeof ev.m === 'number' ? ev.m : (typeof ev.month === 'number' ? ev.month : G.currentCalMonth);
   const evMonth = rawMonth > 11 ? rawMonth - 1 : rawMonth;
   return evYear === year && evMonth === month;
 }
@@ -4980,8 +5020,8 @@ function findNewCalEventForDay(day, year, month){
   const y = typeof year === 'number' ? year : G.currentCalYear;
   const m = typeof month === 'number' ? month : G.currentCalMonth;
   return (G.newCalEvents || []).some(ev => {
-    const evYear = typeof ev.y === 'number' ? ev.y : 2026;
-    const rawMonth = typeof ev.m === 'number' ? ev.m : 4;
+    const evYear = typeof ev.y === 'number' ? ev.y : G.currentCalYear;
+    const rawMonth = typeof ev.m === 'number' ? ev.m : G.currentCalMonth;
     const evMonth = rawMonth > 11 ? rawMonth - 1 : rawMonth;
     return ev.calDate === day && evYear === y && evMonth === m;
   });
@@ -5066,29 +5106,48 @@ function openCalModal(d) {
   const label = document.getElementById('calColorLabel'); if(label) label.textContent = '일반';
   openModal('calModal');
 }
-function addCalTag() {
+async function addCalTag() {
   ensureCalendarState();
   const d = G.selectedCalDay;
   const input = document.getElementById('calModalInput');
   const text = input ? input.value.trim() : '';
   const color = calSelectedColor || 'ct-info';
   if (!text || !d) return;
-  let ev = findCalEventForDay(d, G.currentCalYear, G.currentCalMonth);
-  if (ev) ev.tags.push({t: text, c: color});
-  else G.calEvents.push({d, y: G.currentCalYear, m: G.currentCalMonth, tags: [{t: text, c: color}]});
-  renderCalendar(G.currentCalYear, G.currentCalMonth);
-  openCalModal(d);
-  showToast(`${G.currentCalMonth + 1}월 ${d}일 일정이 추가되었습니다.`, 'info');
+  if(!window.opsRadarCreateCalendarEvent || !window.opsRadarApi){
+    showToast('DB 연결을 준비 중입니다. 잠시 후 다시 시도해주세요.','warn');
+    return;
+  }
+  try{
+    await window.opsRadarCreateCalendarEvent({title:text,day:d,year:G.currentCalYear,month:G.currentCalMonth,color});
+    await window.opsRadarApi.loadCalendar();
+    renderCalendar(G.currentCalYear,G.currentCalMonth);
+    openCalModal(d);
+    showToast(`${G.currentCalMonth + 1}월 ${d}일 일정이 추가되었습니다.`, 'info');
+  }catch(error){
+    console.warn('Calendar create API failed',error);
+    showToast('캘린더 등록에 실패했습니다.','warn');
+  }
 }
-function deleteCalTag(d, idx) {
+async function deleteCalTag(d, idx) {
   ensureCalendarState();
   const ev = findCalEventForDay(d, G.currentCalYear, G.currentCalMonth);
   if (!ev) return;
-  ev.tags.splice(idx, 1);
-  if (ev.tags.length === 0) G.calEvents = G.calEvents.filter(e => e !== ev);
-  renderCalendar(G.currentCalYear, G.currentCalMonth);
-  openCalModal(d);
-  showToast('일정이 삭제되었습니다.', 'info');
+  const tag=ev.tags[idx];
+  try{
+    if(tag?.apiId && window.opsRadarApi){
+      await window.opsRadarApi.request(`/calendar/${tag.apiId}`,{method:'DELETE'});
+      await window.opsRadarApi.loadCalendar();
+    }else{
+      ev.tags.splice(idx,1);
+      if(ev.tags.length===0)G.calEvents=G.calEvents.filter(e=>e!==ev);
+    }
+    renderCalendar(G.currentCalYear,G.currentCalMonth);
+    openCalModal(d);
+    showToast('일정이 삭제되었습니다.','info');
+  }catch(error){
+    console.warn('Calendar delete API failed',error);
+    showToast('캘린더 삭제에 실패했습니다.','warn');
+  }
 }
 function registerCalEvent(parsed, calDate){
   ensureCalendarState();
@@ -5661,5 +5720,6 @@ setTimeout(initOpsRadarSkin, 0);</script>
   }, 0);
 })();
 </script>
+<script src="/static/api-integration.js"></script>
 </body>
 </html>
