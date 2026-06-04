@@ -261,6 +261,12 @@ tempCodeRunnerFile.py
 # Local GitHub snapshots
 _github_remote_snapshots/
 
+# Local archive and legacy project snapshots
+*.zip
+opsradar_v2/
+TeamAZAG_Harness_Process_20260529/
+harness_framework-codex/
+
 # PyPI configuration file
 .pypirc
 
