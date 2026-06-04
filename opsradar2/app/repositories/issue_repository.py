@@ -5,6 +5,8 @@ from typing import Optional
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
+
 
 class IssueRepository:
     def __init__(self, db: AsyncSession):
@@ -16,11 +18,11 @@ class IssueRepository:
                 """
                 SELECT column_name
                 FROM information_schema.columns
-                WHERE table_schema = 'public'
+                WHERE table_schema = :schema
                   AND table_name = :table_name
                 """
             ),
-            {"table_name": table_name},
+            {"schema": settings.DB_SCHEMA, "table_name": table_name},
         )
         return {row[0] for row in result.all()}
 
@@ -29,20 +31,28 @@ class IssueRepository:
             text(
                 """
                 INSERT INTO issues (
-                  id, project_id, assignee_member_id, title, description,
-                  severity, status, source_type, approval_status, domino_chain,
+                  id, project_id, assignee_member_id, reporter_member_id,
+                  source_document_id, source_chunk_id, title, description,
+                  severity, status, source_type, approval_status,
+                  confidence_score, is_candidate, risk_reason, domino_chain,
                   created_at, updated_at
                 )
                 SELECT
                   gen_random_uuid(),
                   selected_project.id,
                   pm.id,
+                  reporter_pm.id,
+                  CAST(:source_document_id AS uuid),
+                  CAST(:source_chunk_id AS uuid),
                   :title,
                   :description,
                   COALESCE(:severity, 'medium'),
                   COALESCE(:status, 'open'),
-                  'manual',
-                  'approved',
+                  COALESCE(:source, 'manual'),
+                  COALESCE(:approval_status, 'approved'),
+                  :confidence,
+                  COALESCE(:is_candidate, false),
+                  :risk_reason,
                   :domino_impact,
                   now(),
                   now()
@@ -56,6 +66,10 @@ class IssueRepository:
                 LEFT JOIN project_members pm
                   ON pm.project_id = selected_project.id
                  AND pm.user_id = u.id
+                LEFT JOIN users reporter_u ON reporter_u.name = :reporter
+                LEFT JOIN project_members reporter_pm
+                  ON reporter_pm.project_id = selected_project.id
+                 AND reporter_pm.user_id = reporter_u.id
                 RETURNING
                   id::text AS id,
                   title,
@@ -63,7 +77,7 @@ class IssueRepository:
                   severity,
                   severity AS risk_level,
                   status,
-                  'manual' AS source,
+                  source_type AS source,
                   domino_chain AS domino_impact,
                   created_at
                 """
@@ -74,7 +88,15 @@ class IssueRepository:
                 "description": data.get("description"),
                 "severity": data.get("severity"),
                 "status": data.get("status"),
+                "source": data.get("source"),
+                "approval_status": data.get("approval_status"),
+                "confidence": data.get("confidence"),
+                "is_candidate": data.get("is_candidate"),
+                "risk_reason": data.get("risk_reason"),
+                "source_document_id": data.get("source_document_id"),
+                "source_chunk_id": data.get("source_chunk_id"),
                 "assignee": data.get("assignee"),
+                "reporter": data.get("reporter"),
                 "domino_impact": data.get("domino_impact"),
             },
         )

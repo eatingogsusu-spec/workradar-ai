@@ -17,6 +17,7 @@ from app.api.v1.endpoints import (
     knowledge,
     projects,
     reports,
+    system,
     todos,
 )
 
@@ -38,6 +39,7 @@ API_ROUTERS: tuple[RouterSpec, ...] = (
     RouterSpec(reports.router, "/reports", "reports"),
     RouterSpec(knowledge.router, "/knowledge", "knowledge"),
     RouterSpec(chat.router, "/chat", "chat"),
+    RouterSpec(system.router, "/system", "system"),
 )
 
 

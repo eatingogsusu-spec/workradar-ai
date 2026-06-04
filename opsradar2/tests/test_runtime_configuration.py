@@ -58,6 +58,25 @@ def test_calendar_state_is_exposed_to_api_adapter() -> None:
     assert "window.G.calEvents = Array.from(byDay.values());" in adapter
 
 
+def test_react_frontend_runtime_settings_are_configurable() -> None:
+    config = read("app/core/config.py")
+    main = read("app/main.py")
+    env_example = read(".env.example")
+
+    assert "FRONTEND_ORIGINS" in config
+    assert "parse_csv_env" in config
+    assert "allow_origins=list(settings.FRONTEND_ORIGINS)" in main
+    assert "http://127.0.0.1:5173" in env_example
+
+
+def test_fastapi_can_serve_react_build_output() -> None:
+    main = read("app/main.py")
+
+    assert "FRONTEND_DIST = FRONTEND / \"dist\"" in main
+    assert "react_assets = FRONTEND_DIST / \"assets\"" in main
+    assert 'app.mount("/assets"' in main
+    assert "def spa_fallback" in main
+
 
 def test_api_router_uses_registry() -> None:
     api = read("app/api/api.py")
@@ -65,12 +84,18 @@ def test_api_router_uses_registry() -> None:
 
     assert "include_api_routers(api_router)" in api
     assert "RouterSpec(todos.router, \"/todos\", \"todos\")" in registry
+    assert "RouterSpec(system.router, \"/system\", \"system\")" in registry
     assert "def include_api_routers" in registry
 
 
-
 def normalize_route_path(path: str) -> str:
-    return path.replace("{todo_id}", "{}").replace("{issue_id}", "{}").replace("{event_id}", "{}").replace("{report_id}", "{}")
+    return (
+        path.replace("{todo_id}", "{}")
+        .replace("{issue_id}", "{}")
+        .replace("{event_id}", "{}")
+        .replace("{report_id}", "{}")
+        .replace("{document_id}", "{}")
+    )
 
 
 def test_frontend_api_paths_exist_in_backend_router() -> None:
@@ -84,6 +109,8 @@ def test_frontend_api_paths_exist_in_backend_router() -> None:
     }
 
     expected_routes = {
+        ("GET", "/system/health"),
+        ("GET", "/system/frontend-config"),
         ("GET", "/dashboard/summary"),
         ("GET", "/todos"),
         ("POST", "/todos"),
@@ -100,6 +127,10 @@ def test_frontend_api_paths_exist_in_backend_router() -> None:
         ("POST", "/reports/generate"),
         ("PATCH", "/reports/{}"),
         ("POST", "/chat"),
+        ("POST", "/chat/extract"),
+        ("POST", "/documents/upload"),
+        ("GET", "/documents"),
+        ("GET", "/documents/{}/status"),
     }
 
     assert expected_routes <= backend_routes
@@ -110,4 +141,22 @@ def test_frontend_backend_contract_doc_exists() -> None:
 
     assert "`/api/v1/todos`" in contracts
     assert "`/api/v1/chat`" in contracts
+    assert "`/api/v1/system/frontend-config`" in contracts
+    assert "`/api/v1/documents/upload`" in contracts
+    assert "`/api/v1/chat/extract`" in contracts
     assert 'window.OPSRADAR_API_BASE || "/api/v1"' in contracts
+
+def test_ai_pipeline_is_integrated_under_opsradar2_app() -> None:
+    parser = read("app/ai/file_parser.py")
+    chunker = read("app/ai/chunker.py")
+    retriever = read("app/ai/retriever.py")
+    summarizer = read("app/ai/summarizer.py")
+    documents = read("app/api/v1/endpoints/documents.py")
+    chat = read("app/api/v1/endpoints/chat.py")
+
+    assert "SUPPORTED_EXTENSIONS" in parser
+    assert "def chunk_text" in chunker
+    assert "async def retrieve" in retriever
+    assert "async def extract_todos" in summarizer
+    assert "run_document_pipeline" in documents
+    assert '@router.post("/extract")' in chat

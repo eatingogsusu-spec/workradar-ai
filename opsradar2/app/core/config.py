@@ -17,6 +17,11 @@ load_dotenv(PROJECT_ROOT / ".env")
 load_dotenv()
 
 
+def parse_csv_env(name: str, default: str) -> tuple[str, ...]:
+    raw = os.getenv(name, default)
+    return tuple(item.strip() for item in raw.split(",") if item.strip())
+
+
 @dataclass(frozen=True)
 class Settings:
     DATABASE_URL: str = os.getenv(
@@ -24,6 +29,10 @@ class Settings:
         "postgresql+asyncpg://user:password@localhost:5432/opsradar",
     )
     DB_SCHEMA: str = os.getenv("DB_SCHEMA", "public")
+    FRONTEND_ORIGINS: tuple[str, ...] = parse_csv_env(
+        "FRONTEND_ORIGINS",
+        "http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:8000,http://localhost:8000",
+    )
     AI_PROVIDER: str = os.getenv("AI_PROVIDER", "disabled")
     AZURE_OPENAI_API_KEY: str = os.getenv("AZURE_OPENAI_API_KEY", "")
     AZURE_OPENAI_ENDPOINT: str = os.getenv("AZURE_OPENAI_ENDPOINT", "")

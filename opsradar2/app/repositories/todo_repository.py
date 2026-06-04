@@ -5,6 +5,8 @@ from typing import Optional
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
+
 
 class TodoRepository:
     def __init__(self, db: AsyncSession):
@@ -16,11 +18,11 @@ class TodoRepository:
                 """
                 SELECT column_name
                 FROM information_schema.columns
-                WHERE table_schema = 'public'
+                WHERE table_schema = :schema
                   AND table_name = :table_name
                 """
             ),
-            {"table_name": table_name},
+            {"schema": settings.DB_SCHEMA, "table_name": table_name},
         )
         return {row[0] for row in result.all()}
 
@@ -102,22 +104,28 @@ class TodoRepository:
             text(
                 """
                 INSERT INTO todos (
-                  id, project_id, assignee_member_id, title, status, priority,
-                  source_type, approval_status, confidence_score, due_at, linked_issue_id,
+                  id, project_id, assignee_member_id, created_by_member_id,
+                  source_document_id, source_chunk_id, linked_issue_id,
+                  title, description, status, priority,
+                  source_type, approval_status, confidence_score, due_at,
                   created_at, updated_at
                 )
                 SELECT
                   gen_random_uuid(),
                   selected_project.id,
                   pm.id,
+                  creator_pm.id,
+                  CAST(:source_document_id AS uuid),
+                  CAST(:source_chunk_id AS uuid),
+                  CAST(:linked_issue_id AS uuid),
                   :title,
+                  :description,
                   COALESCE(:status, 'pending'),
                   COALESCE(:priority, 'medium'),
                   COALESCE(:source, 'manual'),
                   COALESCE(:approval_status, 'approved'),
                   :confidence,
                   CAST(:due_at AS timestamptz),
-                  CAST(:linked_issue_id AS uuid),
                   now(),
                   now()
                 FROM (
@@ -130,12 +138,17 @@ class TodoRepository:
                 LEFT JOIN project_members pm
                   ON pm.project_id = selected_project.id
                  AND pm.user_id = u.id
+                LEFT JOIN users creator_u ON creator_u.name = :created_by
+                LEFT JOIN project_members creator_pm
+                  ON creator_pm.project_id = selected_project.id
+                 AND creator_pm.user_id = creator_u.id
                 RETURNING id::text
                 """
             ),
             {
                 "project_id": data.get("project_id"),
                 "title": data["title"],
+                "description": data.get("description"),
                 "status": data.get("status"),
                 "priority": data.get("priority"),
                 "source": data.get("source"),
@@ -143,7 +156,10 @@ class TodoRepository:
                 "confidence": data.get("confidence"),
                 "due_at": data.get("due_at"),
                 "linked_issue_id": data.get("linked_issue_id"),
+                "source_document_id": data.get("source_document_id"),
+                "source_chunk_id": data.get("source_chunk_id"),
                 "assignee": data.get("assignee"),
+                "created_by": data.get("created_by"),
             },
         )
         await self.db.commit()

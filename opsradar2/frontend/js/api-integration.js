@@ -10,11 +10,21 @@
   }
 
   async function request(path, options = {}) {
+    const headers = options.body instanceof FormData
+      ? { ...(options.headers || {}) }
+      : { "Content-Type": "application/json", ...(options.headers || {}) };
     const res = await fetch(`${API}${path}`, {
-      headers: { "Content-Type": "application/json", ...(options.headers || {}) },
       ...options,
+      headers,
     });
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    if (!res.ok) {
+      let detail = `${res.status} ${res.statusText}`;
+      try {
+        const body = await res.json();
+        detail = body.detail || body.message || detail;
+      } catch (_) {}
+      throw new Error(detail);
+    }
     return res.status === 204 ? null : res.json();
   }
 
@@ -204,6 +214,156 @@
     if (typeof renderReportList === "function") renderReportList();
   }
 
+  async function uploadDocument(file, options = {}) {
+    const form = new FormData();
+    form.append("file", file);
+    if (options.projectId) form.append("project_id", options.projectId);
+    if (options.docType) form.append("doc_type", options.docType);
+    return request("/documents/upload", {
+      method: "POST",
+      body: form,
+    });
+  }
+
+  async function getDocumentStatus(documentId) {
+    return request(`/documents/${documentId}/status`);
+  }
+
+  async function getDocumentChunks(documentId) {
+    return request(`/documents/${documentId}/chunks`);
+  }
+
+  async function waitForDocumentAnalysis(documentId, onStatus) {
+    const terminal = new Set(["completed", "failed", "error"]);
+    for (let attempt = 0; attempt < 40; attempt += 1) {
+      const status = await getDocumentStatus(documentId);
+      if (typeof onStatus === "function") onStatus(status);
+      if (terminal.has(status.analysis_status || status.status)) return status;
+      await new Promise((resolve) => setTimeout(resolve, attempt < 5 ? 700 : 1500));
+    }
+    throw new Error("문서 분석 대기 시간이 초과되었습니다.");
+  }
+
+  async function createTodoFromChunk(documentId, chunkId, data) {
+    return request(`/documents/${documentId}/chunks/${chunkId}/todos`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async function createIssueFromChunk(documentId, chunkId, data) {
+    return request(`/documents/${documentId}/chunks/${chunkId}/issues`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  function byDocumentId(items, documentId) {
+    return (items || []).filter((item) => item.document_id === documentId);
+  }
+
+  function firstChunkText(chunks) {
+    const chunk = (chunks || [])[0];
+    if (!chunk) return "저장된 chunk가 없습니다.";
+    return String(chunk.content || "").slice(0, 420);
+  }
+
+  function renderRealDocumentResult({ file, documentId, chunks, todos: docTodos, issues: docIssues }) {
+    const chunk = (chunks || [])[0];
+    const chunkCount = chunks?.length || 0;
+    const issueCount = docIssues?.length || 0;
+    const todoCount = docTodos?.length || 0;
+    const blockedCount = (docTodos || []).filter((todo) => todo.status === "blocked").length
+      + (docIssues || []).filter((issue) => issue.status === "blocked").length;
+
+    if (typeof setStepBar === "function") setStepBar(3);
+    const resultFname = document.getElementById("resultFname");
+    const rChunkMeta = document.getElementById("rChunkMeta");
+    const rChunkContent = document.getElementById("rChunkContent");
+    const rSrcDoc = document.getElementById("rSrcDoc");
+    const rSrcRange = document.getElementById("rSrcRange");
+    const rSrcReason = document.getElementById("rSrcReason");
+    const resultSection = document.getElementById("resultSection");
+
+    if (resultFname) resultFname.textContent = file.name;
+    if (rChunkMeta) rChunkMeta.textContent = `${file.name} · ${chunkCount} chunks · document ${documentId.slice(0, 8)}`;
+    if (rChunkContent) rChunkContent.textContent = firstChunkText(chunks);
+    if (rSrcDoc) rSrcDoc.textContent = file.name;
+    if (rSrcRange) rSrcRange.textContent = chunk ? `chunk #${chunk.chunk_index ?? 0}` : "-";
+    if (rSrcReason) {
+      rSrcReason.textContent = issueCount || todoCount
+        ? "AI 분석 결과가 DB에 Todo/Issue로 저장되었습니다. 필요한 항목은 각 화면에서 승인하거나 수정할 수 있습니다."
+        : "문서와 chunk는 DB에 저장되었습니다. AI가 항목을 추출하지 못한 경우 수동으로 Todo/Issue를 만들 수 있습니다.";
+    }
+
+    if (typeof countUp === "function") {
+      countUp("rTodo", todoCount, 500);
+      countUp("rIssue", issueCount, 500);
+      countUp("rBlocked", blockedCount, 500);
+    } else {
+      const rTodo = document.getElementById("rTodo");
+      const rIssue = document.getElementById("rIssue");
+      const rBlocked = document.getElementById("rBlocked");
+      if (rTodo) rTodo.textContent = todoCount;
+      if (rIssue) rIssue.textContent = issueCount;
+      if (rBlocked) rBlocked.textContent = blockedCount;
+    }
+
+    if (resultSection) resultSection.style.display = "block";
+    if (window.G?.analysisHistory) {
+      window.G.analysisHistory.unshift({
+        name: file.name,
+        type: "document",
+        date: typeof formatOpsDate === "function" ? formatOpsDate("short") : new Date().toLocaleDateString("ko-KR"),
+        todo: todoCount,
+        issue: issueCount,
+        blocked: blockedCount,
+      });
+    }
+  }
+
+  async function runRealDocumentAnalysis(files) {
+    if (!files?.length) throw new Error("업로드할 파일이 없습니다.");
+    const file = files[0];
+    const upload = await uploadDocument(file);
+    const documentId = upload.document_id;
+    if (!documentId) throw new Error("백엔드에서 document_id를 받지 못했습니다.");
+
+    await waitForDocumentAnalysis(documentId, (status) => {
+      const progress = Number(status.progress || 0);
+      if (typeof setFlow === "function") {
+        if (progress < 40) setFlow(1, "active", "파일 저장 및 텍스트 추출 중", `진행률 ${progress}%`, "s-active");
+        else setFlow(1, "done", "파일 저장 및 텍스트 추출 완료", "DB documents/document_chunks 저장", "s-done");
+        if (progress >= 40 && progress < 80) setFlow(2, "active", "Todo/Issue 추출 중", `진행률 ${progress}%`, "s-active");
+        else if (progress >= 80) setFlow(2, "done", "Todo/Issue 추출 완료", "DB todos/issues 반영", "s-done");
+        if (progress >= 80 && progress < 100) setFlow(3, "active", "운영 요약 생성 중", `진행률 ${progress}%`, "s-active");
+      }
+    });
+
+    if (typeof setFlow === "function") {
+      setFlow(1, "done", "파일 저장 및 텍스트 추출 완료", "DB documents/document_chunks 저장", "s-done");
+      setFlow(2, "done", "Todo/Issue 추출 완료", "DB todos/issues 반영", "s-done");
+      setFlow(3, "done", "운영 요약 생성 완료", "분석 결과 저장 완료", "s-done");
+    }
+
+    const chunkData = await getDocumentChunks(documentId);
+    const todoData = await request("/todos");
+    const issueData = await request("/issues");
+    const docTodos = byDocumentId(todoData.todos, documentId);
+    const docIssues = byDocumentId(issueData.issues, documentId);
+
+    renderRealDocumentResult({
+      file,
+      documentId,
+      chunks: chunkData.chunks || [],
+      todos: docTodos,
+      issues: docIssues,
+    });
+
+    await window.opsRadarApi.reload();
+    return { documentId, chunks: chunkData.chunks || [], todos: docTodos, issues: docIssues };
+  }
+
   window.opsRadarCreateCalendarEvent = async function ({ title, day, month, year, color }) {
     const target = new Date(
       year ?? window.G?.currentCalYear ?? new Date().getFullYear(),
@@ -227,6 +387,12 @@
 
   window.opsRadarApi = {
     request,
+    uploadDocument,
+    getDocumentStatus,
+    getDocumentChunks,
+    createTodoFromChunk,
+    createIssueFromChunk,
+    runDocumentAnalysis: runRealDocumentAnalysis,
     loadTodos: loadTodosFromAPI,
     loadIssues: loadIssuesFromAPI,
     loadCalendar: loadCalendarFromAPI,
@@ -385,10 +551,66 @@
     patchCreateActions();
     patchCalendarActions();
     patchReportActions();
+    patchDocumentAnalysis();
     window.opsRadarApi.reload().then((results) => {
       const rejected = results.filter((r) => r.status === "rejected");
       if (rejected.length) console.warn("Some OpsRadar API loads failed", rejected);
     });
+  }
+
+  function patchDocumentAnalysis() {
+    if (typeof startAnalysis !== "function") return;
+    window.startAnalysis = startAnalysis = async function () {
+      if (!window.G?.uploadedFiles?.length) {
+        if (typeof showUploadError === "function") showUploadError("general");
+        return;
+      }
+      if (typeof hideUploadError === "function") hideUploadError();
+      if (typeof validateUploadedFiles === "function") {
+        const validation = await validateUploadedFiles(window.G.uploadedFiles);
+        if (!validation.ok) {
+          if (typeof showUploadError === "function") showUploadError(validation.reason);
+          return;
+        }
+      }
+
+      const uploadSection = document.getElementById("uploadSection");
+      const analysisSection = document.getElementById("analysisSection");
+      const analysisGuide = document.getElementById("analysisGuide");
+      const resultSection = document.getElementById("resultSection");
+      const uploadedFname = document.getElementById("uploadedFname");
+      const analysisBadge = document.getElementById("analysisBadge");
+      const file = window.G.uploadedFiles[0];
+
+      if (uploadSection) uploadSection.style.display = "none";
+      if (analysisSection) analysisSection.style.display = "block";
+      if (analysisGuide) analysisGuide.style.display = "none";
+      if (resultSection) resultSection.style.display = "none";
+      if (uploadedFname) uploadedFname.textContent = `AI가 업무 내용을 분석하고 있습니다... · ${file.name}`;
+      if (analysisBadge) {
+        analysisBadge.textContent = "분석 중...";
+        analysisBadge.className = "badge b-accent";
+      }
+      if (typeof setStepBar === "function") setStepBar(2);
+
+      try {
+        await runRealDocumentAnalysis(window.G.uploadedFiles);
+        if (analysisBadge) {
+          analysisBadge.textContent = "완료";
+          analysisBadge.className = "badge b-success";
+        }
+        if (typeof showToast === "function") showToast("분석 결과가 DB에 저장되었습니다.", "success");
+        if (typeof addNotif === "function") addNotif(`"${file.name.slice(0, 20)}" 분석 완료. Todo와 이슈를 확인하세요.`, "success");
+      } catch (error) {
+        console.warn("Document upload/analysis failed", error);
+        if (analysisBadge) {
+          analysisBadge.textContent = "실패";
+          analysisBadge.className = "badge b-danger";
+        }
+        if (typeof showToast === "function") showToast(`문서 분석에 실패했습니다. ${error.message || ""}`, "warn");
+        if (uploadSection) uploadSection.style.display = "block";
+      }
+    };
   }
 
   if (document.readyState === "loading") {
