@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { AiCandidatePreview, EvidencePanel } from "./ProductDirection.jsx";
 
 const emptySnapshot = {
   currentTab: "ai",
@@ -195,7 +194,6 @@ function EmptyTodoGuide() {
             <i className="ti ti-plus" /> 수동 등록
           </button>
         </div>
-        <AiCandidatePreview />
       </div>
     </div>
   );
@@ -315,17 +313,6 @@ function TodoDetail({ todo }) {
             <div className="risk-box">{todo.risk}</div>
           </>
         ) : null}
-        <EvidencePanel
-          compact
-          evidence={{
-            title: todo.title,
-            reviewStatus: todo.status === "approved" || todo.status === "done" ? "approved" : "pending_review",
-            sourceDocument: todo.src || "operation_log_test_20260605.txt",
-            evidenceText: todo.chunk || grounds[0],
-            aiReason: todo.risk || "운영 기록에서 후속 조치가 필요한 신호가 확인되어 Todo 후보로 제안합니다.",
-            sourceType: todo.type === "manual" ? "수동 등록" : "AI 제안",
-          }}
-        />
       </div>
       <div style={{ padding: "12px 14px", borderTop: "1px solid var(--border)", display: "flex", gap: 5 }}>
         <ActionButtons todo={todo} />
