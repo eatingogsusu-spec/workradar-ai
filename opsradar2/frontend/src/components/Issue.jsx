@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
+import { AiCandidatePreview, EvidencePanel, ReviewStatusBadge } from "./ProductDirection.jsx";
 
 const emptySnapshot = {
   currentTab: "confirmed",
@@ -15,7 +16,7 @@ function severityBadge(issue) {
   if (issue.type === "candidate") {
     return (
       <>
-        <span className="badge b-warn">후보</span>
+        <span className="badge b-warn">?꾨낫</span>
         <span style={{ fontSize: 10, fontFamily: "var(--mono)", color: "var(--warn)", fontWeight: 500 }}>
           {issue.confidence ?? 0}%
         </span>
@@ -39,6 +40,7 @@ function EmptyIssueList() {
     <div style={{ padding: 40, textAlign: "center", color: "var(--text3)", fontSize: 12 }}>
       <i className="ti ti-check" style={{ fontSize: 28, display: "block", marginBottom: 8 }} />
       이 탭에 항목이 없습니다.
+      <AiCandidatePreview title="결제 API 응답 지연 Issue 후보" />
     </div>
   );
 }
@@ -65,24 +67,25 @@ function IssueCard({ issue }) {
         {statusBadge(issue.status)}
         {issue.hasTodo ? (
           <span className="badge b-success" style={{ fontSize: 9 }}>
-            Todo 생성됨
+            Todo ?앹꽦??
           </span>
         ) : null}
+        <ReviewStatusBadge status={isCandidate ? "pending_review" : issue.status === "resolved" ? "official" : "approved"} />
       </div>
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
-        <span className="badge b-gray">{issue.src || "자동 감지"}</span>
-        {issue.days > 0 ? <span className="badge b-gray">{issue.days}일째</span> : null}
+        <span className="badge b-gray">{issue.src || "?먮룞 媛먯?"}</span>
+        {issue.days > 0 ? <span className="badge b-gray">{issue.days}?쇱㎏</span> : null}
         {issue.assignee ? (
-          <span className="badge b-gray">담당: {issue.assignee}</span>
+          <span className="badge b-gray">?대떦: {issue.assignee}</span>
         ) : (
           <span className="badge b-danger" style={{ fontSize: 9 }}>
-            담당자 미지정
+            ?대떦??誘몄???
           </span>
         )}
       </div>
       <div className="issue-desc">{issue.desc}</div>
       <div className="issue-footer">
-        <div style={{ fontSize: 10, color: "var(--text3)" }}>AI 자동 탐지</div>
+        <div style={{ fontSize: 10, color: "var(--text3)" }}>AI ?먮룞 ?먯?</div>
         <div style={{ display: "flex", gap: 5 }}>
           {isCandidate ? (
             <>
@@ -95,7 +98,7 @@ function IssueCard({ issue }) {
                   callLegacy("openConfirmIssue", issue.id);
                 }}
               >
-                이슈 확정
+                ?댁뒋 ?뺤젙
               </button>
               <button
                 className="tbtn"
@@ -106,7 +109,7 @@ function IssueCard({ issue }) {
                   callLegacy("doRemoveIssue", issue.id);
                 }}
               >
-                무시
+                臾댁떆
               </button>
             </>
           ) : issue.type === "resolved" ? null : (
@@ -119,7 +122,7 @@ function IssueCard({ issue }) {
                 callLegacy("openTodoCreate", issue.id);
               }}
             >
-              <i className="ti ti-plus" /> 대응 Todo 생성
+              <i className="ti ti-plus" /> ???Todo ?앹꽦
             </button>
           )}
         </div>
@@ -134,9 +137,9 @@ function IssueDetail({ issue }) {
       <div className="detail-empty" id="issueDetailEmpty">
         <i className="ti ti-hand-click" />
         <span>
-          이슈를 클릭하면
+          ?댁뒋瑜??대┃?섎㈃
           <br />
-          상세 내용이 표시됩니다
+          ?곸꽭 ?댁슜???쒖떆?⑸땲??
         </span>
       </div>
     );
@@ -150,7 +153,7 @@ function IssueDetail({ issue }) {
         </div>
         {issue.chunk ? (
           <>
-            <div className="detail-section">출처 청크</div>
+            <div className="detail-section">異쒖쿂 泥?겕</div>
             <div className="chunk-box">
               <div className="chunk-meta">
                 <i className="ti ti-file-text" style={{ fontSize: 11, color: "var(--accent)" }} />
@@ -162,15 +165,15 @@ function IssueDetail({ issue }) {
         ) : null}
         {issue.domino?.length ? (
           <>
-            <div className="detail-section">도미노 영향</div>
+            <div className="detail-section">?꾨????곹뼢</div>
             <div className="domino">
-              <div className="domino-lbl">왜 위험한가</div>
+              <div className="domino-lbl">???꾪뿕?쒓?</div>
               {issue.domino.map((item) => (
-                <div key={item}>→ {item}</div>
+                <div key={item}>??{item}</div>
               ))}
               {issue.dominoFinal ? (
                 <div className="domino-final" style={{ marginTop: 4 }}>
-                  → {issue.dominoFinal}
+                  ??{issue.dominoFinal}
                 </div>
               ) : null}
             </div>
@@ -178,7 +181,7 @@ function IssueDetail({ issue }) {
         ) : null}
         {issue.history?.length ? (
           <>
-            <div className="detail-section">상태 변화 이력</div>
+            <div className="detail-section">?곹깭 蹂???대젰</div>
             {issue.history.map((item) => (
               <div className="history-row" key={`${item.date}-${item.s}-${item.note}`}>
                 <div className="history-date">{item.date}</div>
@@ -192,9 +195,20 @@ function IssueDetail({ issue }) {
             ))}
           </>
         ) : null}
+        <EvidencePanel
+          compact
+          evidence={{
+            title: issue.title,
+            reviewStatus: issue.type === "candidate" ? "pending_review" : issue.status === "resolved" ? "official" : "approved",
+            sourceDocument: issue.src || "operation_log_test_20260605.txt",
+            evidenceText: issue.chunk || issue.desc || "운영 기록에서 고객 영향 가능성이 있는 신호가 확인되었습니다.",
+            aiReason: issue.dominoFinal || "리스크 전파 가능성이 있어 운영 이슈 후보로 제안합니다.",
+            sourceType: issue.type === "candidate" ? "AI 제안" : "공식 Issue",
+          }}
+        />
         {issue.createdTodos?.length ? (
           <>
-            <div className="detail-section">생성된 대응 Todo</div>
+            <div className="detail-section">?앹꽦?????Todo</div>
             {issue.createdTodos.map((todo) => (
               <div
                 key={todo.id}
@@ -221,11 +235,11 @@ function IssueDetail({ issue }) {
         <div id="issueDetailActions" style={{ display: "flex", padding: "12px 14px", borderTop: "1px solid var(--border)", flexDirection: "column", gap: 6 }}>
           <>
             <button className="tbtn primary" type="button" onClick={() => callLegacy("openTodoCreate", issue.id)} style={{ justifyContent: "center" }}>
-              <i className="ti ti-plus" /> 대응 Todo 생성
+              <i className="ti ti-plus" /> ???Todo ?앹꽦
             </button>
             <div style={{ display: "flex", gap: 5, marginTop: 4 }}>
               <button className="tbtn" type="button" style={{ flex: 1, justifyContent: "center", color: "var(--success)" }} onClick={() => callLegacy("resolveIssue", issue.id)}>
-                <i className="ti ti-check" /> 해결 완료
+                <i className="ti ti-check" /> ?닿껐 ?꾨즺
               </button>
             </div>
           </>
@@ -239,10 +253,10 @@ function IssueDetail({ issue }) {
               onClick={() => callLegacy("openConfirmIssue", issue.id)}
               style={{ justifyContent: "center", background: "var(--danger)", borderColor: "var(--danger)" }}
             >
-              <i className="ti ti-alert-triangle" /> 이슈 확정
+              <i className="ti ti-alert-triangle" /> ?댁뒋 ?뺤젙
             </button>
             <button className="tbtn" type="button" onClick={() => callLegacy("doRemoveIssue", issue.id)} style={{ justifyContent: "center", color: "var(--text3)", marginTop: 4 }}>
-              무시
+              臾댁떆
             </button>
           </>
         </div>
@@ -272,8 +286,8 @@ export default function Issue() {
   const currentTab = snapshot.currentTab || "confirmed";
   const tabs = useMemo(
     () => [
-      { id: "confirmed", label: "확정 이슈", count: counts.confirmed, badge: "b-danger" },
-      { id: "candidate", label: "이슈 후보", count: counts.candidate, badge: "b-warn" },
+      { id: "confirmed", label: "?뺤젙 ?댁뒋", count: counts.confirmed, badge: "b-danger" },
+      { id: "candidate", label: "?댁뒋 ?꾨낫", count: counts.candidate, badge: "b-warn" },
       { id: "resolved", label: "Resolved", count: counts.resolved, badge: "b-gray" },
     ],
     [counts.candidate, counts.confirmed, counts.resolved],
@@ -282,24 +296,24 @@ export default function Issue() {
   return (
     <>
       <div className="topbar">
-        <div className="topbar-title">이슈 로그</div>
+        <div className="topbar-title">?댁뒋 濡쒓렇</div>
         <div style={{ display: "flex", gap: 8 }}>
           <button className="tbtn primary" type="button" onClick={() => callLegacy("openIssueCreateModal")}>
-            <i className="ti ti-plus" /> 수동 등록
+            <i className="ti ti-plus" /> ?섎룞 ?깅줉
           </button>
-          <div className="chip" data-current-date="short">오늘 날짜</div>
+          <div className="chip" data-current-date="short">?ㅻ뒛 ?좎쭨</div>
         </div>
       </div>
       <div className="ctx-banner" id="issuectxBanner">
         <i className="ti ti-circle-check" />
-        <span id="issuectxText">Todo가 생성되었습니다. Todo 화면에서 확인하세요.</span>
+        <span id="issuectxText">Todo媛 ?앹꽦?섏뿀?듬땲?? Todo ?붾㈃?먯꽌 ?뺤씤?섏꽭??</span>
         <button
           className="tbtn"
           type="button"
           onClick={() => callLegacy("nav", "todo")}
           style={{ marginLeft: "auto", fontSize: 10, padding: "3px 8px", color: "var(--success)", borderColor: "var(--success)" }}
         >
-          Todo 확인 →
+          Todo ?뺤씤 ??
         </button>
       </div>
       <div className="tabs">

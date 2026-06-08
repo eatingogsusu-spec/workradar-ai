@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { ReportQualityCheck } from "./ProductDirection.jsx";
 
 const emptySnapshot = {
   currentPeriod: "weekly",
@@ -143,6 +144,7 @@ function ReportDetail({ report }) {
           </button>
         </div>
       </div>
+      <ReportQualityCheck />
       <ReportSection title="완료된 업무" items={sections.completed} />
       <ReportSection title="진행 중인 업무" items={sections.inProgress} />
       <ReportSection title="AI 및 기술적 상세 내용" items={sections.technical} />
@@ -182,6 +184,7 @@ function ReportEditor({ snapshot }) {
         className="report-editor text-content"
         dangerouslySetInnerHTML={{ __html: snapshot.editorHtml }}
       />
+      <ReportQualityCheck />
       <div className="report-editor-actions">
         <button className="tbtn" type="button" onClick={() => callLegacy("shareReport")}>
           <i className="ti ti-share" /> 공유

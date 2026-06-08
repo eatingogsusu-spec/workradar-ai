@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { DashboardReviewCards } from "./ProductDirection.jsx";
 
 const defaultAdminRisks = [
   {
@@ -274,6 +275,15 @@ function AdminDashboard({ risks, onIssueDetail, onNav }) {
           </div>
         </div>
       </section>
+
+      <section className="product-direction-note">
+        <i className="ti ti-route" />
+        <span>
+          Dashboard는 AI 후보와 공식 운영 데이터를 구분하고, 오늘 검토해야 할 항목·High Risk·근거 부족 항목을 우선 표시합니다.
+        </span>
+      </section>
+
+      <DashboardReviewCards onNav={onNav} />
 
       <section>
         <div className="ops-section-heading">
