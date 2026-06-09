@@ -13,7 +13,10 @@ ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
 FRONTEND_DIST = FRONTEND / "dist"
 FRONTEND_ENTRY = FRONTEND_DIST / "index.html" if FRONTEND_DIST.exists() else FRONTEND / "index.html"
-FRONTEND_STATIC = FRONTEND_DIST if FRONTEND_DIST.exists() else FRONTEND
+FRONTEND_PUBLIC_STATIC = FRONTEND / "public" / "static"
+FRONTEND_STATIC = (
+    FRONTEND_DIST / "static" if (FRONTEND_DIST / "static").exists() else FRONTEND_PUBLIC_STATIC
+)
 
 app = FastAPI(
     title="OpsRadar API",
@@ -42,9 +45,6 @@ async def disable_frontend_cache(request, call_next):
     return response
 
 
-if FRONTEND_STATIC.exists():
-    app.mount("/static", StaticFiles(directory=FRONTEND_STATIC), name="static")
-
 react_assets = FRONTEND_DIST / "assets"
 if react_assets.exists():
     app.mount("/assets", StaticFiles(directory=react_assets), name="assets")
@@ -65,6 +65,15 @@ def health_check():
         "app": "opsradar2",
         "db_schema": settings.DB_SCHEMA,
     }
+
+
+@app.api_route("/static/{asset_type}/{asset_path:path}", methods=["GET", "HEAD"])
+def frontend_static_asset(asset_type: str, asset_path: str):
+    for static_root in (FRONTEND_STATIC, FRONTEND_PUBLIC_STATIC):
+        candidate = (static_root / asset_type / asset_path).resolve()
+        if candidate.is_file() and candidate.is_relative_to(static_root.resolve()):
+            return FileResponse(candidate)
+    raise HTTPException(status_code=404, detail="Not found")
 
 
 @app.get("/{path:path}")

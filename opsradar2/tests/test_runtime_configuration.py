@@ -22,10 +22,11 @@ def test_dev_server_does_not_override_database_url() -> None:
 
     assert "DATABASE_URL" not in server
     assert "selector_loop_factory" in server
+    assert "port=8002" in server
 
 
 def test_calendar_adapter_preserves_selected_year_and_month() -> None:
-    adapter = read("frontend/js/api-integration.js")
+    adapter = read("frontend/public/static/js/api-integration.js")
 
     assert "const [year, month, day] = date.split(\"-\").map(Number);" in adapter
     assert "y: year" in adapter
@@ -36,45 +37,50 @@ def test_calendar_adapter_preserves_selected_year_and_month() -> None:
 
 
 def test_chat_ui_calls_backend_api() -> None:
-    frontend_app = read("frontend/js/app.js")
-    index = read("frontend/index.html")
+    frontend_app = read("frontend/public/static/js/chat.js")
+    legacy_markup = read("frontend/src/legacy/legacyMarkup.js")
 
     assert "window.opsRadarApi.request('/chat'" in frontend_app
-    assert '<script src="/static/js/api-integration.js"></script>' in index
+    assert '"/static/js/api-integration.js"' in legacy_markup
 
 
 def test_frontend_api_uses_same_origin_by_default() -> None:
-    adapter = read("frontend/js/api-integration.js")
+    adapter = read("frontend/public/static/js/api-integration.js")
 
     assert 'window.OPSRADAR_API_BASE || "/api/v1"' in adapter
 
 
 def test_calendar_state_is_exposed_to_api_adapter() -> None:
-    frontend_app = read("frontend/js/app.js")
-    adapter = read("frontend/js/api-integration.js")
+    calendar_runtime = read("frontend/public/static/js/calendar.js")
+    adapter = read("frontend/public/static/js/api-integration.js")
 
-    assert "window.G = G;" in frontend_app
-    assert "if (!window.G) return;" in adapter
-    assert "window.G.calEvents = Array.from(byDay.values());" in adapter
+    assert "window.getCalendarRuntimeState = function getCalendarRuntimeState()" in calendar_runtime
+    assert "window.replaceCalendarRuntimeEvents = function replaceCalendarRuntimeEvents(events)" in calendar_runtime
+    assert "window.replaceCalendarRuntimeEvents?.(Array.from(byDay.values()));" in adapter
 
 
 def test_react_frontend_runtime_settings_are_configurable() -> None:
     config = read("app/core/config.py")
     main = read("app/main.py")
     env_example = read(".env.example")
+    vite_config = read("frontend/vite.config.js")
 
     assert "FRONTEND_ORIGINS" in config
     assert "parse_csv_env" in config
     assert "allow_origins=list(settings.FRONTEND_ORIGINS)" in main
-    assert "http://127.0.0.1:5173" in env_example
+    assert "http://127.0.0.1:8002" in env_example
+    assert '"http://127.0.0.1:8002"' in vite_config
 
 
 def test_fastapi_can_serve_react_build_output() -> None:
     main = read("app/main.py")
 
     assert "FRONTEND_DIST = FRONTEND / \"dist\"" in main
+    assert "FRONTEND_PUBLIC_STATIC = FRONTEND / \"public\" / \"static\"" in main
     assert "react_assets = FRONTEND_DIST / \"assets\"" in main
     assert 'app.mount("/assets"' in main
+    assert '@app.api_route("/static/{asset_type}/{asset_path:path}", methods=["GET", "HEAD"])' in main
+    assert "def frontend_static_asset" in main
     assert "def spa_fallback" in main
 
 
@@ -145,6 +151,7 @@ def test_frontend_backend_contract_doc_exists() -> None:
     assert "`/api/v1/documents/upload`" in contracts
     assert "`/api/v1/chat/extract`" in contracts
     assert 'window.OPSRADAR_API_BASE || "/api/v1"' in contracts
+    assert "http://127.0.0.1:8002" in contracts
 
 def test_ai_pipeline_is_integrated_under_opsradar2_app() -> None:
     parser = read("app/ai/file_parser.py")

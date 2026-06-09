@@ -30,8 +30,8 @@ sys.path.insert(0, str(ROOT))
 from app.core.database import AsyncSessionLocal, engine
 
 
-API_BASE = os.getenv("OPSRADAR_API_BASE", "http://127.0.0.1:8010/api/v1").rstrip("/")
-HEALTH_URL = os.getenv("OPSRADAR_HEALTH_URL", "http://127.0.0.1:8010/health")
+API_BASE = os.getenv("OPSRADAR_API_BASE", "http://127.0.0.1:8002/api/v1").rstrip("/")
+HEALTH_URL = os.getenv("OPSRADAR_HEALTH_URL", "http://127.0.0.1:8002/health")
 CHECK_PREFIX = "__opsradar_mvp_review_flow__"
 
 
