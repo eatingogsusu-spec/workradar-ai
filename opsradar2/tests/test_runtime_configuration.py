@@ -45,8 +45,14 @@ def test_chat_ui_calls_backend_api() -> None:
 
 def test_frontend_api_uses_same_origin_by_default() -> None:
     adapter = read("frontend/js/api-integration.js")
+    app = read("frontend/js/app.js")
+    public_index = read("frontend/public/index.html")
 
     assert 'window.OPSRADAR_API_BASE || "/api/v1"' in adapter
+    assert 'window.OPSRADAR_API_BASE || "/api/v1"' in app
+    assert 'window.OPSRADAR_API_BASE || "/api/v1"' in public_index
+    assert "localhost:8000/api/v1" not in app
+    assert "127.0.0.1:8000/api/v1" not in public_index
 
 
 def test_calendar_state_is_exposed_to_api_adapter() -> None:

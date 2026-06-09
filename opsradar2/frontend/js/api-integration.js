@@ -802,6 +802,7 @@
   function patchCreateActions() {
     if (typeof saveManual === "function") {
       const original = saveManual;
+      if (String(original).includes("opsRadarApi.request('/todos'")) return;
       window.saveManual = saveManual = async function () {
         const title = document.getElementById("manualTitle")?.value?.trim();
         if (!title) return original();
