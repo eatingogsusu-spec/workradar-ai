@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OpsRadar AI — Clean Version</title>
+<title>WorkRader AI - Clean Version</title>
 <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
@@ -21,7 +21,7 @@ window.OPSRADAR_API_BASE = window.location.port === "8010"
 <!-- ══ 사이드바 ══ -->
 <div class="sidebar">
   <div class="sb-logo">
-    <div class="sb-logo-name">OpsRadar</div>
+    <div class="sb-logo-name">WorkRader</div>
     <div class="sb-logo-tag">운영 인텔리전스</div>
   </div>
   <div class="sb-nav">
@@ -47,10 +47,11 @@ window.OPSRADAR_API_BASE = window.location.port === "8010"
   </div>
   <div class="sb-footer">
     <div style="display:flex;align-items:center;gap:8px">
-      <div class="sb-avatar">희진</div>
+      <div class="sb-avatar" id="sidebarUserAvatar">김</div>
       <div>
-        <div style="font-size:11px;color:var(--text);font-weight:500">관리자</div>
-        <div style="font-size:10px;color:var(--text3)">PM · 팀장</div>
+        <div id="sidebarUserName" style="font-size:11px;color:var(--text);font-weight:500">김희진</div>
+        <div id="sidebarUserRole" style="font-size:11px;color:var(--text);font-weight:500">관리자</div>
+        <div id="sidebarUserDescription" style="font-size:10px;color:var(--text3)">PM · 팀장</div>
       </div>
     </div>
   </div>

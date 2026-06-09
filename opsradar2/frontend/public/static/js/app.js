@@ -105,7 +105,7 @@ function getHandoffPreviewData(type){
     onboarding: {
       title:'신규 입사자 온보딩 브리핑', target:'신규 입사자 온보딩',
       sections:[
-        ['프로젝트 개요','OpsRadar는 운영 로그, Todo, Risk, Calendar, 인수인계 문맥을 AI가 연결해 운영 상태를 추론하는 SaaS형 운영 인텔리전스 시스템입니다.'],
+        ['프로젝트 개요','WorkRader는 운영 로그, Todo, Risk, Calendar, 인수인계 문맥을 AI가 연결해 운영 상태를 추론하는 SaaS형 운영 인텔리전스 시스템입니다.'],
         ['현재 진행 업무','결제 API 안정화, 등록된 우선 작업 없음, 운영 로그 기반 Todo 추출 정확도 개선이 진행 중입니다.'],
         ['최근 주요 결정','High Risk는 Dashboard에서 먼저 확인하고, AI 생성 Todo는 승인 후 실행 관리로 넘기는 흐름을 유지합니다.'],
         ['반복 발생 이슈','운영 이벤트, 운영 리스크, Risk 데이터 없음가 반복적으로 관찰됩니다.'],
@@ -1914,7 +1914,7 @@ function kFlowSteps(steps, activeIndex = -1) {
 function kCtxOnboarding() {
   return `
     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4">신규 입사자<br>온보딩</div>
-    <div style="font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:16px">맥락 없이 투입되면 온보딩에 1~2주 낭비. OpsRadar가 현재 운영 상태를 자동 정리해 줍니다.</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:16px">맥락 없이 투입되면 온보딩에 1~2주 낭비. WorkRader가 현재 운영 상태를 자동 정리해 줍니다.</div>
     <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">온보딩 진행률</div>
     <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:25%;background:var(--success);border-radius:3px" id="onboardingBar"></div></div>
     <div style="font-size:10px;color:var(--text3);margin-bottom:14px">1/4 단계 완료</div>
@@ -1938,7 +1938,7 @@ function kContentOnboarding() {
       <div class="kcard-body">
         <div class="kb-why"><i class="ti ti-info-circle" style="font-size:13px;flex-shrink:0"></i><div><strong>왜 중요한가:</strong> 프로젝트 전체 맥락을 모르면 개별 업무가 왜 필요한지 이해 못 함.</div></div>
         <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">확인 항목</div>
-        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">OpsRadar 서비스 정의 — 운영 인텔리전스 AI 시스템</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">WorkRader 서비스 정의 — 운영 인텔리전스 AI 시스템</div></div>
         <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">기술스택: FastAPI · PostgreSQL · FAISS · React · Azure OpenAI</div></div>
         <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">팀 구성 및 역할 (PM·AI·인프라·백엔드·프론트)</div></div>
         <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">8주 MVP 로드맵 및 현재 주차 확인</div></div>
@@ -2233,7 +2233,7 @@ const floatCtx = {
   calendar:  { label:'캘린더 기반으로 답변합니다.', qs:['이번 달 리스크 구간 알려줘','부재 일정 추가해줘'] },
   knowledge: { label:'인수인계 센터 기반입니다.', qs:['인수인계 문서 생성해줘','부재자 업무 이관 도와줘'] },
   reports:   { label:'보고서 화면입니다.', qs:['주간 보고서 초안 생성해줘','이번 주 운영 요약해줘'] },
-  chat:      { label:'AI Assistant 화면입니다.', qs:['OpsRadar 사용법 알려줘'] },
+  chat:      { label:'AI Assistant 화면입니다.', qs:['WorkRader 사용법 알려줘'] },
 };
 
 function toggleFloatAI() {
@@ -2669,7 +2669,7 @@ function getHandoffPreviewData(type){
     onboarding: {
       title:'신규 입사자 온보딩 브리핑', target:'신규 입사자 온보딩',
       sections:[
-        ['프로젝트 개요','OpsRadar는 운영 로그, Todo, Risk, Calendar, 인수인계 문맥을 AI가 연결해 운영 상태를 추론하는 SaaS형 운영 인텔리전스 시스템입니다.'],
+        ['프로젝트 개요','WorkRader는 운영 로그, Todo, Risk, Calendar, 인수인계 문맥을 AI가 연결해 운영 상태를 추론하는 SaaS형 운영 인텔리전스 시스템입니다.'],
         ['현재 운영 상태','결제 API 장기 미해결, Blocked Todo 누적, 승인 대기 항목이 핵심 관찰 지점입니다.'],
         ['최근 주요 이슈','운영 이벤트, 운영 리스크, Risk 데이터 없음가 반복적으로 관찰됩니다.'],
         ['우선 확인해야 할 문서','연결된 문서가 없습니다.'],
@@ -2894,19 +2894,37 @@ function initOpsRadarSkin(){
 function getStoredUserInfo(){
   let rawUser = null;
   let rawRole = null;
+  let storedName = null;
   try{
+    storedName = localStorage.getItem('opsradar_user_name');
+    rawRole = localStorage.getItem('opsradar_user_role') || localStorage.getItem('role');
     rawUser = localStorage.getItem('user');
-    rawRole = localStorage.getItem('role');
   }catch(e){}
-  let userName = '관리자';
-  if(rawUser){
+  let userName = storedName || '김희진';
+  if(!storedName && rawUser){
     try{
       const parsed = JSON.parse(rawUser);
       userName = parsed.name || parsed.username || parsed.email || rawUser;
     }catch(e){ userName = rawUser; }
   }
   const isMember = (rawRole || '').toLowerCase() === 'member' || document.getElementById('db-tab-member')?.classList.contains('active');
-  return { userName, role: isMember ? 'Team Member' : 'Admin', roleKo: isMember ? '팀원' : '관리자' };
+  return {
+    userName,
+    role: isMember ? 'Team Member' : 'Admin',
+    roleKo: isMember ? '팀원' : '관리자',
+    roleDescription: isMember ? 'Team Member' : 'PM · 팀장'
+  };
+}
+function updateSidebarUserDisplay(){
+  const info = getStoredUserInfo();
+  const sidebarName = document.getElementById('sidebarUserName');
+  const sidebarRole = document.getElementById('sidebarUserRole');
+  const sidebarDescription = document.getElementById('sidebarUserDescription');
+  const sidebarAvatar = document.getElementById('sidebarUserAvatar');
+  if(sidebarName) sidebarName.textContent = info.userName;
+  if(sidebarRole) sidebarRole.textContent = info.roleKo;
+  if(sidebarDescription) sidebarDescription.textContent = info.roleDescription;
+  if(sidebarAvatar) sidebarAvatar.textContent = (info.userName || 'U').trim().slice(0, 1).toUpperCase();
 }
 function updateSettingsPage(){
   const info = getStoredUserInfo();
@@ -2927,6 +2945,7 @@ function updateSettingsPage(){
   if(userMirror) userMirror.textContent = info.userName;
   if(roleMirror) roleMirror.textContent = info.role;
   if(stateMirror) stateMirror.textContent = 'Active';
+  updateSidebarUserDisplay();
   let theme = 'dark';
   try{ theme = localStorage.getItem('theme') || localStorage.getItem('opsradar-skin') || document.body.dataset.theme || 'dark'; }catch(e){}
   setOpsRadarTheme(theme);
@@ -2935,6 +2954,9 @@ function logout(){
   try{
     localStorage.removeItem('access_token');
     localStorage.removeItem('token');
+    localStorage.removeItem('opsradar_user_role');
+    localStorage.removeItem('opsradar_user_name');
+    localStorage.removeItem('opsradar_user_id');
     localStorage.removeItem('role');
     localStorage.removeItem('user');
   }catch(e){}
@@ -2945,6 +2967,7 @@ function logout(){
 window.setOpsRadarTheme = setOpsRadarTheme;
 window.setOpsRadarSkin = setOpsRadarSkin;
 window.updateSettingsPage = updateSettingsPage;
+window.updateSidebarUserDisplay = updateSidebarUserDisplay;
 window.logout = logout;
 const ISSUE_DETAIL_MOCK = {
   'payment-api': {

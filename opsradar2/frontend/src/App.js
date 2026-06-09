@@ -9,7 +9,7 @@ const LABELS = {
   admin: "\uAD00\uB9AC\uC790",
   member: "\uD300\uC6D0",
   logout: "\uB85C\uADF8\uC544\uC6C3",
-  staticShell: "\uC815\uC801 OpsRadar \uD654\uBA74\uC740 public/index.html\uC5D0\uC11C \uB80C\uB354\uB9C1\uB429\uB2C8\uB2E4.",
+  staticShell: "\uC815\uC801 WorkRader \uD654\uBA74\uC740 public/index.html\uC5D0\uC11C \uB80C\uB354\uB9C1\uB429\uB2C8\uB2E4.",
   staticHelp: "\uD654\uBA74\uC774 \uBE44\uC5B4 \uBCF4\uC774\uBA74 public/index.html \uB610\uB294 \uC815\uC801 \uC2A4\uD06C\uB9BD\uD2B8 \uACBD\uB85C\uB97C \uD655\uC778\uD558\uC138\uC694.",
 };
 
@@ -17,6 +17,8 @@ function syncDashboardRoleUi(role, name) {
   const isMember = role === "member";
   const allowedRole = isMember ? "member" : "pm";
   const roleLabel = isMember ? LABELS.member : LABELS.admin;
+  const roleDescription = isMember ? "Team Member" : "PM \u00B7 \uD300\uC7A5";
+  const displayName = name || LABELS.user;
   const switcher = document.querySelector(".ops-role-switch");
 
   if (typeof window.__opsradarOriginalSwitchDbRole !== "function" && typeof window.switchDbRole === "function") {
@@ -41,7 +43,16 @@ function syncDashboardRoleUi(role, name) {
     badge.className = "ops-login-role-badge";
     switcher.insertAdjacentElement("afterend", badge);
   }
-  badge.textContent = `${name || LABELS.user} / ${roleLabel}`;
+  badge.textContent = `${displayName} / ${roleLabel}`;
+
+  const sidebarName = document.getElementById("sidebarUserName");
+  const sidebarRole = document.getElementById("sidebarUserRole");
+  const sidebarDescription = document.getElementById("sidebarUserDescription");
+  const sidebarAvatar = document.getElementById("sidebarUserAvatar");
+  if (sidebarName) sidebarName.textContent = displayName;
+  if (sidebarRole) sidebarRole.textContent = roleLabel;
+  if (sidebarDescription) sidebarDescription.textContent = roleDescription;
+  if (sidebarAvatar) sidebarAvatar.textContent = displayName.trim().slice(0, 1) || "U";
 }
 
 function App() {
@@ -106,7 +117,7 @@ function App() {
 
   return (
     <main style={{ padding: "24px", fontFamily: "system-ui, sans-serif" }}>
-      <h1>OpsRadar frontend shell</h1>
+      <h1>WorkRader frontend shell</h1>
       <p>{LABELS.staticShell}</p>
       <p>{LABELS.staticHelp}</p>
       <button type="button" onClick={handleLogout}>{LABELS.logout}</button>

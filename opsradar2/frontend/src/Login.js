@@ -57,7 +57,7 @@ function Login({ onLogin }) {
       <section className="opsradar-login-copy" aria-labelledby="login-title">
         <div className="opsradar-login-mark">OR</div>
         <p>AI Operational Intelligence</p>
-        <h1 id="login-title">OpsRadar</h1>
+        <h1 id="login-title">WorkRader</h1>
         <div className="opsradar-login-subtitle">
           {LABELS.subtitleLine1}
           <br />
