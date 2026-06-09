@@ -197,17 +197,53 @@ class IssueRepository:
         return bool(result.scalar_one())
 
     async def update(self, issue_id: str, data: dict) -> bool:
-        allowed = {key: value for key, value in data.items() if key in {"status", "approval_status"}}
-        if not allowed:
+        normalized = dict(data)
+        if "risk_level" in normalized and "severity" not in normalized:
+            normalized["severity"] = normalized["risk_level"]
+        allowed = {
+            key: value
+            for key, value in normalized.items()
+            if key in {"title", "description", "status", "severity", "approval_status"}
+        }
+        assignments = [f"{key} = :{key}" for key in allowed]
+        params = {"issue_id": issue_id, **allowed}
+        if "assignee" in normalized:
+            assignments.append(
+                """
+                assignee_member_id = (
+                  SELECT pm.id
+                  FROM project_members pm
+                  JOIN users u ON u.id = pm.user_id
+                  WHERE pm.project_id = issues.project_id
+                    AND u.name = :assignee
+                    AND pm.status = 'active'
+                  LIMIT 1
+                )
+                """
+            )
+            params["assignee"] = normalized.get("assignee")
+        if not assignments:
             return True
 
-        assignments = ", ".join(f"{key} = :{key}" for key in allowed)
         result = await self.db.execute(
-            text(f"UPDATE issues SET {assignments}, updated_at = now() WHERE id = CAST(:issue_id AS uuid)"),
-            {"issue_id": issue_id, **allowed},
+            text(
+                f"""
+                UPDATE issues
+                SET {", ".join(assignments)}, updated_at = now()
+                WHERE id = CAST(:issue_id AS uuid)
+                """
+            ),
+            params,
         )
         await self.db.commit()
         return result.rowcount > 0
-
     async def resolve(self, issue_id: str) -> bool:
         return await self.update(issue_id, {"status": "resolved"})
+
+    async def delete(self, issue_id: str) -> bool:
+        result = await self.db.execute(
+            text("DELETE FROM issues WHERE id = CAST(:issue_id AS uuid)"),
+            {"issue_id": issue_id},
+        )
+        await self.db.commit()
+        return result.rowcount > 0

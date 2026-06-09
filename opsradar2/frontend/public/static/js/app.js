@@ -1,24 +1,6 @@
 // ════════════════════════════════════════════════
-// API 베이스 URL 설정
-// ════════════════════════════════════════════════
-window.OPSRADAR_API_BASE = "http://localhost:8000/api/v1";
-
-// ════════════════════════════════════════════════
 // 전역 상태
 // ════════════════════════════════════════════════
-window.OpsRadarFrontend = window.OpsRadarFrontend || {
-  modules: {},
-  schemas: {},
-  registerModule(name, module) {
-    if (!name) return;
-    this.modules[name] = {
-      name,
-      loadedAt: new Date().toISOString(),
-      ...(module || {}),
-    };
-  },
-};
-
 const G = {
   currentScreen: 'dashboard',
   currentTodoTab: 'ai',

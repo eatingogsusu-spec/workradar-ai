@@ -56,6 +56,15 @@ async def resolve_issue(issue_id: str, db: AsyncSession = Depends(get_db)):
     return {"status": "success", "issue_id": issue_id}
 
 
+@router.delete("/{issue_id}")
+async def delete_issue(issue_id: str, db: AsyncSession = Depends(get_db)):
+    service = IssueService(IssueRepository(db))
+    deleted = await service.delete_issue(issue_id)
+    if not deleted:
+        raise HTTPException(404, "issue not found")
+    return {"status": "success", "issue_id": issue_id}
+
+
 @router.post("/{issue_id}/todos")
 async def create_todo_from_issue(issue_id: str, body: dict, db: AsyncSession = Depends(get_db)):
     if not body.get("title"):
