@@ -2,9 +2,9 @@
 // API 베이스 URL 설정
 // ════════════════════════════════════════════════
 window.OPSRADAR_API_BASE = window.OPSRADAR_API_BASE || (
-  window.location.port === "8010"
-    ? "/api/v1"
-    : `${window.location.protocol}//${window.location.hostname}:8010/api/v1`
+    window.location.port === "8002"
+      ? "/api/v1"
+      : `${window.location.protocol}//${window.location.hostname}:8002/api/v1`
 );
 
 // ════════════════════════════════════════════════
