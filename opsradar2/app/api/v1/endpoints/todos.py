@@ -1,5 +1,6 @@
 """Todo API."""
 
+import asyncio
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -18,11 +19,24 @@ async def get_todos(
     status: Optional[str] = None,
     source: Optional[str] = None,
     project_id: Optional[str] = None,
+    page: int = 1,
+    limit: int = 15,
     db: AsyncSession = Depends(get_db),
 ):
     service = TodoService(TodoRepository(db))
     normalized_status = None if status in (None, "all") else status
-    return {"todos": await service.list_todos(status=normalized_status, source=source, project_id=project_id)}
+    offset = (page - 1) * limit
+    todos, total = await asyncio.gather(
+        service.list_todos(status=normalized_status, source=source, project_id=project_id, limit=limit, offset=offset),
+        service.count_todos(status=normalized_status, source=source, project_id=project_id),
+    )
+    return {
+        "todos": todos,
+        "total": total,
+        "page": page,
+        "page_size": limit,
+        "has_next": offset + len(todos) < total,
+    }
 
 
 @router.post("")

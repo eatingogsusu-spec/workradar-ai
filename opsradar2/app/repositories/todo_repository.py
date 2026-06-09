@@ -31,11 +31,38 @@ class TodoRepository:
         _COLUMNS_CACHE[table_name] = {row[0] for row in result.all()}
         return _COLUMNS_CACHE[table_name]
 
+    async def count(
+        self,
+        status: Optional[str] = None,
+        source: Optional[str] = None,
+        project_id: Optional[str] = None,
+    ) -> int:
+        todo_columns = await self._columns("todos")
+        filters = []
+        params: dict = {}
+        if project_id and "project_id" in todo_columns:
+            filters.append("project_id = CAST(:project_id AS uuid)")
+            params["project_id"] = project_id
+        if status:
+            filters.append("status = :status")
+            params["status"] = status
+        if source and "source_type" in todo_columns:
+            filters.append("source_type = :source")
+            params["source"] = source
+        where_clause = f"WHERE {' AND '.join(filters)}" if filters else ""
+        result = await self.db.execute(
+            text(f"SELECT COUNT(*) FROM todos {where_clause}"),
+            params,
+        )
+        return result.scalar_one()
+
     async def get_all(
         self,
         status: Optional[str] = None,
         source: Optional[str] = None,
         project_id: Optional[str] = None,
+        limit: int = 15,
+        offset: int = 0,
     ) -> list[dict]:
         todo_columns = await self._columns("todos")
         chunk_columns = await self._columns("document_chunks")
@@ -122,9 +149,10 @@ class TodoRepository:
                 {joins_sql}
                 {where_clause}
                 ORDER BY t.created_at DESC
+                LIMIT :limit OFFSET :offset
                 """
             ),
-            params,
+            {**params, "limit": limit, "offset": offset},
         )
         todos = []
         for row in result.mappings().all():
