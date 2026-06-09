@@ -101,13 +101,7 @@ function App() {
   if (!userRole) return <Login onLogin={handleLogin} />;
 
   if (hasStaticShell) {
-    return (
-      <div className="app-session-control" aria-label={LABELS.sessionLabel}>
-        <span>{userName || LABELS.user}</span>
-        <span>{userRole === "admin" ? LABELS.admin : LABELS.member}</span>
-        <button type="button" onClick={handleLogout}>{LABELS.logout}</button>
-      </div>
-    );
+    return null;
   }
 
   return (
