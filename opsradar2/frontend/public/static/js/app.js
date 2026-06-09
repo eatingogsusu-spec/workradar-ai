@@ -852,8 +852,105 @@ function confirmCloseAnalysisTodoModal(ok){
   if(ok){document.getElementById('analysisTodoCloseConfirm').style.display='none';closeModal('analysisTodoModal');return;}
   document.getElementById('analysisTodoCloseConfirm').style.display='none';
 }
+function openDashboardTodoTab(tabName){
+  const tabMap={ai:'ai',pending:'ai',inprogress:'inprogress',progress:'inprogress',done:'done',completed:'done',rejected:'rejected'};
+  const targetTab=tabMap[tabName]||'ai';
+  nav('todo');
+  switchTodoTab(targetTab);
+}
+function analysisRiskKey(item){return String(item?.apiId||item?.id||item?.title||'');}
+function getAnalysisRiskItems(){return Array.isArray(G.analysisRiskReview)?G.analysisRiskReview:[];}
+function seedAnalysisRiskItems(){
+  if(getAnalysisRiskItems().length)return;
+  const source=Array.isArray(issues)&&issues.length?issues.filter(item=>item.type!=='resolved'):[];
+  G.analysisRiskReview=source.map(item=>({...item}));
+}
+function openAnalysisRiskReview(){
+  seedAnalysisRiskItems();
+  const items=getAnalysisRiskItems();
+  G.analysisRiskChecked=G.analysisRiskChecked||{};
+  items.forEach(item=>{const key=analysisRiskKey(item);if(G.analysisRiskChecked[key]===undefined)G.analysisRiskChecked[key]=true;});
+  const confirmEl=document.getElementById('analysisRiskCloseConfirm');
+  if(confirmEl)confirmEl.style.display='none';
+  const modal=document.getElementById('analysisRiskModal');
+  if(!modal){showToast('리스크 검토 기능은 현재 연결 준비 중입니다.','info');return;}
+  modal.classList.add('show');
+  renderAnalysisRiskReview();
+}
+function renderAnalysisRiskReview(){
+  const list=document.getElementById('analysisRiskList');if(!list)return;
+  const items=getAnalysisRiskItems();
+  if(!items.length){
+    list.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">검토할 Risk 후보가 없습니다. 운영 로그 분석 후 다시 확인해주세요.</div>';
+    updateAnalysisRiskCheckedCount();
+    return;
+  }
+  list.innerHTML=items.map((item,idx)=>{
+    const key=analysisRiskKey(item);const checked=G.analysisRiskChecked?.[key]!==false;
+    const title=escapeHtml(item.title||`Risk 후보 ${idx+1}`);
+    const severity=escapeHtml(item.severity||item.level||'medium');
+    const desc=escapeHtml(item.reason||item.desc||item.description||'운영 로그 기반으로 검토가 필요한 Risk 후보입니다.');
+    const assignee=escapeHtml(item.assignee||'미지정');
+    return `<div style="border:1px solid var(--border);background:var(--surface2);border-radius:var(--radius-sm);padding:10px;display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start">
+      <input type="checkbox" ${checked?'checked':''} onchange="toggleAnalysisRiskChecked('${escapeHtml(key)}',this.checked)" style="accent-color:var(--danger);margin-top:5px">
+      <div style="min-width:0">
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px"><strong style="font-size:12px;color:var(--text)">${title}</strong><span class="badge b-danger">${severity}</span><span class="badge b-gray">${assignee}</span></div>
+        <div class="text-content" style="font-size:11px;color:var(--text2);line-height:1.6">${desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+  updateAnalysisRiskCheckedCount();
+}
+function toggleAnalysisRiskChecked(key,checked){G.analysisRiskChecked=G.analysisRiskChecked||{};G.analysisRiskChecked[key]=checked;updateAnalysisRiskCheckedCount();}
+function setAllAnalysisRiskChecked(checked){G.analysisRiskChecked=G.analysisRiskChecked||{};getAnalysisRiskItems().forEach(item=>{G.analysisRiskChecked[analysisRiskKey(item)]=checked;});renderAnalysisRiskReview();}
+function selectedAnalysisRisks(){return getAnalysisRiskItems().filter(item=>G.analysisRiskChecked?.[analysisRiskKey(item)]!==false);}
+function updateAnalysisRiskCheckedCount(){const el=document.getElementById('analysisRiskCheckedCount');if(el)el.textContent=selectedAnalysisRisks().length;}
+function moveCheckedAnalysisRisksToConfirmed(){
+  const selected=selectedAnalysisRisks();
+  if(!selected.length){showToast('선택된 Risk 후보가 없습니다.','info');return;}
+  const selectedKeys=new Set(selected.map(analysisRiskKey));
+  selected.forEach(item=>{
+    const existing=issues.find(issue=>issue.id===item.id||issue.apiId===item.apiId);
+    if(existing){existing.type='confirmed';existing.status=existing.status||'open';}
+    else issues.unshift({...item,id:item.id||Date.now()+Math.random(),type:'confirmed',status:item.status||'open'});
+  });
+  G.analysisRiskReview=getAnalysisRiskItems().filter(item=>!selectedKeys.has(analysisRiskKey(item)));
+  selectedKeys.forEach(key=>delete G.analysisRiskChecked[key]);
+  renderAnalysisRiskReview();
+  renderIssues();
+  showToast(`${selected.length}개 Risk 후보를 확정 이슈로 이동했습니다.`,'success');
+  if(!getAnalysisRiskItems().length)closeModal('analysisRiskModal');
+}
+function deleteCheckedAnalysisRisks(){
+  const selected=selectedAnalysisRisks();
+  if(!selected.length){showToast('선택된 Risk 후보가 없습니다.','info');return;}
+  const selectedKeys=new Set(selected.map(analysisRiskKey));
+  G.analysisRiskReview=getAnalysisRiskItems().filter(item=>!selectedKeys.has(analysisRiskKey(item)));
+  selectedKeys.forEach(key=>delete G.analysisRiskChecked[key]);
+  renderAnalysisRiskReview();
+  showToast(`${selected.length}개 Risk 후보를 삭제했습니다.`,'info');
+  if(!getAnalysisRiskItems().length)closeModal('analysisRiskModal');
+}
+function requestCloseAnalysisRiskModal(){
+  const confirmEl=document.getElementById('analysisRiskCloseConfirm');
+  if(getAnalysisRiskItems().length&&confirmEl){confirmEl.style.display='block';return;}
+  closeModal('analysisRiskModal');
+}
+function confirmCloseAnalysisRiskModal(ok){
+  const confirmEl=document.getElementById('analysisRiskCloseConfirm');
+  if(ok){if(confirmEl)confirmEl.style.display='none';closeModal('analysisRiskModal');return;}
+  if(confirmEl)confirmEl.style.display='none';
+}
 window.openAnalysisTodoReview=openAnalysisTodoReview;
 window.renderAnalysisTodoReview=renderAnalysisTodoReview;
+window.openDashboardTodoTab=openDashboardTodoTab;
+window.openAnalysisRiskReview=openAnalysisRiskReview;
+window.renderAnalysisRiskReview=renderAnalysisRiskReview;
+window.requestCloseAnalysisRiskModal=requestCloseAnalysisRiskModal;
+window.setAllAnalysisRiskChecked=setAllAnalysisRiskChecked;
+window.confirmCloseAnalysisRiskModal=confirmCloseAnalysisRiskModal;
+window.moveCheckedAnalysisRisksToConfirmed=moveCheckedAnalysisRisksToConfirmed;
+window.deleteCheckedAnalysisRisks=deleteCheckedAnalysisRisks;
 // ════════════════════════════════════════════════
 // 흐름 2 — Todo 승인/반려
 // ════════════════════════════════════════════════
