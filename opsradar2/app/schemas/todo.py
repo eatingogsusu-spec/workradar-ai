@@ -1,17 +1,42 @@
-from pydantic import BaseModel
-from typing import Optional
+from typing import Literal, Optional
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+TodoStatus = Literal["pending", "in_progress", "blocked", "completed"]
+TodoPriority = Literal["low", "medium", "high", "critical"]
+ApprovalStatus = Literal["pending", "approved", "rejected", "needs_revision"]
 
 
 class TodoCreate(BaseModel):
-    title: str
-    priority: Optional[str] = "medium"
+    model_config = ConfigDict(extra="forbid")
+
+    title: str = Field(min_length=1)
+    description: Optional[str] = None
+    status: TodoStatus = "pending"
+    priority: TodoPriority = "medium"
     assignee: Optional[str] = None
+    approval_status: ApprovalStatus = "approved"
+    due_at: Optional[str] = None
+    source: Optional[str] = "manual"
+    project_id: Optional[str] = None
+    confidence: Optional[int] = None
+    linked_issue_id: Optional[str] = None
+    source_document_id: Optional[str] = None
+    source_chunk_id: Optional[str] = None
+    created_by: Optional[str] = None
 
 
 class TodoUpdate(BaseModel):
-    status: Optional[str] = None
-    priority: Optional[str] = None
+    model_config = ConfigDict(extra="forbid")
+
+    title: Optional[str] = Field(default=None, min_length=1)
+    description: Optional[str] = None
+    status: Optional[TodoStatus] = None
+    priority: Optional[TodoPriority] = None
     assignee: Optional[str] = None
+    approval_status: Optional[ApprovalStatus] = None
+    due_at: Optional[str] = None
 
 
 class TodoResponse(BaseModel):

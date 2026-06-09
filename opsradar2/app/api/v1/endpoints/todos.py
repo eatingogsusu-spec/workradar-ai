@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.repositories.todo_repository import TodoRepository
+from app.schemas.todo import TodoCreate, TodoUpdate
 from app.services.todo_service import TodoService
 
 router = APIRouter()
@@ -25,18 +26,16 @@ async def get_todos(
 
 
 @router.post("")
-async def create_todo(body: dict, db: AsyncSession = Depends(get_db)):
-    if not body.get("title"):
-        raise HTTPException(400, "title is required")
+async def create_todo(body: TodoCreate, db: AsyncSession = Depends(get_db)):
     service = TodoService(TodoRepository(db))
-    todo_id = await service.create_todo(body)
+    todo_id = await service.create_todo(body.model_dump(exclude_none=True))
     return {"status": "success", "todo_id": todo_id}
 
 
 @router.patch("/{todo_id}")
-async def update_todo(todo_id: str, body: dict, db: AsyncSession = Depends(get_db)):
+async def update_todo(todo_id: str, body: TodoUpdate, db: AsyncSession = Depends(get_db)):
     service = TodoService(TodoRepository(db))
-    updated = await service.update_todo(todo_id, body)
+    updated = await service.update_todo(todo_id, body.model_dump(exclude_unset=True, exclude_none=True))
     if not updated:
         raise HTTPException(404, "todo not found")
     return {"status": "success", "todo_id": todo_id}

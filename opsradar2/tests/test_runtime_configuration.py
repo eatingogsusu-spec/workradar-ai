@@ -221,3 +221,23 @@ def test_member_actions_use_pydantic_payloads() -> None:
     assert "body: MemberCreate" in members
     assert "body: MemberUpdate" in members
     assert "model_dump(exclude_unset=True, exclude_none=True)" in members
+
+
+def test_todo_and_issue_actions_use_pydantic_payloads() -> None:
+    todo_schema = read("app/schemas/todo.py")
+    issue_schema = read("app/schemas/issue.py")
+    todos = read("app/api/v1/endpoints/todos.py")
+    issues = read("app/api/v1/endpoints/issues.py")
+
+    assert "class TodoCreate" in todo_schema
+    assert "class TodoUpdate" in todo_schema
+    assert 'ConfigDict(extra="forbid")' in todo_schema
+    assert "class IssueCreate" in issue_schema
+    assert "class IssueUpdate" in issue_schema
+    assert 'ConfigDict(extra="forbid")' in issue_schema
+    assert "body: TodoCreate" in todos
+    assert "body: TodoUpdate" in todos
+    assert "body: IssueUpdate" in issues
+    assert "body: TodoCreate" in issues
+    assert "body: dict" not in todos
+    assert "body: dict" not in issues
