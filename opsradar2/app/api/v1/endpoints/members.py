@@ -5,6 +5,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.schemas.member import MemberCreate, MemberUpdate
 
 router = APIRouter()
 
@@ -66,14 +67,17 @@ async def list_members(project_id: str | None = None, active_only: bool = True, 
 
 
 @router.post("")
-async def create_member(body: dict, db: AsyncSession = Depends(get_db)):
-    name = (body.get("name") or "").strip()
-    email = (body.get("email") or "").strip()
+async def create_member(body: MemberCreate, db: AsyncSession = Depends(get_db)):
+    payload = body.model_dump(exclude_none=True)
+    name = payload["name"]
+    email = payload.get("email") or ""
     if not name:
         raise HTTPException(400, "name is required")
     if not email:
         email = f"{name}@opsradar.local"
-    project = await _default_project(db, body.get("project_id"))
+    project = await _default_project(db, payload.get("project_id"))
+    user_role = payload.get("user_role") or payload.get("role") or "member"
+    project_role = payload.get("project_role") or payload.get("role") or "member"
     result = await db.execute(
         text(
             """
@@ -103,9 +107,9 @@ async def create_member(body: dict, db: AsyncSession = Depends(get_db)):
             "project_id": str(project["id"]),
             "name": name,
             "email": email,
-            "user_role": body.get("user_role") or body.get("role") or "member",
-            "project_role": body.get("project_role") or "member",
-            "status": body.get("status") or "active",
+            "user_role": user_role,
+            "project_role": project_role,
+            "status": payload.get("status") or "active",
         },
     )
     await db.commit()
@@ -113,15 +117,18 @@ async def create_member(body: dict, db: AsyncSession = Depends(get_db)):
 
 
 @router.patch("/{member_id}")
-async def update_member(member_id: str, body: dict, db: AsyncSession = Depends(get_db)):
-    allowed_user = {key: body[key] for key in ("name", "email") if key in body and body[key] is not None}
-    if "user_role" in body and body["user_role"] is not None:
-        allowed_user["role"] = body["user_role"]
-    elif "role" in body and body["role"] is not None:
-        allowed_user["role"] = body["role"]
-    allowed_member = {key: body[key] for key in ("status",) if key in body and body[key] is not None}
-    if "project_role" in body and body["project_role"] is not None:
-        allowed_member["role"] = body["project_role"]
+async def update_member(member_id: str, body: MemberUpdate, db: AsyncSession = Depends(get_db)):
+    payload = body.model_dump(exclude_unset=True, exclude_none=True)
+    allowed_user = {key: payload[key] for key in ("name", "email") if key in payload}
+    if "user_role" in payload:
+        allowed_user["role"] = payload["user_role"]
+    elif "role" in payload:
+        allowed_user["role"] = payload["role"]
+    allowed_member = {key: payload[key] for key in ("status",) if key in payload}
+    if "project_role" in payload:
+        allowed_member["role"] = payload["project_role"]
+    elif "role" in payload:
+        allowed_member["role"] = payload["role"]
     if not allowed_user and not allowed_member:
         return {"status": "success", "member_id": member_id}
 

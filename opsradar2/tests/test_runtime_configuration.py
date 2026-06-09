@@ -106,6 +106,7 @@ def normalize_route_path(path: str) -> str:
         .replace("{event_id}", "{}")
         .replace("{report_id}", "{}")
         .replace("{document_id}", "{}")
+        .replace("{member_id}", "{}")
     )
 
 
@@ -131,6 +132,10 @@ def test_frontend_api_paths_exist_in_backend_router() -> None:
         ("PATCH", "/issues/{}"),
         ("PATCH", "/issues/{}/resolve"),
         ("POST", "/issues/{}/todos"),
+        ("GET", "/members"),
+        ("POST", "/members"),
+        ("PATCH", "/members/{}"),
+        ("DELETE", "/members/{}"),
         ("GET", "/calendar"),
         ("POST", "/calendar/"),
         ("DELETE", "/calendar/{}"),
@@ -195,3 +200,15 @@ def test_document_chunk_actions_use_pydantic_payloads() -> None:
     assert "body: ChunkTodoCreate" in documents
     assert "body: ChunkIssueCreate" in documents
     assert "model_dump(exclude_none=True)" in documents
+
+
+def test_member_actions_use_pydantic_payloads() -> None:
+    schemas = read("app/schemas/member.py")
+    members = read("app/api/v1/endpoints/members.py")
+
+    assert "class MemberCreate" in schemas
+    assert "class MemberUpdate" in schemas
+    assert 'ConfigDict(extra="forbid")' in schemas
+    assert "body: MemberCreate" in members
+    assert "body: MemberUpdate" in members
+    assert "model_dump(exclude_unset=True, exclude_none=True)" in members
