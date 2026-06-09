@@ -72,8 +72,9 @@ def test_react_frontend_runtime_settings_are_configurable() -> None:
 def test_fastapi_can_serve_react_build_output() -> None:
     main = read("app/main.py")
 
-    assert "FRONTEND_DIST = FRONTEND / \"dist\"" in main
+    assert "FRONTEND_BUILD = FRONTEND / \"build\"" in main
     assert "react_assets = FRONTEND_DIST / \"assets\"" in main
+    assert "def frontend_static_asset" in main
     assert 'app.mount("/assets"' in main
     assert "def spa_fallback" in main
 

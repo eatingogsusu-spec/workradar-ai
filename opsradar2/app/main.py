@@ -11,9 +11,14 @@ from app.core.config import settings
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
-FRONTEND_DIST = FRONTEND / "dist"
+FRONTEND_BUILD = FRONTEND / "build"
+FRONTEND_DIST = FRONTEND_BUILD if FRONTEND_BUILD.exists() else FRONTEND / "dist"
 FRONTEND_ENTRY = FRONTEND_DIST / "index.html" if FRONTEND_DIST.exists() else FRONTEND / "index.html"
 FRONTEND_STATIC = FRONTEND_DIST / "static" if (FRONTEND_DIST / "static").exists() else FRONTEND / "public" / "static"
+FRONTEND_SOURCE_STATIC = {
+    "css": FRONTEND / "css",
+    "js": FRONTEND / "js",
+}
 
 app = FastAPI(
     title="OpsRadar API",
@@ -42,14 +47,26 @@ async def disable_frontend_cache(request, call_next):
     return response
 
 
-if FRONTEND_STATIC.exists():
-    app.mount("/static", StaticFiles(directory=FRONTEND_STATIC), name="static")
-
 react_assets = FRONTEND_DIST / "assets"
 if react_assets.exists():
     app.mount("/assets", StaticFiles(directory=react_assets), name="assets")
 
 app.include_router(api_router, prefix="/api/v1")
+
+
+@app.api_route("/static/{asset_type}/{asset_path:path}", methods=["GET", "HEAD"])
+def frontend_static_asset(asset_type: str, asset_path: str):
+    source_root = FRONTEND_SOURCE_STATIC.get(asset_type)
+    if source_root is not None:
+        source_path = (source_root / asset_path).resolve()
+        if source_path.is_file() and source_path.is_relative_to(source_root.resolve()):
+            return FileResponse(source_path)
+
+    static_path = (FRONTEND_STATIC / asset_type / asset_path).resolve()
+    if static_path.is_file() and static_path.is_relative_to(FRONTEND_STATIC.resolve()):
+        return FileResponse(static_path)
+
+    raise HTTPException(status_code=404, detail="Static asset not found")
 
 
 @app.get("/")
