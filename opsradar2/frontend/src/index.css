@@ -246,6 +246,20 @@ body.opsradar-login-required > div:not(#root) {
   padding: 5px 9px;
 }
 
+.ops-login-role-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border: 1px solid rgba(103, 232, 249, .25);
+  border-radius: 999px;
+  background: rgba(34, 211, 238, .1);
+  color: #67e8f9;
+  font-size: 11px;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
 @media (max-width: 860px) {
   .opsradar-login {
     grid-template-columns: 1fr;

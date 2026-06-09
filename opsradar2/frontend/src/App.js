@@ -13,6 +13,37 @@ const LABELS = {
   staticHelp: "\uD654\uBA74\uC774 \uBE44\uC5B4 \uBCF4\uC774\uBA74 public/index.html \uB610\uB294 \uC815\uC801 \uC2A4\uD06C\uB9BD\uD2B8 \uACBD\uB85C\uB97C \uD655\uC778\uD558\uC138\uC694.",
 };
 
+function syncDashboardRoleUi(role, name) {
+  const isMember = role === "member";
+  const allowedRole = isMember ? "member" : "pm";
+  const roleLabel = isMember ? LABELS.member : LABELS.admin;
+  const switcher = document.querySelector(".ops-role-switch");
+
+  if (typeof window.__opsradarOriginalSwitchDbRole !== "function" && typeof window.switchDbRole === "function") {
+    window.__opsradarOriginalSwitchDbRole = window.switchDbRole;
+  }
+
+  const originalSwitch = window.__opsradarOriginalSwitchDbRole;
+  if (typeof originalSwitch === "function") {
+    window.switchDbRole = () => originalSwitch(allowedRole);
+    window.switchDbRole.opsradarRoleLocked = true;
+    originalSwitch(allowedRole);
+  }
+
+  if (!switcher) return;
+
+  switcher.style.display = "none";
+
+  let badge = document.getElementById("opsLoginRoleBadge");
+  if (!badge) {
+    badge = document.createElement("div");
+    badge.id = "opsLoginRoleBadge";
+    badge.className = "ops-login-role-badge";
+    switcher.insertAdjacentElement("afterend", badge);
+  }
+  badge.textContent = `${name || LABELS.user} / ${roleLabel}`;
+}
+
 function App() {
   const [userRole, setUserRole] = useState(() => {
     if (typeof window === "undefined") return null;
@@ -31,9 +62,8 @@ function App() {
 
   useEffect(() => {
     if (!userRole || typeof window === "undefined") return undefined;
-    const targetRole = userRole === "member" ? "member" : "pm";
     const timer = window.setTimeout(() => {
-      if (typeof window.switchDbRole === "function") window.switchDbRole(targetRole);
+      syncDashboardRoleUi(userRole, userName);
       if (typeof window.updateSettingsPage === "function") window.updateSettingsPage();
       if (typeof window.logout === "function" && !window.logout.opsradarWrapped) {
         const staticLogout = window.logout;
@@ -46,7 +76,7 @@ function App() {
       }
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [userRole]);
+  }, [userRole, userName]);
 
   function handleLogin(user) {
     window.localStorage.setItem("opsradar_user_role", user.role);
