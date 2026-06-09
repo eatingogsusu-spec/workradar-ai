@@ -54,6 +54,7 @@ class TodoRepository:
         approval_expr = "t.approval_status" if "approval_status" in todo_columns else "'approved'"
         due_expr = "t.due_at" if "due_at" in todo_columns else "t.due_date" if "due_date" in todo_columns else "NULL::timestamptz"
         source_chunk_expr = "t.source_chunk_id::text" if "source_chunk_id" in todo_columns else "NULL::text"
+        description_expr = "t.description" if "description" in todo_columns else "NULL::text"
         evidence_snippet_expr = (
             "dc.content"
             if "source_chunk_id" in todo_columns and "content" in chunk_columns
@@ -97,6 +98,7 @@ class TodoRepository:
                 SELECT
                   t.id::text AS id,
                   t.title,
+                  {description_expr} AS description,
                   t.status,
                   t.priority,
                   {assignee_expr} AS assignee,
@@ -217,7 +219,7 @@ class TodoRepository:
         allowed = {
             key: value
             for key, value in data.items()
-            if key in {"title", "status", "priority", "approval_status"}
+            if key in {"title", "description", "status", "priority", "approval_status", "due_at"}
         }
         assignments = [f"{key} = :{key}" for key in allowed]
         params = {"todo_id": todo_id, **allowed}
@@ -230,6 +232,7 @@ class TodoRepository:
                   JOIN users u ON u.id = pm.user_id
                   WHERE pm.project_id = todos.project_id
                     AND u.name = :assignee
+                    AND pm.status = 'active'
                   LIMIT 1
                 )
                 """
@@ -246,6 +249,19 @@ class TodoRepository:
                 """
             ),
             params,
+        )
+        await self.db.commit()
+        return result.rowcount > 0
+
+    async def delete(self, todo_id: str) -> bool:
+        result = await self.db.execute(
+            text(
+                """
+                DELETE FROM todos
+                WHERE id = CAST(:todo_id AS uuid)
+                """
+            ),
+            {"todo_id": todo_id},
         )
         await self.db.commit()
         return result.rowcount > 0

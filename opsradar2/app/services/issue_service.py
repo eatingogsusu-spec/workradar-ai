@@ -28,6 +28,9 @@ class IssueService:
     async def resolve_issue(self, issue_id: str) -> bool:
         return await self.repo.resolve(issue_id)
 
+    async def delete_issue(self, issue_id: str) -> bool:
+        return await self.repo.delete(issue_id)
+
     async def create_todo_from_issue(self, issue_id: str, data: dict) -> str | None:
         if self.todo_repo is None:
             raise RuntimeError("Todo repository is required")

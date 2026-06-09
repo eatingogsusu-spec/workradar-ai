@@ -1,0 +1,45 @@
+(function () {
+  window.OpsRadarFrontend?.registerModule('todo', {
+    file: 'js/todo.js',
+    screen: 'todo',
+    owns: [
+      'todo list rendering',
+      'todo detail rendering',
+      'todo manual create and edit flow',
+      'todo approval workflow',
+      'todo fallback data shape',
+    ],
+    dataContract: {
+      fields: [
+        'id',
+        'title',
+        'description',
+        'assignees',
+        'priority',
+        'status',
+        'dueDate',
+        'relatedIssue',
+        'source',
+        'sourceType',
+        'tags',
+        'createdAt',
+        'updatedAt',
+      ],
+    },
+    legacyGlobals: [
+      'renderTodos',
+      'renderTodoDetail',
+      'switchTodoTab',
+      'switchTodoView',
+      'openManualModal',
+      'saveManual',
+      'openEditModal',
+      'saveEdit',
+      'bulkApprove',
+      'approveTodo',
+      'rejectTodo',
+      'doneTodo',
+      'undoTodo',
+    ],
+  });
+})();

@@ -12,22 +12,32 @@ class AssistantContextService:
 
     async def build_context(self, *, project_id: str | None = None) -> tuple[str, list[dict]]:
         params = {"project_id": project_id} if project_id else {}
-        project_filter = "WHERE project_id = CAST(:project_id AS uuid)" if project_id else ""
-        todo_filter = "WHERE t.project_id = CAST(:project_id AS uuid)" if project_id else ""
+        todo_conditions = [
+            "t.status IN ('pending', 'in_progress', 'blocked')",
+            "COALESCE(t.approval_status, 'approved') <> 'rejected'",
+        ]
+        if project_id:
+            todo_conditions.append("t.project_id = CAST(:project_id AS uuid)")
+        todo_filter = "WHERE " + " AND ".join(todo_conditions)
         issue_filter = "WHERE i.project_id = CAST(:project_id AS uuid)" if project_id else ""
         calendar_filter = "WHERE ce.project_id = CAST(:project_id AS uuid)" if project_id else ""
+        project_filter = "WHERE project_id = CAST(:project_id AS uuid)" if project_id else ""
 
         todos = (
             await self.db.execute(
                 text(
                     f"""
-                    SELECT title, status, priority, due_at, created_at
+                    SELECT
+                      t.title, t.status, t.priority, t.due_at, t.assignee_member_id,
+                      u.name AS assignee_name, t.created_at
                     FROM todos t
+                    LEFT JOIN project_members pm ON t.assignee_member_id = pm.id
+                    LEFT JOIN users u ON pm.user_id = u.id
                     {todo_filter}
                     ORDER BY
-                      CASE WHEN status IN ('blocked', 'pending', 'in_progress') THEN 0 ELSE 1 END,
-                      created_at DESC
-                    LIMIT 8
+                      CASE WHEN t.status IN ('blocked', 'pending', 'in_progress') THEN 0 ELSE 1 END,
+                      t.created_at DESC
+                    LIMIT 80
                     """
                 ),
                 params,
@@ -38,13 +48,17 @@ class AssistantContextService:
             await self.db.execute(
                 text(
                     f"""
-                    SELECT title, status, severity, description, created_at
+                    SELECT
+                      i.title, i.status, i.severity, i.description, i.assignee_member_id,
+                      u.name AS assignee_name, i.created_at
                     FROM issues i
+                    LEFT JOIN project_members pm ON i.assignee_member_id = pm.id
+                    LEFT JOIN users u ON pm.user_id = u.id
                     {issue_filter}
                     ORDER BY
-                      CASE WHEN severity IN ('critical', 'high') THEN 0 ELSE 1 END,
-                      created_at DESC
-                    LIMIT 8
+                      CASE WHEN i.severity IN ('critical', 'high') THEN 0 ELSE 1 END,
+                      i.created_at DESC
+                    LIMIT 80
                     """
                 ),
                 params,
@@ -92,7 +106,10 @@ class AssistantContextService:
         if todos:
             for row in todos:
                 due = row["due_at"].isoformat() if row["due_at"] else "no due date"
-                lines.append(f"- {row['title']} | status={row['status']} | priority={row['priority']} | due={due}")
+                assignee = row["assignee_name"] or "담당자 미지정"
+                lines.append(
+                    f"- {row['title']} | status={row['status']} | priority={row['priority']} | assignee={assignee} | due={due} | created={row['created_at'].date().isoformat() if row['created_at'] else 'no date'}"
+                )
             sources.append({"title": "Todo data", "type": "todos", "count": len(todos)})
         else:
             lines.append("- no todos found")
@@ -101,7 +118,10 @@ class AssistantContextService:
         if issues:
             for row in issues:
                 description = f" | {row['description']}" if row["description"] else ""
-                lines.append(f"- {row['title']} | status={row['status']} | severity={row['severity']}{description}")
+                assignee = row["assignee_name"] or "담당자 미지정"
+                lines.append(
+                    f"- {row['title']} | status={row['status']} | severity={row['severity']} | assignee={assignee} | created={row['created_at'].date().isoformat() if row['created_at'] else 'no date'}{description}"
+                )
             sources.append({"title": "Issue data", "type": "issues", "count": len(issues)})
         else:
             lines.append("- no issues found")

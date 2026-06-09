@@ -37,11 +37,11 @@ def test_calendar_adapter_preserves_selected_year_and_month() -> None:
 
 
 def test_chat_ui_calls_backend_api() -> None:
-    frontend_app = read("frontend/public/static/js/chat.js")
-    legacy_markup = read("frontend/src/legacy/legacyMarkup.js")
+    frontend_app = read("frontend/js/app.js")
+    public_index = read("frontend/public/index.html")
 
     assert "window.opsRadarApi.request('/chat'" in frontend_app
-    assert '"/static/js/api-integration.js"' in legacy_markup
+    assert '"/static/js/api-integration.js"' in public_index
 
 
 def test_frontend_api_uses_same_origin_by_default() -> None:
@@ -51,19 +51,19 @@ def test_frontend_api_uses_same_origin_by_default() -> None:
 
 
 def test_calendar_state_is_exposed_to_api_adapter() -> None:
-    calendar_runtime = read("frontend/public/static/js/calendar.js")
     adapter = read("frontend/public/static/js/api-integration.js")
 
-    assert "window.getCalendarRuntimeState = function getCalendarRuntimeState()" in calendar_runtime
-    assert "window.replaceCalendarRuntimeEvents = function replaceCalendarRuntimeEvents(events)" in calendar_runtime
-    assert "window.replaceCalendarRuntimeEvents?.(Array.from(byDay.values()));" in adapter
+    assert 'request("/calendar")' in adapter
+    assert 'request("/calendar/"' in adapter
+    assert "loadCalendar: loadCalendarFromAPI" in adapter
 
 
 def test_react_frontend_runtime_settings_are_configurable() -> None:
     config = read("app/core/config.py")
     main = read("app/main.py")
     env_example = read(".env.example")
-    vite_config = read("frontend/vite.config.js")
+    package_json = read("frontend/package.json")
+    public_index = read("frontend/public/index.html")
 
     assert "FRONTEND_ORIGINS" in config
     assert "parse_csv_env" in config
@@ -71,15 +71,18 @@ def test_react_frontend_runtime_settings_are_configurable() -> None:
     assert "allow_origins=list(settings.FRONTEND_ORIGINS)" in main
     assert "http://127.0.0.1:8002" in env_example
     assert "http://127.0.0.1:5173" in env_example
-    assert '"http://127.0.0.1:8002"' in vite_config
+    assert '"react-scripts start"' in package_json
+    assert 'window.location.port === "8002"' in public_index
 
 
 def test_fastapi_can_serve_react_build_output() -> None:
     main = read("app/main.py")
 
+    assert "FRONTEND_BUILD = FRONTEND / \"build\"" in main
     assert "FRONTEND_DIST = FRONTEND / \"dist\"" in main
+    assert "FRONTEND_OUTPUT = FRONTEND_BUILD if FRONTEND_BUILD.exists() else FRONTEND_DIST" in main
     assert "FRONTEND_PUBLIC_STATIC = FRONTEND / \"public\" / \"static\"" in main
-    assert "react_assets = FRONTEND_DIST / \"assets\"" in main
+    assert "react_assets = FRONTEND_OUTPUT / \"assets\"" in main
     assert 'app.mount("/assets"' in main
     assert '@app.api_route("/static/{asset_type}/{asset_path:path}", methods=["GET", "HEAD"])' in main
     assert "def frontend_static_asset" in main

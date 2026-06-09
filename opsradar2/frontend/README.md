@@ -1,90 +1,78 @@
-# OpsRadar Frontend
+# OpsRadar Frontend Base
 
-이 폴더가 현재 공식 프론트엔드입니다.
+This folder keeps the current HTML frontend running while reducing merge
+conflicts. The first rule is simple: do not keep adding feature logic to
+`index.html`.
 
-기존 정적 HTML 프론트는 `opsradar2/frontend-legacy-static/`에 백업해두었고, 현재 `opsradar2/frontend/`는 SeongHo 브랜치에서 가져온 React + Vite 버전입니다.
+## File Roles
 
-## 실행
+- `index.html`: app shell, static screen markup, modal roots, CSS/JS imports
+- `css/theme.css`: colors, fonts, shared variables
+- `css/layout.css`: sidebar, header, page layout
+- `css/components.css`: cards, modals, buttons, badges, feature styles
+- `js/app.js`: legacy bootstrap, navigation, shared globals still being split
+- `js/api-integration.js`: backend API calls and API-to-UI normalization
+- `js/storage.js`: localStorage keys, JSON helpers, auth/session cleanup
+- `js/dashboard.js`: Dashboard feature ownership
+- `js/todo.js`: Todo feature ownership and Todo data contract
+- `js/issue.js`: Issue feature ownership
+- `js/calendar.js`: Calendar feature ownership
+- `js/handoff.js`: Handoff/knowledge feature ownership
+- `js/report.js`: Report feature ownership
+- `js/assistant.js`: AI Assistant feature ownership
+- `js/settings.js`: Settings, profile, theme ownership
 
-PowerShell에서는 `npm` 대신 `npm.cmd`를 사용합니다.
+## Loading Order
 
-```powershell
-cd C:\Users\wndnj\OneDrive\문서\인수인계\opsradar2\frontend
-npm.cmd install
-npm.cmd run dev
+Scripts are loaded in this order:
+
+1. `js/app.js`
+2. `js/api-integration.js`
+3. `js/storage.js`
+4. feature modules
+
+`app.js` still contains legacy functions, but every feature module is loaded and
+registered through `window.OpsRadarFrontend.modules`. When moving logic out of
+`app.js`, move one feature at a time and keep the existing global function name
+until the inline HTML handlers are removed.
+
+## Team Rules
+
+1. Keep direct edits to `index.html` minimal.
+2. Do not add new feature logic to `js/app.js`; move or add it in the matching
+   `js/<feature>.js` file.
+3. Put shared component styles in `css/components.css`.
+4. Put colors and theme tokens in `css/theme.css`.
+5. Manage API calls only in `js/api-integration.js`.
+6. Manage localStorage keys only in `js/storage.js`.
+7. If a feature needs a new shared data field, document it in the owning module
+   before using it in another screen.
+
+## Shared Todo Shape
+
+Todo-facing screens should converge on this shape:
+
+```js
+{
+  id,
+  title,
+  description,
+  assignees,
+  priority,
+  status,
+  dueDate,
+  relatedIssue,
+  source,
+  sourceType,
+  tags,
+  createdAt,
+  updatedAt
+}
 ```
 
-기본 주소:
+## Next Split Targets
 
-```text
-http://127.0.0.1:5173/
-```
-
-## 백엔드 연결
-
-Vite 개발 서버는 `/api` 요청을 FastAPI 서버로 프록시합니다.
-
-기본값:
-
-```text
-React/Vite: http://127.0.0.1:5173
-FastAPI:    http://127.0.0.1:8010
-API:        /api/v1
-```
-
-FastAPI를 다른 포트로 실행 중이면 프록시 대상을 바꿔 실행합니다.
-
-```powershell
-$env:VITE_API_PROXY_TARGET = "http://127.0.0.1:8002"
-npm.cmd run dev
-```
-
-## 구조
-
-```text
-frontend/
-  index.html
-  package.json
-  vite.config.js
-  src/
-    main.jsx
-    App.jsx
-    components/
-      Analysis.jsx
-      Calendar.jsx
-      Chat.jsx
-      Dashboard.jsx
-      Issue.jsx
-      Knowledge.jsx
-      Report.jsx
-      Settings.jsx
-      Todo.jsx
-    legacy/
-      legacyMarkup.js
-      screens/
-    styles/
-      global.css
-  public/
-    static/
-      css/
-      js/
-```
-
-## 현재 판단
-
-이 프론트는 기존 정적 프론트보다 데모 완성도가 높아서 공식 프론트로 승격했습니다.
-
-남은 우선 작업:
-
-1. 깨진 한글 문구 정리
-2. `Analysis` 업로드 흐름을 실제 `/api/v1/documents/upload`와 연결
-3. 화면 문구를 팀장용 업무 레이더, 후속조치, 리스크, 보고서 중심으로 정리
-4. 백엔드 API 필드와 화면 표시 데이터 최종 점검
-
-## 백업
-
-기존 정적 프론트:
-
-```text
-opsradar2/frontend-legacy-static/
-```
+- Move Todo functions listed in `js/todo.js` out of `js/app.js`.
+- Move Calendar functions listed in `js/calendar.js` out of `js/app.js`.
+- Replace inline `onclick` handlers in `index.html` with event binding in the
+  owning module.

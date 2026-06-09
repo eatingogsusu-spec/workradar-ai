@@ -25,3 +25,6 @@ class TodoService:
 
     async def update_todo(self, todo_id: str, data: dict) -> bool:
         return await self.repo.update(todo_id, data)
+
+    async def delete_todo(self, todo_id: str) -> bool:
+        return await self.repo.delete(todo_id)
