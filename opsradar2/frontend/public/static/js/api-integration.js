@@ -77,6 +77,7 @@
       assignee: todo.assignee || null,
       priority: todo.priority || "medium",
       confidence: todo.confidence == null ? null : Number(todo.confidence),
+      dueDate: todo.due_at ? String(todo.due_at).slice(0, 10) : null,
       status: todo.approval_status === "rejected" ? "rejected" : apiStatusToUi(todo.status),
       type: todo.source || "manual",
       chunk: null,
