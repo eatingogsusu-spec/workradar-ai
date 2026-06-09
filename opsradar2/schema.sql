@@ -253,7 +253,6 @@ CREATE TABLE IF NOT EXISTS ai_summaries (
 );
 
 CREATE INDEX IF NOT EXISTS idx_project_members_project_id ON project_members(project_id);
-CREATE INDEX IF NOT EXISTS idx_project_members_project_id ON project_members(project_id);
 CREATE INDEX IF NOT EXISTS idx_users_team_id ON users(team_id);
 CREATE INDEX IF NOT EXISTS idx_projects_team_id ON projects(team_id);
 CREATE INDEX IF NOT EXISTS idx_project_members_team_id ON project_members(team_id);

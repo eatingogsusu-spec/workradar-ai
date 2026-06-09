@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import csv
 import io
-import os
 from pathlib import Path
 
 
@@ -42,28 +41,54 @@ def parse_file(file_path: str | Path) -> tuple[str, str]:
 
 def infer_doc_type(filename: str) -> str:
     name = filename.lower()
-    if any(token in name for token in ("meeting", "minutes", "회의")):
+    if any(token in name for token in ("meeting", "minutes", "회의", "회의록")):
         return "meeting"
     if any(token in name for token in ("email", "mail", "메일")):
         return "email"
-    if any(token in name for token in ("chat", "slack", "채팅")):
+    if any(token in name for token in ("chat", "slack", "채팅", "대화")):
         return "chat"
-    if name.endswith(".csv") or any(token in name for token in ("task", "todo", "업무")):
+    if name.endswith(".csv") or any(token in name for token in ("task", "todo", "업무", "할일")):
         return "csv"
     if any(token in name for token in ("handover", "onboard", "인수인계")):
         return "handover"
-    if any(token in name for token in ("report", "status", "보고")):
+    if any(token in name for token in ("report", "status", "보고", "보고서")):
         return "report"
     return "report"
 
 
 def _parse_text(path: Path) -> str:
-    for encoding in ("utf-8", "cp949"):
+    raw = path.read_bytes()
+    for encoding in ("utf-8-sig", "utf-8", "cp949", "euc-kr", "utf-16", "utf-16-le", "utf-16-be"):
         try:
-            return path.read_text(encoding=encoding)
-        except UnicodeDecodeError:
+            return _repair_mojibake(raw.decode(encoding))
+        except (UnicodeDecodeError, UnicodeError):
             continue
     raise RuntimeError("failed to decode text file")
+
+
+def _repair_mojibake(text: str) -> str:
+    """Repair common UTF-8 text accidentally decoded as Latin-1/CP1252."""
+    if not _looks_mojibake(text):
+        return text
+    for encoding in ("latin1", "cp1252"):
+        try:
+            repaired = text.encode(encoding).decode("utf-8")
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            continue
+        if _score_readability(repaired) > _score_readability(text):
+            return repaired
+    return text
+
+
+def _looks_mojibake(text: str) -> bool:
+    markers = ("Ã", "Â", "ì", "ë", "í", "ê", "ï»¿", "�")
+    return any(marker in text for marker in markers)
+
+
+def _score_readability(text: str) -> int:
+    korean = sum(1 for char in text if "\uac00" <= char <= "\ud7a3")
+    mojibake = sum(text.count(marker) for marker in ("Ã", "Â", "ì", "ë", "í", "ê", "ï»¿", "�"))
+    return korean * 3 - mojibake * 5
 
 
 def _parse_csv(path: Path) -> str:

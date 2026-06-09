@@ -55,6 +55,16 @@ class TodoRepository:
         due_expr = "t.due_at" if "due_at" in todo_columns else "t.due_date" if "due_date" in todo_columns else "NULL::timestamptz"
         source_chunk_expr = "t.source_chunk_id::text" if "source_chunk_id" in todo_columns else "NULL::text"
         description_expr = "t.description" if "description" in todo_columns else "NULL::text"
+        evidence_snippet_expr = (
+            "dc.content"
+            if "source_chunk_id" in todo_columns and "content" in chunk_columns
+            else "NULL::text"
+        )
+        evidence_section_expr = (
+            "dc.section_title"
+            if "source_chunk_id" in todo_columns and "section_title" in chunk_columns
+            else "NULL::text"
+        )
 
         joins = []
         assignee_expr = "NULL::text"
@@ -98,6 +108,8 @@ class TodoRepository:
                   {source_file_expr} AS source_file_name,
                   {source_uploaded_expr} AS source_uploaded_at,
                   {source_chunk_expr} AS source_chunk_id,
+                  {evidence_snippet_expr} AS evidence_snippet,
+                  {evidence_section_expr} AS evidence_section,
                   {approval_expr} AS approval_status,
                   {due_expr} AS due_at,
                   t.created_at
@@ -109,7 +121,28 @@ class TodoRepository:
             ),
             params,
         )
-        return [dict(row) for row in result.mappings().all()]
+        todos = []
+        for row in result.mappings().all():
+            item = dict(row)
+            evidence_snippet = item.pop("evidence_snippet", None)
+            evidence_section = item.pop("evidence_section", None)
+            has_evidence = bool(item.get("source_chunk_id") or evidence_snippet)
+            item["evidence"] = {
+                "document_id": item.get("document_id"),
+                "file_name": item.get("source_file_name"),
+                "chunk_id": item.get("source_chunk_id"),
+                "section": evidence_section,
+                "snippet": evidence_snippet,
+            }
+            item["review"] = {
+                "approval_status": item.get("approval_status"),
+                "has_evidence": has_evidence,
+                "missing_evidence": not has_evidence,
+                "missing_assignee": not bool(item.get("assignee")),
+                "missing_due_date": item.get("due_at") is None,
+            }
+            todos.append(item)
+        return todos
 
     async def create(self, data: dict) -> str:
         result = await self.db.execute(
@@ -217,6 +250,7 @@ class TodoRepository:
         )
         await self.db.commit()
         return result.rowcount > 0
+
     async def delete(self, todo_id: str) -> bool:
         result = await self.db.execute(
             text(

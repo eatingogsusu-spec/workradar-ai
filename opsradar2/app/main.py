@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
 FRONTEND_DIST = FRONTEND / "dist"
 FRONTEND_ENTRY = FRONTEND_DIST / "index.html" if FRONTEND_DIST.exists() else FRONTEND / "index.html"
-FRONTEND_STATIC = FRONTEND_DIST if FRONTEND_DIST.exists() else FRONTEND
+FRONTEND_STATIC = FRONTEND_DIST / "static" if (FRONTEND_DIST / "static").exists() else FRONTEND / "public" / "static"
 
 app = FastAPI(
     title="OpsRadar API",

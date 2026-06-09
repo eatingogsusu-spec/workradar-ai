@@ -17,3 +17,5 @@ class ReportService:
     async def list_reports(self, project_id: str | None = None) -> list[dict]:
         return await self.repo.get_all(project_id=project_id)
 
+    async def review_check(self, project_id: str | None = None) -> dict:
+        return await self.repo.review_check(project_id=project_id)

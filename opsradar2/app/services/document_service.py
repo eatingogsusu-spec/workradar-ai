@@ -1,4 +1,4 @@
-"""Document upload, parsing, chunking, and AI extraction pipeline."""
+﻿"""Document upload, parsing, chunking, and AI extraction pipeline."""
 
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ def normalize_db_file_type(value: str | None, filename: str | None = None) -> st
     name = (filename or "").lower()
     if any(token in name for token in ("meeting", "minutes", "회의", "회의록")):
         return "meeting"
-    if any(token in name for token in ("chat", "slack", "채팅")):
+    if any(token in name for token in ("chat", "slack", "채팅", "대화")):
         return "chat"
     if any(token in name for token in ("email", "mail", "메일")):
         return "email"

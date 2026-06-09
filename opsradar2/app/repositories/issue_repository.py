@@ -111,6 +111,7 @@ class IssueRepository:
     ) -> list[dict]:
         issue_columns = await self._columns("issues")
         chunk_columns = await self._columns("document_chunks")
+        document_columns = await self._columns("documents")
 
         filters = []
         params = {}
@@ -140,6 +141,17 @@ class IssueRepository:
         updated_at_expr = "i.updated_at" if "updated_at" in issue_columns else "i.created_at"
         source_chunk_expr = "i.source_chunk_id::text" if "source_chunk_id" in issue_columns else "NULL::text"
         domino_expr = "i.domino_chain" if "domino_chain" in issue_columns else "NULL::text"
+        due_expr = "i.due_at" if "due_at" in issue_columns else "NULL::timestamptz"
+        evidence_snippet_expr = (
+            "dc.content"
+            if "source_chunk_id" in issue_columns and "content" in chunk_columns
+            else "NULL::text"
+        )
+        evidence_section_expr = (
+            "dc.section_title"
+            if "source_chunk_id" in issue_columns and "section_title" in chunk_columns
+            else "NULL::text"
+        )
 
         joins = []
         assignee_expr = "NULL::text"
@@ -151,12 +163,17 @@ class IssueRepository:
             joins.append("LEFT JOIN users u ON u.id = i.assignee_id")
             assignee_expr = "u.name"
 
+        direct_document_expr = "i.source_document_id" if "source_document_id" in issue_columns else "NULL::uuid"
+        chunk_document_expr = "dc.document_id" if "source_chunk_id" in issue_columns and "document_id" in chunk_columns else "NULL::uuid"
         document_expr = "NULL::text"
+        source_file_expr = "NULL::text"
         if "source_chunk_id" in issue_columns and "document_id" in chunk_columns:
             joins.append("LEFT JOIN document_chunks dc ON dc.id = i.source_chunk_id")
-            document_expr = "dc.document_id::text"
-        elif "source_document_id" in issue_columns:
-            document_expr = "i.source_document_id::text"
+        if "source_document_id" in issue_columns or ("source_chunk_id" in issue_columns and "document_id" in chunk_columns):
+            document_expr = f"COALESCE({direct_document_expr}, {chunk_document_expr})::text"
+        if {"id", "file_name"}.issubset(document_columns):
+            joins.append(f"LEFT JOIN documents d ON d.id = COALESCE({direct_document_expr}, {chunk_document_expr})")
+            source_file_expr = "d.file_name"
 
         joins_sql = "\n                ".join(joins)
 
@@ -174,9 +191,13 @@ class IssueRepository:
                   {confidence_expr} AS confidence,
                   {assignee_expr} AS assignee,
                   {document_expr} AS document_id,
+                  {source_file_expr} AS source_file_name,
                   {source_chunk_expr} AS source_chunk_id,
+                  {evidence_snippet_expr} AS evidence_snippet,
+                  {evidence_section_expr} AS evidence_section,
                   {approval_expr} AS approval_status,
                   {domino_expr} AS domino_impact,
+                  {due_expr} AS due_at,
                   i.created_at,
                   {updated_at_expr} AS updated_at
                 FROM issues i
@@ -187,7 +208,30 @@ class IssueRepository:
             ),
             params,
         )
-        return [dict(row) for row in result.mappings().all()]
+        issues = []
+        for row in result.mappings().all():
+            item = dict(row)
+            evidence_snippet = item.pop("evidence_snippet", None)
+            evidence_section = item.pop("evidence_section", None)
+            has_evidence = bool(item.get("source_chunk_id") or evidence_snippet)
+            missing_assignee = not bool(item.get("assignee"))
+            missing_due_date = item.get("due_at") is None
+            item["evidence"] = {
+                "document_id": item.get("document_id"),
+                "file_name": item.get("source_file_name"),
+                "chunk_id": item.get("source_chunk_id"),
+                "section": evidence_section,
+                "snippet": evidence_snippet,
+            }
+            item["review"] = {
+                "approval_status": item.get("approval_status"),
+                "has_evidence": has_evidence,
+                "missing_evidence": not has_evidence,
+                "missing_assignee": missing_assignee,
+                "missing_due_date": missing_due_date,
+            }
+            issues.append(item)
+        return issues
 
     async def exists(self, issue_id: str) -> bool:
         result = await self.db.execute(

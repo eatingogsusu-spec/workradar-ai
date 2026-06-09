@@ -22,6 +22,11 @@ async def generate_report(body: dict | None = None, db: AsyncSession = Depends(g
         raise HTTPException(400, str(exc)) from exc
 
 
+@router.get("/review-check")
+async def get_report_review_check(project_id: Optional[str] = None, db: AsyncSession = Depends(get_db)):
+    return await ReportService(ReportRepository(db)).review_check(project_id=project_id)
+
+
 @router.patch("/{report_id}")
 async def update_report(report_id: str, body: dict, db: AsyncSession = Depends(get_db)):
     content = body.get("content")

@@ -174,6 +174,53 @@ class ReportRepository:
         )
         return [dict(row) for row in result.mappings().all()]
 
+    async def review_check(self, project_id: str | None = None) -> dict:
+        params = {"project_id": project_id} if project_id else {}
+        todo_where = "WHERE project_id = CAST(:project_id AS uuid)" if project_id else ""
+        issue_where = "WHERE project_id = CAST(:project_id AS uuid)" if project_id else ""
+
+        todo = (
+            await self.db.execute(
+                text(
+                    f"""
+                    SELECT
+                      COUNT(*) FILTER (WHERE source_chunk_id IS NOT NULL) AS with_evidence,
+                      COUNT(*) FILTER (WHERE source_chunk_id IS NULL) AS missing_evidence,
+                      COUNT(*) FILTER (WHERE assignee_member_id IS NULL) AS missing_assignee,
+                      COUNT(*) FILTER (WHERE due_at IS NULL) AS missing_due_date
+                    FROM todos
+                    {todo_where}
+                    """
+                ),
+                params,
+            )
+        ).mappings().one()
+        issue = (
+            await self.db.execute(
+                text(
+                    f"""
+                    SELECT
+                      COUNT(*) FILTER (WHERE source_chunk_id IS NOT NULL) AS with_evidence,
+                      COUNT(*) FILTER (WHERE source_chunk_id IS NULL) AS missing_evidence,
+                      COUNT(*) FILTER (WHERE assignee_member_id IS NULL) AS missing_assignee,
+                      COUNT(*) FILTER (WHERE due_at IS NULL) AS missing_due_date,
+                      COUNT(*) FILTER (WHERE severity IN ('high', 'critical') AND approval_status IN ('pending', 'needs_revision')) AS possible_conflicts
+                    FROM issues
+                    {issue_where}
+                    """
+                ),
+                params,
+            )
+        ).mappings().one()
+
+        return {
+            "with_evidence": int(todo["with_evidence"] or 0) + int(issue["with_evidence"] or 0),
+            "missing_evidence": int(todo["missing_evidence"] or 0) + int(issue["missing_evidence"] or 0),
+            "missing_assignee": int(todo["missing_assignee"] or 0) + int(issue["missing_assignee"] or 0),
+            "missing_due_date": int(todo["missing_due_date"] or 0) + int(issue["missing_due_date"] or 0),
+            "possible_conflicts": int(issue["possible_conflicts"] or 0),
+        }
+
     async def _default_project_id(self) -> str | None:
         result = await self.db.execute(text("SELECT id::text FROM projects ORDER BY created_at LIMIT 1"))
         return result.scalar_one_or_none()
