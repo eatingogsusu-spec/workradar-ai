@@ -21,6 +21,9 @@
 
 // Migrated from legacy app.js by scripts/import-legacy.mjs.
 // Keep these globals until dashboard data/detail behavior is fully React-owned.
+var ISSUE_DETAIL_MOCK = window.ISSUE_DETAIL_MOCK || {};
+window.ISSUE_DETAIL_MOCK = ISSUE_DETAIL_MOCK;
+
 function applyDashboard() { showToast('Dashboard에 반영되었습니다.'); setTimeout(()=>nav('dashboard'),1000); }
 
 function fetchDashboard(){
