@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import json
-import shutil
+import asyncio
 import uuid
 from pathlib import Path
+from typing import BinaryIO
 
 from fastapi import UploadFile
 from sqlalchemy import select, text
@@ -23,6 +24,7 @@ from app.vectorstores.faiss_store import FAISSStore
 
 UPLOAD_DIR = PROJECT_ROOT / "uploads"
 DB_DOCUMENT_FILE_TYPES = {"email", "meeting", "chat", "issue_log", "other"}
+UPLOAD_CHUNK_BYTES = 1024 * 1024
 
 
 def normalize_db_file_type(value: str | None, filename: str | None = None) -> str:
@@ -65,8 +67,7 @@ async def create_upload_record(
     save_path = UPLOAD_DIR / f"{document_id}_{safe_name}"
     UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-    with save_path.open("wb") as output:
-        shutil.copyfileobj(file.file, output)
+    await _save_upload_file(file.file, save_path, settings.MAX_UPLOAD_BYTES)
 
     document = Document(
         id=document_id,
@@ -82,6 +83,25 @@ async def create_upload_record(
     await db.commit()
     await db.refresh(document)
     return document, save_path
+
+
+async def _save_upload_file(source: BinaryIO, save_path: Path, max_bytes: int) -> None:
+    await asyncio.to_thread(_copy_upload_file_with_limit, source, save_path, max_bytes)
+
+
+def _copy_upload_file_with_limit(source: BinaryIO, save_path: Path, max_bytes: int) -> None:
+    total = 0
+    source.seek(0)
+    try:
+        with save_path.open("wb") as output:
+            while chunk := source.read(UPLOAD_CHUNK_BYTES):
+                total += len(chunk)
+                if total > max_bytes:
+                    raise ValueError(f"file is too large; max upload size is {max_bytes} bytes")
+                output.write(chunk)
+    except Exception:
+        save_path.unlink(missing_ok=True)
+        raise
 
 
 async def run_document_pipeline(document_id: str) -> None:

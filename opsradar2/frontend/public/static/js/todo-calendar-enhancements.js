@@ -26,7 +26,20 @@
   }
 
   function dueDateForEdit(todo) {
-    return todo?.dueDate || (todo?.status === "pending" ? today() : today());
+    return todo?.dueDate || (todo?.status === "pending" ? recommendedDueDate(todo) : today());
+  }
+
+  function enableDateHitbox(input) {
+    if (!input || input.dataset.hitboxBound === "true") return;
+    input.dataset.hitboxBound = "true";
+    const wrap = input.parentElement;
+    if (!wrap) return;
+    wrap.classList.add("todo-date-hitbox");
+    wrap.onclick = (event) => {
+      if (event.target.closest("button, select, textarea")) return;
+      input.focus();
+      if (typeof input.showPicker === "function") input.showPicker();
+    };
   }
 
   const originalOpenEditModal = window.openEditModal;
@@ -36,6 +49,7 @@
     const input = document.getElementById("editDueDate");
     const hint = document.getElementById("editDueHint");
     if (input) input.value = dueDateForEdit(todo);
+    enableDateHitbox(input);
     if (hint) {
       const recommendation = recommendedDueDate(todo);
       hint.textContent = todo?.status === "pending"
@@ -249,6 +263,20 @@
     return result;
   };
 
+  const baseLoadTodos = window.opsRadarApi.loadTodos;
+  window.opsRadarApi.loadTodos = async function () {
+    const result = await baseLoadTodos();
+    syncTodoCalendar();
+    return result;
+  };
+
+  const baseLoadCalendar = window.opsRadarApi.loadCalendar;
+  window.opsRadarApi.loadCalendar = async function () {
+    const result = await baseLoadCalendar();
+    syncTodoCalendar();
+    return result;
+  };
+
   ["approveTodo", "doneTodo", "undoTodo"].forEach((name) => {
     const original = window[name];
     if (typeof original !== "function") return;
@@ -319,9 +347,13 @@
     document.getElementById("tcAssignee").value = issue.suggestAssignee || issue.assignee || (window.opsRadarMembers || [])[0]?.name || "";
     document.getElementById("tcPriority").value = issue.suggestPriority || issue.severity || "medium";
     document.getElementById("tcDue").value = recommendedDueDate({ ...issue, priority: issue.suggestPriority || issue.severity });
+    enableDateHitbox(document.getElementById("tcDue"));
     openModal("todoCreateModal");
   };
   window.openDashboardTodoCreate = window.openTodoCreate;
+  window.createTodoFromIssue = function (issueId) {
+    window.openTodoCreate(issueId);
+  };
 
   window.confirmTodoCreate = async function () {
     const title = document.getElementById("tcTitle")?.value?.trim();
@@ -356,4 +388,5 @@
     syncTodoCalendar();
     if (typeof renderDashboardLive === "function") renderDashboardLive();
   }, 800);
+  setTimeout(syncTodoCalendar, 5000);
 })();

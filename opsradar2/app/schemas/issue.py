@@ -2,7 +2,7 @@
 Issue 스키마
 담당: 박주원
 """
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Literal, Optional
 from datetime import datetime
 
@@ -26,6 +26,8 @@ class IssueUpdate(BaseModel):
 
 
 class IssueResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     title: str
     description: Optional[str]
@@ -35,6 +37,3 @@ class IssueResponse(BaseModel):
     confidence: Optional[str]
     assignee: Optional[str]
     created_at: datetime
-
-    class Config:
-        from_attributes = True

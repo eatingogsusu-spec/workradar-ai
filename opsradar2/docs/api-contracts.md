@@ -13,8 +13,9 @@ window.OPSRADAR_API_BASE || "/api/v1"
 
 For local React/Vite development, use one of these:
 
-- Vite proxy from `/api` to `http://127.0.0.1:8000`
-- Direct API calls to `http://127.0.0.1:8000/api/v1` with `FRONTEND_ORIGINS`
+- Primary local entrypoint: `http://127.0.0.1:8002`
+- FastAPI serves the frontend and API together, so same-origin `/api/v1` calls work by default.
+- CRA dev server can proxy `/api` to `http://127.0.0.1:8002`.
 
 ## Runtime Metadata
 

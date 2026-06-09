@@ -1,7 +1,9 @@
 """Focused service tests for persistence decisions."""
 
 import asyncio
+from datetime import datetime
 
+from app.repositories.todo_repository import _normalize_due_at
 from app.services.report_service import ReportService
 from app.services.issue_service import IssueService
 from app.services.todo_service import TodoService
@@ -107,3 +109,15 @@ def test_issue_service_does_not_create_todo_for_missing_issue():
 
     assert todo_id is None
     assert todo_repo.created is None
+
+
+def test_todo_due_date_string_is_normalized_for_asyncpg():
+    due_at = _normalize_due_at("2026-06-30")
+
+    assert isinstance(due_at, datetime)
+    assert due_at.isoformat() == "2026-06-30T00:00:00"
+
+
+def test_empty_todo_due_date_is_normalized_to_none():
+    assert _normalize_due_at("") is None
+    assert _normalize_due_at(None) is None

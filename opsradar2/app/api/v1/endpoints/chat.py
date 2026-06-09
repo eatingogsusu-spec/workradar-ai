@@ -251,15 +251,32 @@ def _local_answer(message: str, context: str) -> str:
 
     if "calendar" in lowered or "일정" in message or "캘린더" in message:
         events = sections.get("Calendar", [])
+        member_todos = []
+        if member_name:
+            events = [event for event in events if member_name in event]
+            member_todos = [
+                todo for todo in _filter_by_assignee(sections.get("Todos", []), member_name)
+                if "status=in_progress" in todo or "status=approved" in todo
+            ]
         if target_date:
             events = _filter_by_date(events, target_date)
-        if not events:
+            member_todos = _filter_by_date(member_todos, target_date)
+        if not events and not member_todos:
             when = f"{target_date}에 " if target_date else "현재 "
-            return f"📅 {when}등록된 일정이 없습니다."
+            owner = f"{member_name}님의 " if member_name else ""
+            return f"📅 {when}{owner}등록된 일정 또는 진행 Todo가 없습니다."
         date_prefix = f"{target_date} 시작일 기준 " if target_date else ""
-        lines = [f"📅 **{date_prefix}일정 현황**\n"]
+        owner = f"{member_name}님의 " if member_name else ""
+        lines = [f"📅 **{date_prefix}{owner}일정 현황**\n"]
         for event in events[:8]:
             lines.append(f"  · {event.lstrip('- ').strip()}")
+        if member_todos:
+            lines.append("\n📋 진행 Todo와 마감일")
+            for todo in member_todos[:8]:
+                parts = todo.lstrip("- ").split(" | ")
+                title = parts[0].strip()
+                due = next((part.replace("due=", "") for part in parts if "due=" in part), "no due date")
+                lines.append(f"  · {title} · 마감 {due if due != 'no due date' else '미지정'}")
         return "\n".join(lines)
 
     if member_name:

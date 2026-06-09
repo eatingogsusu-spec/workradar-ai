@@ -2696,3 +2696,15 @@ body[data-skin="light"] .toast{background:#172033;color:white}
 .skin-switcher button{border:0;background:transparent;color:var(--text-tertiary);font-size:11px;font-weight:800;padding:7px 10px;border-radius:999px;cursor:pointer;line-height:1}
 .skin-switcher button.active{background:var(--accent-blue);color:#fff}.skin-switcher button:hover:not(.active){background:var(--bg-tertiary);color:var(--text-primary)}
 @media(max-width:760px){.skin-switcher{right:12px;bottom:12px}.skin-switcher button{padding:7px 9px}}
+
+/* Todo due-date picker and settings layout hardening */
+.todo-date-hitbox{cursor:pointer;border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--surface2);transition:border-color .15s ease,background .15s ease}
+.todo-date-hitbox:hover,.todo-date-hitbox:focus-within{border-color:var(--accent);background:var(--accent-soft)}
+.todo-date-hitbox .form-input[type="date"]{cursor:pointer;width:100%;min-height:42px}
+.assistant-todo-schedule{display:flex;flex-direction:column;gap:7px;margin-top:9px;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+.assistant-todo-schedule-title{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:850;color:var(--accent)}
+.assistant-todo-schedule-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px;border:1px solid var(--border);border-radius:8px;background:var(--surface2)}
+.assistant-todo-schedule-item>div{min-width:0}.assistant-todo-schedule-item strong,.assistant-todo-schedule-item span{display:block;overflow-wrap:anywhere}.assistant-todo-schedule-item strong{font-size:11px;color:var(--text)}.assistant-todo-schedule-item span{font-size:10px;color:var(--text3);margin-top:3px}
+.assistant-todo-schedule-item button{flex-shrink:0;border:1px solid var(--border);border-radius:7px;background:var(--surface);color:var(--accent);padding:6px 8px;font-size:10px;font-weight:800;cursor:pointer}
+#s-settings{min-height:0;overflow-y:auto}#s-settings .settings-content{flex:none;max-width:none;padding-bottom:110px;overflow:visible}#s-settings .settings-panel{flex:0 0 auto;overflow:visible}
+@media(max-width:620px){.assistant-todo-schedule-item{align-items:stretch;flex-direction:column}.assistant-todo-schedule-item button{width:100%}}

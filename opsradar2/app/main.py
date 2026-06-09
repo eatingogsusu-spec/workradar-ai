@@ -11,9 +11,14 @@ from app.core.config import settings
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
+FRONTEND_BUILD = FRONTEND / "build"
 FRONTEND_DIST = FRONTEND / "dist"
-FRONTEND_ENTRY = FRONTEND_DIST / "index.html" if FRONTEND_DIST.exists() else FRONTEND / "index.html"
-FRONTEND_STATIC = FRONTEND_DIST / "static" if (FRONTEND_DIST / "static").exists() else FRONTEND / "public" / "static"
+FRONTEND_OUTPUT = FRONTEND_BUILD if FRONTEND_BUILD.exists() else FRONTEND_DIST
+FRONTEND_ENTRY = FRONTEND_OUTPUT / "index.html" if FRONTEND_OUTPUT.exists() else FRONTEND / "index.html"
+FRONTEND_PUBLIC_STATIC = FRONTEND / "public" / "static"
+FRONTEND_STATIC = (
+    FRONTEND_OUTPUT / "static" if (FRONTEND_OUTPUT / "static").exists() else FRONTEND_PUBLIC_STATIC
+)
 
 app = FastAPI(
     title="OpsRadar API",
@@ -42,10 +47,7 @@ async def disable_frontend_cache(request, call_next):
     return response
 
 
-if FRONTEND_STATIC.exists():
-    app.mount("/static", StaticFiles(directory=FRONTEND_STATIC), name="static")
-
-react_assets = FRONTEND_DIST / "assets"
+react_assets = FRONTEND_OUTPUT / "assets"
 if react_assets.exists():
     app.mount("/assets", StaticFiles(directory=react_assets), name="assets")
 
@@ -67,10 +69,23 @@ def health_check():
     }
 
 
+@app.api_route("/static/{asset_type}/{asset_path:path}", methods=["GET", "HEAD"])
+def frontend_static_asset(asset_type: str, asset_path: str):
+    for static_root in (FRONTEND_STATIC, FRONTEND_PUBLIC_STATIC):
+        candidate = (static_root / asset_type / asset_path).resolve()
+        if candidate.is_file() and candidate.is_relative_to(static_root.resolve()):
+            return FileResponse(candidate)
+    raise HTTPException(status_code=404, detail="Not found")
+
+
 @app.get("/{path:path}")
 def spa_fallback(path: str):
     if path.startswith(("api/", "docs", "openapi.json", "redoc")):
         raise HTTPException(status_code=404, detail="Not found")
-    if FRONTEND_DIST.exists() and FRONTEND_ENTRY.exists() and "." not in Path(path).name:
+    for static_root in (FRONTEND_OUTPUT, FRONTEND / "public"):
+        candidate = (static_root / path).resolve()
+        if candidate.is_file() and candidate.is_relative_to(static_root.resolve()):
+            return FileResponse(candidate)
+    if FRONTEND_OUTPUT.exists() and FRONTEND_ENTRY.exists() and "." not in Path(path).name:
         return FileResponse(FRONTEND_ENTRY)
     return FileResponse(FRONTEND / "index.html")

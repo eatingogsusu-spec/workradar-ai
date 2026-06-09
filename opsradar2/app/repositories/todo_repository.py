@@ -1,11 +1,22 @@
 """Todo persistence for the v4 OpsRadar schema."""
 
+from datetime import date, datetime, time
 from typing import Optional
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
+
+
+def _normalize_due_at(value):
+    if value in (None, ""):
+        return None
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, date):
+        return datetime.combine(value, time.min)
+    return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
 
 
 class TodoRepository:
@@ -199,7 +210,7 @@ class TodoRepository:
                 "source": data.get("source"),
                 "approval_status": data.get("approval_status"),
                 "confidence": data.get("confidence"),
-                "due_at": data.get("due_at"),
+                "due_at": _normalize_due_at(data.get("due_at")),
                 "linked_issue_id": data.get("linked_issue_id"),
                 "source_document_id": data.get("source_document_id"),
                 "source_chunk_id": data.get("source_chunk_id"),
@@ -215,11 +226,14 @@ class TodoRepository:
 
     async def update(self, todo_id: str, data: dict) -> bool:
         allowed = {
-            key: value
+            key: _normalize_due_at(value) if key == "due_at" else value
             for key, value in data.items()
             if key in {"title", "description", "status", "priority", "approval_status", "due_at"}
         }
-        assignments = [f"{key} = :{key}" for key in allowed]
+        assignments = [
+            "due_at = CAST(:due_at AS timestamptz)" if key == "due_at" else f"{key} = :{key}"
+            for key in allowed
+        ]
         params = {"todo_id": todo_id, **allowed}
         if "assignee" in data:
             assignments.append(

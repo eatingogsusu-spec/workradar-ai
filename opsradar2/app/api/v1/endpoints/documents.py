@@ -12,6 +12,7 @@ from app.core.database import get_db
 from app.models import Document
 from app.repositories.issue_repository import IssueRepository
 from app.repositories.todo_repository import TodoRepository
+from app.schemas.document import ChunkIssueCreate, ChunkTodoCreate
 from app.services.document_service import create_upload_record, resolve_project_id, run_document_pipeline
 from app.services.issue_service import IssueService
 from app.services.todo_service import TodoService
@@ -112,9 +113,13 @@ async def get_document_chunks(document_id: str, db: AsyncSession = Depends(get_d
 
 
 @router.post("/{document_id}/chunks/{chunk_id}/todos")
-async def create_todo_from_chunk(document_id: str, chunk_id: str, body: dict, db: AsyncSession = Depends(get_db)):
-    if not body.get("title"):
-        raise HTTPException(400, "title is required")
+async def create_todo_from_chunk(
+    document_id: str,
+    chunk_id: str,
+    body: ChunkTodoCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    payload = body.model_dump(exclude_none=True)
     chunk = await _get_chunk(db, document_id, chunk_id)
     if not chunk:
         raise HTTPException(404, "chunk not found")
@@ -122,22 +127,26 @@ async def create_todo_from_chunk(document_id: str, chunk_id: str, body: dict, db
     service = TodoService(TodoRepository(db))
     todo_id = await service.create_todo(
         {
-            **body,
+            **payload,
             "project_id": chunk["project_id"],
             "source_document_id": chunk["document_id"],
             "source_chunk_id": chunk["id"],
-            "description": body.get("description") or chunk["content"],
+            "description": payload.get("description") or chunk["content"],
             "source": "manual",
-            "approval_status": body.get("approval_status", "approved"),
+            "approval_status": payload.get("approval_status", "approved"),
         }
     )
     return {"status": "success", "todo_id": todo_id, "source_chunk_id": chunk["id"]}
 
 
 @router.post("/{document_id}/chunks/{chunk_id}/issues")
-async def create_issue_from_chunk(document_id: str, chunk_id: str, body: dict, db: AsyncSession = Depends(get_db)):
-    if not body.get("title"):
-        raise HTTPException(400, "title is required")
+async def create_issue_from_chunk(
+    document_id: str,
+    chunk_id: str,
+    body: ChunkIssueCreate,
+    db: AsyncSession = Depends(get_db),
+):
+    payload = body.model_dump(exclude_none=True)
     chunk = await _get_chunk(db, document_id, chunk_id)
     if not chunk:
         raise HTTPException(404, "chunk not found")
@@ -145,14 +154,14 @@ async def create_issue_from_chunk(document_id: str, chunk_id: str, body: dict, d
     service = IssueService(IssueRepository(db))
     issue = await service.create_issue(
         {
-            **body,
+            **payload,
             "project_id": chunk["project_id"],
             "source_document_id": chunk["document_id"],
             "source_chunk_id": chunk["id"],
-            "description": body.get("description") or chunk["content"],
+            "description": payload.get("description") or chunk["content"],
             "source": "manual",
-            "approval_status": body.get("approval_status", "approved"),
-            "is_candidate": body.get("is_candidate", False),
+            "approval_status": payload.get("approval_status", "approved"),
+            "is_candidate": payload.get("is_candidate", False),
         }
     )
     return {"status": "success", "issue": issue, "source_chunk_id": chunk["id"]}
