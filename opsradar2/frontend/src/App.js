@@ -13,6 +13,17 @@ const LABELS = {
   staticHelp: "\uD654\uBA74\uC774 \uBE44\uC5B4 \uBCF4\uC774\uBA74 public/index.html \uB610\uB294 \uC815\uC801 \uC2A4\uD06C\uB9BD\uD2B8 \uACBD\uB85C\uB97C \uD655\uC778\uD558\uC138\uC694.",
 };
 
+function clearOpsRadarSession() {
+  window.localStorage.removeItem("opsradar_user_role");
+  window.localStorage.removeItem("opsradar_user_name");
+  window.localStorage.removeItem("opsradar_user_id");
+  window.localStorage.removeItem("role");
+  window.localStorage.removeItem("user");
+  window.localStorage.removeItem("access_token");
+  window.localStorage.removeItem("token");
+  window.localStorage.removeItem("auth");
+}
+
 function syncDashboardRoleUi(role, name) {
   const isMember = role === "member";
   const allowedRole = isMember ? "member" : "pm";
@@ -58,7 +69,8 @@ function syncDashboardRoleUi(role, name) {
 function App() {
   const [userRole, setUserRole] = useState(() => {
     if (typeof window === "undefined") return null;
-    return window.localStorage.getItem("opsradar_user_role");
+    const storedRole = window.localStorage.getItem("opsradar_user_role");
+    return storedRole === "admin" || storedRole === "member" ? storedRole : null;
   });
   const [userName, setUserName] = useState(() => {
     if (typeof window === "undefined") return "";
@@ -77,9 +89,7 @@ function App() {
       syncDashboardRoleUi(userRole, userName);
       if (typeof window.updateSettingsPage === "function") window.updateSettingsPage();
       if (typeof window.logout === "function" && !window.logout.opsradarWrapped) {
-        const staticLogout = window.logout;
         const wrappedLogout = () => {
-          staticLogout();
           handleLogout();
         };
         wrappedLogout.opsradarWrapped = true;
@@ -100,13 +110,11 @@ function App() {
   }
 
   function handleLogout() {
-    window.localStorage.removeItem("opsradar_user_role");
-    window.localStorage.removeItem("opsradar_user_name");
-    window.localStorage.removeItem("opsradar_user_id");
-    window.localStorage.removeItem("role");
-    window.localStorage.removeItem("user");
+    clearOpsRadarSession();
     setUserRole(null);
     setUserName("");
+    document.body.classList.add("opsradar-login-required");
+    window.location.reload();
   }
 
   if (!userRole) return <Login onLogin={handleLogin} />;

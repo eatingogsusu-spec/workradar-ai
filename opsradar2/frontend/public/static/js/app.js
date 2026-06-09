@@ -2988,6 +2988,18 @@ function initOpsRadarSkin(){
   setOpsRadarTheme(saved);
   updateSettingsPage();
 }
+function clearOpsRadarSession(){
+  try{
+    localStorage.removeItem('opsradar_user_role');
+    localStorage.removeItem('opsradar_user_name');
+    localStorage.removeItem('opsradar_user_id');
+    localStorage.removeItem('role');
+    localStorage.removeItem('user');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('token');
+    localStorage.removeItem('auth');
+  }catch(e){}
+}
 function getStoredUserInfo(){
   let rawUser = null;
   let rawRole = null;
@@ -3048,23 +3060,15 @@ function updateSettingsPage(){
   setOpsRadarTheme(theme);
 }
 function logout(){
-  try{
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('token');
-    localStorage.removeItem('opsradar_user_role');
-    localStorage.removeItem('opsradar_user_name');
-    localStorage.removeItem('opsradar_user_id');
-    localStorage.removeItem('role');
-    localStorage.removeItem('user');
-  }catch(e){}
-  updateSettingsPage();
-  alert('로그아웃되었습니다.');
-  nav('dashboard');
+  clearOpsRadarSession();
+  document.body.classList.add('opsradar-login-required');
+  window.location.reload();
 }
 window.setOpsRadarTheme = setOpsRadarTheme;
 window.setOpsRadarSkin = setOpsRadarSkin;
 window.updateSettingsPage = updateSettingsPage;
 window.updateSidebarUserDisplay = updateSidebarUserDisplay;
+window.clearOpsRadarSession = clearOpsRadarSession;
 window.logout = logout;
 const ISSUE_DETAIL_MOCK = {
   'payment-api': {
