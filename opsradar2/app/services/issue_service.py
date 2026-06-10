@@ -19,8 +19,18 @@ class IssueService:
         status: Optional[str] = None,
         risk_level: Optional[str] = None,
         project_id: Optional[str] = None,
+        limit: int = 15,
+        offset: int = 0,
     ) -> list[dict]:
-        return await self.repo.get_all(status=status, risk_level=risk_level, project_id=project_id)
+        return await self.repo.get_all(status=status, risk_level=risk_level, project_id=project_id, limit=limit, offset=offset)
+
+    async def count_issues(
+        self,
+        status: Optional[str] = None,
+        risk_level: Optional[str] = None,
+        project_id: Optional[str] = None,
+    ) -> int:
+        return await self.repo.count(status=status, risk_level=risk_level, project_id=project_id)
 
     async def update_issue(self, issue_id: str, data: dict) -> bool:
         return await self.repo.update(issue_id, data)

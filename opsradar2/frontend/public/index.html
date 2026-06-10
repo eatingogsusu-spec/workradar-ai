@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OpsRadar AI — Clean Version</title>
+<title>WorkRader AI - Clean Version</title>
 <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
@@ -11,17 +11,18 @@
 <link rel="stylesheet" href="/static/css/layout.css">
 <link rel="stylesheet" href="/static/css/components.css">
 </head>
+
 <body><script>
 window.OPSRADAR_API_BASE = window.location.port === "8002"
   ? "/api/v1"
   : `${window.location.protocol}//${window.location.hostname}:8002/api/v1`;
 </script>
-<div style="display:flex;flex:1;overflow:hidden">
 
+<div style="display:flex;flex:1;overflow:hidden">
 <!-- ══ 사이드바 ══ -->
 <div class="sidebar">
   <div class="sb-logo">
-    <div class="sb-logo-name">OpsRadar</div>
+    <div class="sb-logo-name">WorkRader</div>
     <div class="sb-logo-tag">운영 인텔리전스</div>
   </div>
   <div class="sb-nav">
@@ -47,10 +48,11 @@ window.OPSRADAR_API_BASE = window.location.port === "8002"
   </div>
   <div class="sb-footer">
     <div style="display:flex;align-items:center;gap:8px">
-      <div class="sb-avatar">희진</div>
+      <div class="sb-avatar" id="sidebarUserAvatar">김</div>
       <div>
-        <div style="font-size:11px;color:var(--text);font-weight:500">관리자</div>
-        <div style="font-size:10px;color:var(--text3)">PM · 팀장</div>
+        <div id="sidebarUserName" style="font-size:11px;color:var(--text);font-weight:500">김희진</div>
+        <div id="sidebarUserRole" style="font-size:11px;color:var(--text);font-weight:500">관리자</div>
+        <div id="sidebarUserDescription" style="font-size:10px;color:var(--text3)">PM · 팀장</div>
       </div>
     </div>
   </div>
@@ -719,6 +721,84 @@ window.OPSRADAR_API_BASE = window.location.port === "8002"
     </section>
   </div>
 </div>
+
+<div class="screen legacy-settings-screen" id="s-settings-legacy" hidden>
+  <div class="topbar">
+    <div class="topbar-title">설정</div>
+    <span class="badge b-accent">Front-end only</span>
+  </div>
+  <div class="content settings-content">
+    <section class="settings-panel">
+      <div class="settings-card-inner">
+        <div class="settings-panel-head">
+          <div>
+            <div class="settings-eyebrow">Profile</div>
+            <h3>계정 프로필</h3>
+            <p class="settings-panel-sub">현재 접속한 사용자와 운영 권한 정보를 확인합니다.</p>
+          </div>
+          <span class="settings-status-badge" id="settingsLoginStatus">로그인됨</span>
+        </div>
+        <div class="settings-profile-card">
+          <div class="settings-avatar" id="settingsUserAvatar">관</div>
+          <div class="settings-profile-main">
+            <div class="settings-profile-name" id="settingsUserName">관리자</div>
+            <div class="settings-profile-meta">
+              <span class="settings-role-badge" id="settingsUserRole">관리자 · Admin</span>
+              <span class="settings-status-badge" id="settingsUserState">로그인됨</span>
+            </div>
+          </div>
+        </div>
+        <div class="settings-info-strip">
+          <div class="settings-info-card"><span>사용자</span><strong id="settingsUserNameMirror">관리자</strong></div>
+          <div class="settings-info-card"><span>역할</span><strong id="settingsUserRoleMirror">Admin</strong></div>
+          <div class="settings-info-card"><span>세션</span><strong id="settingsUserStateMirror">Active</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-panel">
+      <div class="settings-card-inner">
+        <div class="settings-panel-head">
+          <div>
+            <div class="settings-eyebrow">Appearance</div>
+            <h3>화면 테마</h3>
+            <p class="settings-panel-sub">운영 관제 화면의 밝기와 대비를 선택합니다.</p>
+          </div>
+          <span class="settings-current-theme" id="settingsThemeLabel">Dark</span>
+        </div>
+        <div class="settings-appearance-row">
+          <div class="settings-appearance-copy">
+            <strong>인터페이스 모드</strong>
+            <p>선택한 테마는 브라우저 localStorage에 저장되며 새로고침 후에도 유지됩니다.</p>
+          </div>
+          <div class="settings-pill-toggle" role="group" aria-label="테마 선택">
+            <button type="button" class="settings-pill-option" data-theme-choice="dark" onclick="setOpsRadarTheme('dark')"><i class="ti ti-moon"></i> Dark</button>
+            <button type="button" class="settings-pill-option" data-theme-choice="light" onclick="setOpsRadarTheme('light')"><i class="ti ti-sun"></i> Light</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-panel danger-zone">
+      <div class="settings-card-inner">
+        <div class="settings-panel-head">
+          <div>
+            <div class="settings-eyebrow">Session</div>
+            <h3>위험 액션</h3>
+            <p class="settings-panel-sub">현재 브라우저에 저장된 로그인 정보를 정리합니다.</p>
+          </div>
+        </div>
+        <div class="settings-logout-row">
+          <div>
+            <strong>현재 세션 종료</strong>
+            <p>프론트 localStorage의 access_token, role, user 정보를 제거합니다. 백엔드/DB에는 영향을 주지 않습니다.</p>
+          </div>
+          <button type="button" class="settings-logout-btn" onclick="logout()"><i class="ti ti-logout"></i> 로그아웃</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
 </div><!-- /main -->
 </div>
 
@@ -919,6 +999,7 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
   <button class="float-ai-btn" onclick="toggleFloatAI()" title="AI에게 질문">
     <i class="ti ti-message-dots"></i>
   </button>
+</div>
 </div>
 <script src="/static/js/app.js"></script>
 <script src="/static/js/api-integration.js"></script>

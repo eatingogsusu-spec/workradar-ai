@@ -7,12 +7,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 
+_COLUMNS_CACHE: dict[str, set[str]] = {}
+
 
 class IssueRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
     async def _columns(self, table_name: str) -> set[str]:
+        if table_name in _COLUMNS_CACHE:
+            return _COLUMNS_CACHE[table_name]
         result = await self.db.execute(
             text(
                 """
@@ -24,7 +28,8 @@ class IssueRepository:
             ),
             {"schema": settings.DB_SCHEMA, "table_name": table_name},
         )
-        return {row[0] for row in result.all()}
+        _COLUMNS_CACHE[table_name] = {row[0] for row in result.all()}
+        return _COLUMNS_CACHE[table_name]
 
     async def create(self, data: dict) -> dict:
         result = await self.db.execute(
@@ -103,11 +108,40 @@ class IssueRepository:
         await self.db.commit()
         return dict(result.mappings().one())
 
+    async def count(
+        self,
+        status: Optional[str] = None,
+        risk_level: Optional[str] = None,
+        project_id: Optional[str] = None,
+    ) -> int:
+        issue_columns = await self._columns("issues")
+        filters = []
+        params: dict = {}
+        if project_id and "project_id" in issue_columns:
+            filters.append("project_id = CAST(:project_id AS uuid)")
+            params["project_id"] = project_id
+        if "approval_status" in issue_columns:
+            filters.append("approval_status <> 'rejected'")
+        if status:
+            filters.append("status = :status")
+            params["status"] = status
+        if risk_level:
+            filters.append("severity = :risk_level")
+            params["risk_level"] = risk_level
+        where_clause = f"WHERE {' AND '.join(filters)}" if filters else ""
+        result = await self.db.execute(
+            text(f"SELECT COUNT(*) FROM issues {where_clause}"),
+            params,
+        )
+        return result.scalar_one()
+
     async def get_all(
         self,
         status: Optional[str] = None,
         risk_level: Optional[str] = None,
         project_id: Optional[str] = None,
+        limit: int = 15,
+        offset: int = 0,
     ) -> list[dict]:
         issue_columns = await self._columns("issues")
         chunk_columns = await self._columns("document_chunks")
@@ -204,9 +238,10 @@ class IssueRepository:
                 {joins_sql}
                 {where_clause}
                 ORDER BY i.created_at DESC
+                LIMIT :limit OFFSET :offset
                 """
             ),
-            params,
+            {**params, "limit": limit, "offset": offset},
         )
         issues = []
         for row in result.mappings().all():

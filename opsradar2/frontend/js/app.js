@@ -1,10 +1,11 @@
 // ════════════════════════════════════════════════
 // API 베이스 URL 설정
 // ════════════════════════════════════════════════
+
 window.OPSRADAR_API_BASE = window.OPSRADAR_API_BASE || (
-  window.location.port === "8002"
-    ? "/api/v1"
-    : `${window.location.protocol}//${window.location.hostname}:8002/api/v1`
+    window.location.port === "8002"
+      ? "/api/v1"
+      : `${window.location.protocol}//${window.location.hostname}:8002/api/v1`
 );
 
 // ════════════════════════════════════════════════
@@ -1434,36 +1435,6 @@ function parseScheduleMsg(msg){
   return{person,date,type,impact:type==='회의'?'팀 진행상황 점검':`${person} 담당 업무 공백 예상`};
 }
 
-function isScheduleCreateRequest(msg){
-  return /부재|휴가|외근|외부 일정|일정\s*(추가|등록|생성)|캘린더에|회의\s*(추가|등록|잡아|생성)|미팅\s*(추가|등록|잡아|생성)/.test(msg);
-}
-
-function assistantScheduleTodos(prompt){
-  const member=(window.opsRadarMembers||[]).map(m=>m.name).find(name=>prompt.includes(name))
-    || ['이성우','박주원','김희진','김성호'].find(name=>prompt.includes(name));
-  if(!member || !/일정|스케줄|마감|업무/.test(prompt)) return [];
-  return todos.filter(todo=>todo.status==='approved' && todo.assignee===member);
-}
-
-function assistantTodoCards(prompt){
-  const items=assistantScheduleTodos(prompt);
-  if(!items.length) return '';
-  return `<div class="assistant-todo-schedule">
-    <div class="assistant-todo-schedule-title"><i class="ti ti-calendar-check"></i> 진행 Todo와 마감일</div>
-    ${items.slice(0,6).map(todo=>`<div class="assistant-todo-schedule-item">
-      <div><strong>${escapeHtml(cleanTodoTitle(todo.title))}</strong><span>${escapeHtml(todo.dueDate ? `마감 ${todo.dueDate}` : '마감일 미지정')}</span></div>
-      <button type="button" onclick="openAssistantTodoDetail(${todo.id})">상세보기</button>
-    </div>`).join('')}
-  </div>`;
-}
-
-function openAssistantTodoDetail(id){
-  nav('todo');
-  switchTodoTab('inprogress');
-  openTodoDetailModal(id);
-}
-window.openAssistantTodoDetail=openAssistantTodoDetail;
-
 // ════════════════════════════════════════════════
 // AI Assistant (흐름 5)
 // ════════════════════════════════════════════════
@@ -1621,13 +1592,13 @@ async function sendMsg(text){
     if(res){
       if(res.type==='schedule') showScheduleConfirm(msg,res);
       else appendChatMsg('ai',res.text,res.src);
-    } else if(isScheduleCreateRequest(msg)){
+    } else if(/부재|외부 일정|휴가|회의|미팅|일정|추가/.test(msg)){
       const parsed=parseScheduleMsg(msg);showScheduleConfirmRaw(msg,parsed);
     } else {
       appendChatMsg('ai','운영 데이터에서 관련 정보를 찾고 있습니다. 더 구체적으로 질문해주시면 정확한 답변을 드릴 수 있습니다.',null);
     }
   };
-  if(chatResponses[msg] || isScheduleCreateRequest(msg)){
+  if(chatResponses[msg] || /부재|외부 일정|휴가|회의|미팅|일정|추가/.test(msg)){
     setTimeout(renderLocalReply,900+Math.random()*400);
     return;
   }
@@ -1729,7 +1700,7 @@ function appendChatMsg(role,text,src=null,withBtn=false){
     div.innerHTML=`<div class="msg-av av-user"><i class="ti ti-user" style="font-size:13px"></i></div><div class="bubble bubble-user text-content">${escapeHtml(text)}</div>`;
     saveMessageToCurrentSession('user', text);
   } else {
-    div.innerHTML=`<div class="msg-av av-ai"><i class="ti ti-sparkles" style="font-size:13px"></i></div><div><div class="ai-analysis-card"><div class="ai-card-kicker">AI OPERATION ANALYSIS</div><div class="ai-card-title">운영 데이터 기반 분석 결과</div><p class="text-content">${escapeHtml(text)}</p>${normalizeSources(src).length?`<div class="ai-card-source"><i class="ti ti-file-text" style="font-size:11px"></i> 출처: ${escapeHtml(normalizeSources(src).join(', '))}</div>`:''}</div>${assistantTodoCards(G.lastChatPrompt||'')}${withBtn?'<div style="margin-top:6px"><div class="tbtn" style="font-size:10px;padding:4px 10px;color:var(--accent)" onclick="nav(\'knowledge\')"><i class="ti ti-transfer"></i> 인수인계 문서 생성</div></div>':''}</div>`;
+    div.innerHTML=`<div class="msg-av av-ai"><i class="ti ti-sparkles" style="font-size:13px"></i></div><div><div class="ai-analysis-card"><div class="ai-card-kicker">AI OPERATION ANALYSIS</div><div class="ai-card-title">운영 데이터 기반 분석 결과</div><p class="text-content">${escapeHtml(text)}</p>${normalizeSources(src).length?`<div class="ai-card-source"><i class="ti ti-file-text" style="font-size:11px"></i> 출처: ${escapeHtml(normalizeSources(src).join(', '))}</div>`:''}</div>${withBtn?'<div style="margin-top:6px"><div class="tbtn" style="font-size:10px;padding:4px 10px;color:var(--accent)" onclick="nav(\'knowledge\')"><i class="ti ti-transfer"></i> 인수인계 문서 생성</div></div>':''}</div>`;
     updateChatContextPanel((G.lastChatPrompt || '') + ' ' + text, src);
     saveMessageToCurrentSession('assistant', text, { src, withBtn });
   }

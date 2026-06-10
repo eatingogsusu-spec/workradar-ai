@@ -28,21 +28,6 @@
     return res.status === 204 ? null : res.json();
   }
 
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-  async function loadWithRetry(label, loader, attempts = 2) {
-    let lastError;
-    for (let attempt = 0; attempt < attempts; attempt += 1) {
-      try {
-        return await loader();
-      } catch (error) {
-        lastError = error;
-        if (attempt + 1 < attempts) await sleep(700);
-      }
-    }
-    throw new Error(`${label}: ${lastError?.message || "load failed"}`);
-  }
-
   function replaceArray(target, values) {
     if (!Array.isArray(target)) return;
     target.length = 0;
@@ -369,7 +354,7 @@
       title: type === "monthly" ? "월간 운영 보고서" : "주간 운영 보고서",
       period: `${report.start_date || report.week_start || "-"} ~ ${report.end_date || report.week_end || "-"}`,
       createdAt: report.created_at,
-      author: "OpsRadar",
+      author: "WorkRader",
       status: "draft",
       issues: 0,
       doneTodos: 0,
@@ -631,20 +616,6 @@
     return created.event;
   };
 
-  async function reloadAll() {
-    const critical = await Promise.allSettled([
-      loadWithRetry("todos", loadTodosFromAPI),
-      loadWithRetry("issues", loadIssuesFromAPI),
-      loadWithRetry("members", loadMembersFromAPI),
-    ]);
-    const secondary = await Promise.allSettled([
-      loadWithRetry("dashboard", loadDashboardFromAPI),
-      loadWithRetry("calendar", loadCalendarFromAPI),
-      loadWithRetry("reports", loadReportsFromAPI),
-    ]);
-    return [...critical, ...secondary];
-  }
-
   window.opsRadarApi = {
     request,
     uploadDocument,
@@ -658,7 +629,14 @@
     loadCalendar: loadCalendarFromAPI,
     loadReports: loadReportsFromAPI,
     loadMembers: loadMembersFromAPI,
-    reload: reloadAll,
+    reload: () => Promise.allSettled([
+      loadDashboardFromAPI(),
+      loadTodosFromAPI(),
+      loadIssuesFromAPI(),
+      loadCalendarFromAPI(),
+      loadReportsFromAPI(),
+      loadMembersFromAPI(),
+    ]),
   };
 
   function patchTodoActions() {
@@ -938,12 +916,7 @@
     patchDocumentAnalysis();
     window.opsRadarApi.reload().then((results) => {
       const rejected = results.filter((r) => r.status === "rejected");
-      if (rejected.length) {
-        console.warn(
-          "OpsRadar initial loads failed",
-          rejected.map((result) => result.reason?.message || String(result.reason)),
-        );
-      }
+      if (rejected.length) console.warn("Some WorkRader API loads failed", rejected);
     });
   }
 

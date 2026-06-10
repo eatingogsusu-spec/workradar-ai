@@ -14,10 +14,16 @@ FRONTEND = ROOT / "frontend"
 FRONTEND_BUILD = FRONTEND / "build"
 FRONTEND_DIST = FRONTEND / "dist"
 FRONTEND_OUTPUT = FRONTEND_BUILD if FRONTEND_BUILD.exists() else FRONTEND_DIST
-FRONTEND_ENTRY = FRONTEND_OUTPUT / "index.html" if FRONTEND_OUTPUT.exists() else FRONTEND / "index.html"
 FRONTEND_PUBLIC_STATIC = FRONTEND / "public" / "static"
 FRONTEND_STATIC = (
     FRONTEND_OUTPUT / "static" if (FRONTEND_OUTPUT / "static").exists() else FRONTEND_PUBLIC_STATIC
+)
+# Prefer the git-tracked public/index.html over compiled build output
+_public_entry = FRONTEND / "public" / "index.html"
+FRONTEND_ENTRY = (
+    _public_entry if _public_entry.exists() else
+    FRONTEND_OUTPUT / "index.html" if FRONTEND_OUTPUT.exists() else
+    FRONTEND / "index.html"
 )
 
 app = FastAPI(

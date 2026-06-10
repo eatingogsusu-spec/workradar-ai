@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from fastapi import APIRouter
 
 from app.api.v1.endpoints import (
+    auth,
     calendar,
     chat,
     dashboard,
@@ -31,6 +32,7 @@ class RouterSpec:
 
 
 API_ROUTERS: tuple[RouterSpec, ...] = (
+    RouterSpec(auth.router, "/auth", "auth"),
     RouterSpec(calendar.router, "/calendar", "calendar"),
     RouterSpec(projects.router, "/projects", "projects"),
     RouterSpec(documents.router, "/documents", "documents"),

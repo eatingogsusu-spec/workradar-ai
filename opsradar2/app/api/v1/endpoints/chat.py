@@ -6,6 +6,7 @@ import re
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.ai.llm_client import AzureOpenAIConfigError
@@ -18,10 +19,6 @@ from app.services.assistant_context_service import AssistantContextService
 
 router = APIRouter()
 
-# 팀원 이름 목록
-TEAM_MEMBERS = ["이성우", "김희진", "박주원", "김성호", "김예은"]
-
-
 class ExtractRequest(BaseModel):
     text: str = Field(min_length=1)
 
@@ -30,6 +27,7 @@ class ExtractRequest(BaseModel):
 async def chat(payload: ChatRequest, db: AsyncSession = Depends(get_db)):
     """Answer with current OpsRadar data, plus document RAG when available."""
     operational_context, operational_sources = await AssistantContextService(db).build_context()
+    team_members = await _load_team_members(db)
 
     rag_context = ""
     rag_sources: list[dict] = []
@@ -50,16 +48,16 @@ async def chat(payload: ChatRequest, db: AsyncSession = Depends(get_db)):
 
     context = "\n\n".join(part for part in [rag_context, operational_context] if part.strip())
     if _is_operational_question(payload.message) or settings.AI_PROVIDER.lower() != "azure":
-        answer = _local_answer(payload.message, operational_context)
+        answer = _local_answer(payload.message, operational_context, team_members)
     else:
         try:
             answer_result = await answer_question(payload.message, context)
             answer = answer_result.get("answer", "")
         except Exception:
-            answer = _local_answer(payload.message, operational_context)
+            answer = _local_answer(payload.message, operational_context, team_members)
 
         if not answer.strip() or "AI_PROVIDER=azure" in answer:
-            answer = _local_answer(payload.message, operational_context)
+            answer = _local_answer(payload.message, operational_context, team_members)
 
     return ChatResponse(
         answer=answer,
@@ -97,9 +95,26 @@ def _is_operational_question(message: str) -> bool:
     return any(token in lowered or token in message for token in tokens)
 
 
-def _extract_member_name(message: str) -> str | None:
+async def _load_team_members(db: AsyncSession) -> list[str]:
+    result = await db.execute(
+        text(
+            """
+            SELECT DISTINCT u.name
+            FROM project_members pm
+            JOIN users u ON u.id = pm.user_id
+            WHERE u.deleted_at IS NULL
+              AND pm.status = 'active'
+              AND COALESCE(u.name, '') <> ''
+            ORDER BY u.name
+            """
+        )
+    )
+    return [row[0] for row in result.all()]
+
+
+def _extract_member_name(message: str, team_members: list[str]) -> str | None:
     """질문에서 팀원 이름 추출"""
-    for member in TEAM_MEMBERS:
+    for member in team_members:
         if member in message:
             return member
     return None
@@ -178,10 +193,10 @@ def _assignee_empty_message(member_name: str, item_label: str, target_date: str 
     return "\n".join(lines)
 
 
-def _local_answer(message: str, context: str) -> str:
+def _local_answer(message: str, context: str, team_members: list[str] | None = None) -> str:
     lowered = message.lower()
     sections = _split_context(context)
-    member_name = _extract_member_name(message)
+    member_name = _extract_member_name(message, team_members or [])
     target_date = _extract_date_filter(message)
 
     if "todo" in lowered or "할 일" in message or "미완료" in message:

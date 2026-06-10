@@ -5,6 +5,7 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.security import hash_password
 from app.schemas.member import MemberCreate, MemberUpdate
 
 router = APIRouter()
@@ -78,15 +79,20 @@ async def create_member(body: MemberCreate, db: AsyncSession = Depends(get_db)):
     project = await _default_project(db, payload.get("project_id"))
     user_role = payload.get("user_role") or payload.get("role") or "member"
     project_role = payload.get("project_role") or payload.get("role") or "member"
+    username = payload.get("username") or None
+    password_hash = hash_password(payload["password"]) if payload.get("password") else None
     result = await db.execute(
         text(
             """
             WITH upsert_user AS (
-              INSERT INTO users (id, team_id, name, email, role, created_at, updated_at, deleted_at)
-              VALUES (gen_random_uuid(), :team_id, :name, :email, COALESCE(:user_role, 'member'), now(), now(), NULL)
+              INSERT INTO users (id, team_id, name, email, role, username, password_hash, status, created_at, updated_at, deleted_at)
+              VALUES (gen_random_uuid(), :team_id, :name, :email, COALESCE(:user_role, 'member'),
+                      :username, :password_hash, 'active', now(), now(), NULL)
               ON CONFLICT (email) DO UPDATE
               SET name = EXCLUDED.name,
                   role = EXCLUDED.role,
+                  username = COALESCE(EXCLUDED.username, users.username),
+                  password_hash = COALESCE(EXCLUDED.password_hash, users.password_hash),
                   deleted_at = NULL,
                   updated_at = now()
               RETURNING id, team_id
@@ -110,6 +116,8 @@ async def create_member(body: MemberCreate, db: AsyncSession = Depends(get_db)):
             "user_role": user_role,
             "project_role": project_role,
             "status": payload.get("status") or "active",
+            "username": username,
+            "password_hash": password_hash,
         },
     )
     await db.commit()
@@ -119,7 +127,9 @@ async def create_member(body: MemberCreate, db: AsyncSession = Depends(get_db)):
 @router.patch("/{member_id}")
 async def update_member(member_id: str, body: MemberUpdate, db: AsyncSession = Depends(get_db)):
     payload = body.model_dump(exclude_unset=True, exclude_none=True)
-    allowed_user = {key: payload[key] for key in ("name", "email") if key in payload}
+    allowed_user = {key: payload[key] for key in ("name", "email", "username") if key in payload}
+    if "password" in payload:
+        allowed_user["password_hash"] = hash_password(payload["password"])
     if "user_role" in payload:
         allowed_user["role"] = payload["user_role"]
     elif "role" in payload:

@@ -1,57 +1,57 @@
 import { useEffect, useState } from "react";
 import Login from "./Login";
 
-const LABELS = {
-  adminName: "\uAE40\uD76C\uC9C4",
-  memberName: "\uC624\uC138\uBBFC",
-  sessionLabel: "\uD604\uC7AC \uB85C\uADF8\uC778 \uC138\uC158",
-  user: "\uC0AC\uC6A9\uC790",
-  admin: "\uAD00\uB9AC\uC790",
-  member: "\uD300\uC6D0",
-  logout: "\uB85C\uADF8\uC544\uC6C3",
-  staticShell: "\uC815\uC801 OpsRadar \uD654\uBA74\uC740 public/index.html\uC5D0\uC11C \uB80C\uB354\uB9C1\uB429\uB2C8\uB2E4.",
-  staticHelp: "\uD654\uBA74\uC774 \uBE44\uC5B4 \uBCF4\uC774\uBA74 public/index.html \uB610\uB294 \uC815\uC801 \uC2A4\uD06C\uB9BD\uD2B8 \uACBD\uB85C\uB97C \uD655\uC778\uD558\uC138\uC694.",
-};
-
 function App() {
-  const [userRole, setUserRole] = useState(() => {
+  const [session, setSession] = useState(() => {
     if (typeof window === "undefined") return null;
-    return window.localStorage.getItem("opsradar_user_role");
+    try {
+      const raw = window.localStorage.getItem("opsradar_session");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
   });
-  const [userName, setUserName] = useState(() => {
-    if (typeof window === "undefined") return "";
-    return window.localStorage.getItem("opsradar_user_name") || "";
-  });
-  const hasStaticShell = typeof document !== "undefined" && document.querySelector(".sidebar .sb-logo-name");
+
+  const hasStaticShell =
+    typeof document !== "undefined" &&
+    document.querySelector(".sidebar .sb-logo-name");
 
   useEffect(() => {
-    document.body.classList.toggle("opsradar-login-required", !userRole);
+    document.body.classList.toggle("opsradar-login-required", !session);
     return () => document.body.classList.remove("opsradar-login-required");
-  }, [userRole]);
+  }, [session]);
 
-  function handleLogin(role) {
-    const name = role === "admin" ? LABELS.adminName : LABELS.memberName;
-    window.localStorage.setItem("opsradar_user_role", role);
-    window.localStorage.setItem("opsradar_user_name", name);
-    setUserRole(role);
-    setUserName(name);
+  function handleLogin(data) {
+    const sessionData = {
+      token: data.access_token,
+      user: data.user,
+    };
+    window.localStorage.setItem("opsradar_session", JSON.stringify(sessionData));
+    window.localStorage.setItem("opsradar_user_role", data.user.role);
+    window.localStorage.setItem("opsradar_user_name", data.user.name);
+    setSession(sessionData);
   }
 
   function handleLogout() {
+    window.localStorage.removeItem("opsradar_session");
     window.localStorage.removeItem("opsradar_user_role");
     window.localStorage.removeItem("opsradar_user_name");
-    setUserRole(null);
-    setUserName("");
+    setSession(null);
   }
 
-  if (!userRole) return <Login onLogin={handleLogin} />;
+  if (!session) return <Login onLogin={handleLogin} />;
+
+  const { user } = session;
+  const roleLabel = user.role === "admin" ? "관리자" : "팀원";
 
   if (hasStaticShell) {
     return (
-      <div className="app-session-control" aria-label={LABELS.sessionLabel}>
-        <span>{userName || LABELS.user}</span>
-        <span>{userRole === "admin" ? LABELS.admin : LABELS.member}</span>
-        <button type="button" onClick={handleLogout}>{LABELS.logout}</button>
+      <div className="app-session-control" aria-label="현재 로그인 세션">
+        <span>{user.name}</span>
+        <span>{roleLabel}</span>
+        <button type="button" onClick={handleLogout}>
+          로그아웃
+        </button>
       </div>
     );
   }
@@ -59,9 +59,11 @@ function App() {
   return (
     <main style={{ padding: "24px", fontFamily: "system-ui, sans-serif" }}>
       <h1>OpsRadar frontend shell</h1>
-      <p>{LABELS.staticShell}</p>
-      <p>{LABELS.staticHelp}</p>
-      <button type="button" onClick={handleLogout}>{LABELS.logout}</button>
+      <p>정적 OpsRadar 화면은 public/index.html에서 렌더링됩니다.</p>
+      <p>화면이 비어 보이면 public/index.html 또는 정적 스크립트 경로를 확인하세요.</p>
+      <button type="button" onClick={handleLogout}>
+        로그아웃
+      </button>
     </main>
   );
 }

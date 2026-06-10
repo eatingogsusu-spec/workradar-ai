@@ -37,11 +37,11 @@ def test_calendar_adapter_preserves_selected_year_and_month() -> None:
 
 
 def test_chat_ui_calls_backend_api() -> None:
-    frontend_app = read("frontend/public/static/js/app.js")
-    index = read("frontend/public/index.html")
+    frontend_app = read("frontend/js/app.js")
+    public_index = read("frontend/public/index.html")
 
     assert "window.opsRadarApi.request('/chat'" in frontend_app
-    assert '<script src="/static/js/api-integration.js"></script>' in index
+    assert '"/static/js/api-integration.js"' in public_index
 
 
 def test_frontend_api_uses_same_origin_by_default() -> None:
@@ -53,14 +53,16 @@ def test_frontend_api_uses_same_origin_by_default() -> None:
 def test_calendar_state_is_exposed_to_api_adapter() -> None:
     adapter = read("frontend/public/static/js/api-integration.js")
 
-    assert "if (!window.G) return;" in adapter
-    assert "window.G.calEvents = Array.from(byDay.values());" in adapter
+    assert 'request("/calendar")' in adapter
+    assert 'request("/calendar/"' in adapter
+    assert "loadCalendar: loadCalendarFromAPI" in adapter
 
 
 def test_react_frontend_runtime_settings_are_configurable() -> None:
     config = read("app/core/config.py")
     main = read("app/main.py")
     env_example = read(".env.example")
+    package_json = read("frontend/package.json")
     public_index = read("frontend/public/index.html")
 
     assert "FRONTEND_ORIGINS" in config
@@ -69,6 +71,7 @@ def test_react_frontend_runtime_settings_are_configurable() -> None:
     assert "allow_origins=list(settings.FRONTEND_ORIGINS)" in main
     assert "http://127.0.0.1:8002" in env_example
     assert "http://127.0.0.1:5173" in env_example
+    assert '"react-scripts start"' in package_json
     assert 'window.location.port === "8002"' in public_index
 
 
@@ -176,6 +179,15 @@ def test_ai_pipeline_is_integrated_under_opsradar2_app() -> None:
     assert '@router.post("/extract")' in chat
 
 
+def test_chat_member_matching_uses_database_members() -> None:
+    chat = read("app/api/v1/endpoints/chat.py")
+
+    assert "TEAM_MEMBERS" not in chat
+    assert "def _load_team_members" in chat
+    assert "FROM project_members pm" in chat
+    assert "_local_answer(payload.message, operational_context, team_members)" in chat
+
+
 def test_document_upload_has_size_limit_and_nonblocking_copy() -> None:
     config = read("app/core/config.py")
     service = read("app/services/document_service.py")
@@ -209,3 +221,23 @@ def test_member_actions_use_pydantic_payloads() -> None:
     assert "body: MemberCreate" in members
     assert "body: MemberUpdate" in members
     assert "model_dump(exclude_unset=True, exclude_none=True)" in members
+
+
+def test_todo_and_issue_actions_use_pydantic_payloads() -> None:
+    todo_schema = read("app/schemas/todo.py")
+    issue_schema = read("app/schemas/issue.py")
+    todos = read("app/api/v1/endpoints/todos.py")
+    issues = read("app/api/v1/endpoints/issues.py")
+
+    assert "class TodoCreate" in todo_schema
+    assert "class TodoUpdate" in todo_schema
+    assert 'ConfigDict(extra="forbid")' in todo_schema
+    assert "class IssueCreate" in issue_schema
+    assert "class IssueUpdate" in issue_schema
+    assert 'ConfigDict(extra="forbid")' in issue_schema
+    assert "body: TodoCreate" in todos
+    assert "body: TodoUpdate" in todos
+    assert "body: IssueUpdate" in issues
+    assert "body: TodoCreate" in issues
+    assert "body: dict" not in todos
+    assert "body: dict" not in issues
