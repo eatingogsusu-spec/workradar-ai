@@ -1,6 +1,5 @@
 """Issue API."""
 
-import asyncio
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -34,10 +33,8 @@ async def get_issues(
     service = IssueService(IssueRepository(db))
     normalized_status = None if status in (None, "all") else status
     offset = (page - 1) * limit
-    issues, total = await asyncio.gather(
-        service.list_issues(status=normalized_status, risk_level=risk_level, project_id=project_id, limit=limit, offset=offset),
-        service.count_issues(status=normalized_status, risk_level=risk_level, project_id=project_id),
-    )
+    issues = await service.list_issues(status=normalized_status, risk_level=risk_level, project_id=project_id, limit=limit, offset=offset)
+    total = await service.count_issues(status=normalized_status, risk_level=risk_level, project_id=project_id)
     return {
         "issues": issues,
         "total": total,
