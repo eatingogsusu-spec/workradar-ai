@@ -61,6 +61,7 @@ async def create_upload_record(
     file: UploadFile,
     project_id: uuid.UUID,
     doc_type: str | None = None,
+    uploaded_by_member_id: uuid.UUID | None = None,
 ) -> tuple[Document, Path]:
     document_id = uuid.uuid4()
     safe_name = Path(file.filename or "upload.txt").name
@@ -72,6 +73,7 @@ async def create_upload_record(
     document = Document(
         id=document_id,
         project_id=project_id,
+        uploaded_by_member_id=uploaded_by_member_id,
         file_name=safe_name,
         file_type=normalize_db_file_type(doc_type or infer_doc_type(safe_name), safe_name),
         mime_type=file.content_type,
@@ -190,8 +192,9 @@ async def _create_extracted_items(
     source_chunk_id = chunk_rows[0].id if chunk_rows else None
 
     for item in extracted.get("todos", [])[:20]:
-        title = item.get("content") or item.get("title")
+        title = item.get("title") or item.get("content")
         if title:
+            description = item.get("description") or item.get("content") or str(title)
             db.add(
                 Todo(
                     id=uuid.uuid4(),
@@ -199,7 +202,7 @@ async def _create_extracted_items(
                     source_document_id=document.id,
                     source_chunk_id=source_chunk_id,
                     title=str(title)[:500],
-                    description=str(title),
+                    description=str(description),
                     status="pending",
                     priority=item.get("priority") or "medium",
                     source_type="ai",

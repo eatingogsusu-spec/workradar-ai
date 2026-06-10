@@ -45,3 +45,73 @@ def test_authenticated_runtime_loads_all_todos_for_local_tabs():
     assert 'localStorage.getItem("opsradar_session")' in adapter
     assert "headers.Authorization = `Bearer ${token}`" in adapter
     assert 'request("/todos?limit=500")' in adapter
+
+
+def test_role_workflow_supports_assignees_rejection_and_member_permissions():
+    workflow = read("frontend/public/static/js/role-workflow-enhancements.js")
+    index = read("frontend/public/index.html")
+
+    assert "담당자는 최소 한 명이어야 합니다." in workflow
+    assert "editAssigneeEditor" in workflow
+    assert "tcAssigneeEditor" in workflow
+    assert "todoRejectReasonModal" in workflow
+    assert "showTodoRejectionReason" in workflow
+    assert "wr-team-member" in workflow
+    assert "extraAssignees(todo).includes(name)" in workflow
+    assert "/static/js/role-workflow-enhancements.js" in index
+
+
+def test_analysis_approval_center_and_calendar_preferences_are_available():
+    workflow = read("frontend/public/static/js/role-workflow-enhancements.js")
+
+    assert "분석 승인 관리" in workflow
+    assert "승인 대기함" in workflow
+    assert "승인 완료함" in workflow
+    assert "captureAnalysisApproval" in workflow
+    assert "calendarPreferencePanel" in workflow
+    assert "applyCalendarPreferences" in workflow
+    assert "analysisApprovalCenter" in workflow
+    assert "팀장에게 전송" in workflow
+    assert "discardCurrentAnalysis" in workflow
+    assert 'item.status = "done"' in workflow
+    assert "refreshApprovalRecordsFromServer" in workflow
+
+
+def test_document_upload_tracks_uploader_for_shared_approval_center():
+    endpoint = read("app/api/v1/endpoints/documents.py")
+    service = read("app/services/document_service.py")
+
+    assert "uploaded_by_member_id = await _resolve_uploaded_by_member_id" in endpoint
+    assert '"uploaded_by": document["uploaded_by"]' in endpoint
+    assert '"pending_todo_count"' in endpoint
+    assert "uploaded_by_member_id=uploaded_by_member_id" in service
+
+
+def test_personal_todo_counts_and_clean_detail_are_available():
+    workflow = read("frontend/public/static/js/role-workflow-enhancements.js")
+
+    assert "updatePersonalTodoCounts" in workflow
+    assert "extraAssignees(todo).includes(memberName())" in workflow
+    assert "AI 분석 근거" in workflow
+    assert "wr-todo-source" in workflow
+    assert "todo.recommendedAssignee || todo.assignee" in workflow
+
+
+def test_calendar_month_navigation_replaces_ai_prediction_panel():
+    workflow = read("frontend/public/static/js/role-workflow-enhancements.js")
+    styles = read("frontend/public/static/css/role-workflow-enhancements.css")
+
+    assert 'insight.id = "wrCalendarMonthNav"' in workflow
+    assert "calPrevBtn" in workflow
+    assert "calMonthTitle" in workflow
+    assert "calNextBtn" in workflow
+    assert ".wr-calendar-month-nav" in styles
+
+
+def test_ai_extraction_separates_todo_title_and_description():
+    summarizer = read("app/ai/summarizer.py")
+    document_service = read("app/services/document_service.py")
+
+    assert '"title": "해야 할 일"' in summarizer
+    assert '"description": "업무 수행 방법과 완료 기준"' in summarizer
+    assert 'description = item.get("description") or item.get("content") or str(title)' in document_service

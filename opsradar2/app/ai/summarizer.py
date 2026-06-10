@@ -77,7 +77,7 @@ async def extract_todos(document_text: str) -> dict:
 
 형식:
 {{
-  "todos": [{{"content": "", "assignee": null, "due_date": null}}],
+  "todos": [{{"title": "해야 할 일", "description": "업무 수행 방법과 완료 기준", "assignee": null, "due_date": null}}],
   "decisions": [""],
   "issues": [{{"title": "", "description": "", "severity": "medium"}}]
 }}
@@ -113,13 +113,22 @@ def _normalize_extraction(data: dict[str, Any]) -> dict:
     normalized_todos = []
     for item in todos[:20]:
         if isinstance(item, str) and not _is_completed_statement(item):
-            normalized_todos.append({"content": item, "assignee": None, "due_date": None})
+            normalized_todos.append(
+                {
+                    "title": str(item)[:160],
+                    "description": str(item),
+                    "assignee": None,
+                    "due_date": None,
+                }
+            )
         elif isinstance(item, dict):
-            content = item.get("content") or item.get("title")
-            if content and not _is_completed_statement(str(content)):
+            title = item.get("title") or item.get("content")
+            description = item.get("description") or item.get("content") or title
+            if title and not _is_completed_statement(f"{title} {description}"):
                 normalized_todos.append(
                     {
-                        "content": str(content),
+                        "title": str(title)[:160],
+                        "description": str(description),
                         "assignee": item.get("assignee"),
                         "due_date": item.get("due_date") or item.get("due_at"),
                     }
@@ -205,7 +214,15 @@ def _heuristic_extract(text: str) -> dict:
     issues = []
     for line in lines:
         if not _is_completed_statement(line) and any(token in line for token in ("해야", "필요", "담당", "마감", "TODO", "todo")):
-            todos.append({"content": line[:300], "assignee": None, "due_date": None})
+            title = re.sub(r"^(?:[-*•]\s*)?(?:todo|할\s*일|액션\s*아이템)\s*[:：-]?\s*", "", line, flags=re.IGNORECASE)
+            todos.append(
+                {
+                    "title": title[:160],
+                    "description": line[:300],
+                    "assignee": None,
+                    "due_date": None,
+                }
+            )
         if any(token in line for token in ("결정", "확정", "합의")):
             decisions.append(line[:300])
         if not _is_resolved_issue(line) and any(token in line for token in ("이슈", "문제", "blocked", "Blocked", "리스크", "주의 필요")):
