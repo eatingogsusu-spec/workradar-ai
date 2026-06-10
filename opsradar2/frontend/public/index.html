@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OpsRadar AI — Clean Version</title>
+<title>WorkRader AI - Clean Version</title>
 <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
@@ -11,13 +11,17 @@
 <link rel="stylesheet" href="/static/css/layout.css">
 <link rel="stylesheet" href="/static/css/components.css">
 </head>
-<body><script>window.OPSRADAR_API_BASE = window.OPSRADAR_API_BASE || "/api/v1";</script>
-<div style="display:flex;flex:1;overflow:hidden">
+
+<body><script>
+window.OPSRADAR_API_BASE = window.location.port === "8002"
+  ? "/api/v1"
+  : `${window.location.protocol}//${window.location.hostname}:8002/api/v1`;
+</script>
 
 <!-- ══ 사이드바 ══ -->
 <div class="sidebar">
   <div class="sb-logo">
-    <div class="sb-logo-name">OpsRadar</div>
+    <div class="sb-logo-name">WorkRader</div>
     <div class="sb-logo-tag">운영 인텔리전스</div>
   </div>
   <div class="sb-nav">
@@ -43,10 +47,11 @@
   </div>
   <div class="sb-footer">
     <div style="display:flex;align-items:center;gap:8px">
-      <div class="sb-avatar">희진</div>
+      <div class="sb-avatar" id="sidebarUserAvatar">김</div>
       <div>
-        <div style="font-size:11px;color:var(--text);font-weight:500">관리자</div>
-        <div style="font-size:10px;color:var(--text3)">PM · 팀장</div>
+        <div id="sidebarUserName" style="font-size:11px;color:var(--text);font-weight:500">김희진</div>
+        <div id="sidebarUserRole" style="font-size:11px;color:var(--text);font-weight:500">관리자</div>
+        <div id="sidebarUserDescription" style="font-size:10px;color:var(--text3)">PM · 팀장</div>
       </div>
     </div>
   </div>
@@ -92,7 +97,7 @@
 
       <section>
         <div class="ops-section-heading">
-          <div><i class="ti ti-alert-triangle"></i> High Risk 이슈</div>
+          <div><i class="ti ti-alert-triangle"></i> 미해결 이슈</div>
           <button class="ops-link-btn" onclick="nav('issues')">전체 이슈 보기 <i class="ti ti-arrow-right"></i></button>
         </div>
         <div class="ops-risk-grid" id="db-high-risk-grid">
@@ -321,6 +326,8 @@
       <div class="tbtn" id="todoBulkApproveBtn" onclick="bulkApprove()"><i class="ti ti-checks"></i> 체크항목 전체승인</div>
       <div class="tbtn" id="todoBulkRejectBtn" onclick="bulkReject()" style="color:var(--danger)"><i class="ti ti-ban"></i> 체크항목 반려</div>
       <div class="tbtn" id="todoBulkUndoBtn" onclick="bulkUndoApprove()" style="display:none"><i class="ti ti-rotate-2"></i> 체크항목 되돌리기</div>
+      <div class="tbtn" id="todoBulkCompleteBtn" onclick="bulkCompleteTodos()" style="display:none;color:var(--success)"><i class="ti ti-check"></i> 체크항목 완료</div>
+      <div class="tbtn" id="todoBulkDeleteBtn" onclick="bulkDeleteTodos()" style="display:none;color:var(--danger)"><i class="ti ti-trash"></i> 선택항목 영구삭제</div>
     </div>
   </div>
   <div class="body-wrap">
@@ -713,6 +720,84 @@
     </section>
   </div>
 </div>
+
+<div class="screen legacy-settings-screen" id="s-settings-legacy" hidden>
+  <div class="topbar">
+    <div class="topbar-title">설정</div>
+    <span class="badge b-accent">Front-end only</span>
+  </div>
+  <div class="content settings-content">
+    <section class="settings-panel">
+      <div class="settings-card-inner">
+        <div class="settings-panel-head">
+          <div>
+            <div class="settings-eyebrow">Profile</div>
+            <h3>계정 프로필</h3>
+            <p class="settings-panel-sub">현재 접속한 사용자와 운영 권한 정보를 확인합니다.</p>
+          </div>
+          <span class="settings-status-badge" id="settingsLoginStatus">로그인됨</span>
+        </div>
+        <div class="settings-profile-card">
+          <div class="settings-avatar" id="settingsUserAvatar">관</div>
+          <div class="settings-profile-main">
+            <div class="settings-profile-name" id="settingsUserName">관리자</div>
+            <div class="settings-profile-meta">
+              <span class="settings-role-badge" id="settingsUserRole">관리자 · Admin</span>
+              <span class="settings-status-badge" id="settingsUserState">로그인됨</span>
+            </div>
+          </div>
+        </div>
+        <div class="settings-info-strip">
+          <div class="settings-info-card"><span>사용자</span><strong id="settingsUserNameMirror">관리자</strong></div>
+          <div class="settings-info-card"><span>역할</span><strong id="settingsUserRoleMirror">Admin</strong></div>
+          <div class="settings-info-card"><span>세션</span><strong id="settingsUserStateMirror">Active</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-panel">
+      <div class="settings-card-inner">
+        <div class="settings-panel-head">
+          <div>
+            <div class="settings-eyebrow">Appearance</div>
+            <h3>화면 테마</h3>
+            <p class="settings-panel-sub">운영 관제 화면의 밝기와 대비를 선택합니다.</p>
+          </div>
+          <span class="settings-current-theme" id="settingsThemeLabel">Dark</span>
+        </div>
+        <div class="settings-appearance-row">
+          <div class="settings-appearance-copy">
+            <strong>인터페이스 모드</strong>
+            <p>선택한 테마는 브라우저 localStorage에 저장되며 새로고침 후에도 유지됩니다.</p>
+          </div>
+          <div class="settings-pill-toggle" role="group" aria-label="테마 선택">
+            <button type="button" class="settings-pill-option" data-theme-choice="dark" onclick="setOpsRadarTheme('dark')"><i class="ti ti-moon"></i> Dark</button>
+            <button type="button" class="settings-pill-option" data-theme-choice="light" onclick="setOpsRadarTheme('light')"><i class="ti ti-sun"></i> Light</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="settings-panel danger-zone">
+      <div class="settings-card-inner">
+        <div class="settings-panel-head">
+          <div>
+            <div class="settings-eyebrow">Session</div>
+            <h3>위험 액션</h3>
+            <p class="settings-panel-sub">현재 브라우저에 저장된 로그인 정보를 정리합니다.</p>
+          </div>
+        </div>
+        <div class="settings-logout-row">
+          <div>
+            <strong>현재 세션 종료</strong>
+            <p>프론트 localStorage의 access_token, role, user 정보를 제거합니다. 백엔드/DB에는 영향을 주지 않습니다.</p>
+          </div>
+          <button type="button" class="settings-logout-btn" onclick="logout()"><i class="ti ti-logout"></i> 로그아웃</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
 </div><!-- /main -->
 </div>
 
@@ -737,7 +822,7 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
     <div class="modal-actions"><div class="tbtn" onclick="closeModal('uploadGuideModal')">닫기</div><div class="tbtn primary" onclick="closeModal('uploadGuideModal');retryUpload()">다시 업로드</div></div>
   </div>
 </div><div class="modal-overlay" id="todoCreateModal">
-  <div class="modal slide-up">
+  <div class="modal slide-up" style="width:min(620px,92vw)">
     <div class="modal-title">대응 Todo 생성</div>
     <div class="modal-sub" id="tcModalSub"></div>
     <div style="background:var(--danger-soft);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px;color:var(--danger);margin-bottom:12px;display:flex;align-items:flex-start;gap:6px"><i class="ti ti-alert-triangle" style="font-size:13px;flex-shrink:0"></i><div id="tcModalFrom"></div></div>
@@ -843,6 +928,7 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
     <div style="margin-bottom:8px"><div class="form-label">제목</div><input class="form-input" id="editTitle" type="text"></div>
     <div style="margin-bottom:8px"><div class="form-label">업무내용</div><textarea class="form-input" id="editDescription" rows="3" style="resize:vertical" placeholder="간략한 업무내용"></textarea></div>
     <div><div class="form-label">담당자</div><select class="form-input" id="editAssignee"><option>이성우</option><option>박주원</option><option>김희진</option><option>김성호</option><option>관리자</option></select></div>
+    <div style="margin-top:10px"><div class="form-label">마감일 캘린더</div><input class="form-input" id="editDueDate" type="date"><div id="editDueHint" style="font-size:10px;color:var(--accent);margin-top:5px"></div></div>
     <div class="modal-actions"><div class="tbtn" onclick="closeModal('editModal')">취소</div><div class="tbtn primary" onclick="saveEdit()">저장</div></div>
   </div>
 </div>
@@ -925,5 +1011,6 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
 <script src="/static/js/assistant.js"></script>
 <script src="/static/js/settings.js"></script>
 <script src="/static/js/ops-workflow-enhancements.js"></script>
+<script src="/static/js/todo-calendar-enhancements.js"></script>
 <div id="root"></div></body>
 </html>

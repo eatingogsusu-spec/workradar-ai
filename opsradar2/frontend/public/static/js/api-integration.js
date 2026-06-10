@@ -77,6 +77,7 @@
       assignee: todo.assignee || null,
       priority: todo.priority || "medium",
       confidence: todo.confidence == null ? null : Number(todo.confidence),
+      dueDate: todo.due_at ? String(todo.due_at).slice(0, 10) : null,
       status: todo.approval_status === "rejected" ? "rejected" : apiStatusToUi(todo.status),
       type: todo.source || "manual",
       chunk: null,
@@ -353,7 +354,7 @@
       title: type === "monthly" ? "월간 운영 보고서" : "주간 운영 보고서",
       period: `${report.start_date || report.week_start || "-"} ~ ${report.end_date || report.week_end || "-"}`,
       createdAt: report.created_at,
-      author: "OpsRadar",
+      author: "WorkRader",
       status: "draft",
       issues: 0,
       doneTodos: 0,
@@ -915,7 +916,7 @@
     patchDocumentAnalysis();
     window.opsRadarApi.reload().then((results) => {
       const rejected = results.filter((r) => r.status === "rejected");
-      if (rejected.length) console.warn("Some OpsRadar API loads failed", rejected);
+      if (rejected.length) console.warn("Some WorkRader API loads failed", rejected);
     });
   }
 

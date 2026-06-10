@@ -92,7 +92,7 @@
 
       <section>
         <div class="ops-section-heading">
-          <div><i class="ti ti-alert-triangle"></i> High Risk 이슈</div>
+          <div><i class="ti ti-alert-triangle"></i> 미해결 이슈</div>
           <button class="ops-link-btn" onclick="nav('issues')">전체 이슈 보기 <i class="ti ti-arrow-right"></i></button>
         </div>
         <div class="ops-risk-grid" id="db-high-risk-grid">
@@ -321,6 +321,8 @@
       <div class="tbtn" id="todoBulkApproveBtn" onclick="bulkApprove()"><i class="ti ti-checks"></i> 체크항목 전체승인</div>
       <div class="tbtn" id="todoBulkRejectBtn" onclick="bulkReject()" style="color:var(--danger)"><i class="ti ti-ban"></i> 체크항목 반려</div>
       <div class="tbtn" id="todoBulkUndoBtn" onclick="bulkUndoApprove()" style="display:none"><i class="ti ti-rotate-2"></i> 체크항목 되돌리기</div>
+      <div class="tbtn" id="todoBulkCompleteBtn" onclick="bulkCompleteTodos()" style="display:none;color:var(--success)"><i class="ti ti-check"></i> 체크항목 완료</div>
+      <div class="tbtn" id="todoBulkDeleteBtn" onclick="bulkDeleteTodos()" style="display:none;color:var(--danger)"><i class="ti ti-trash"></i> 선택항목 영구삭제</div>
     </div>
   </div>
   <div class="body-wrap">
@@ -737,7 +739,7 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
     <div class="modal-actions"><div class="tbtn" onclick="closeModal('uploadGuideModal')">닫기</div><div class="tbtn primary" onclick="closeModal('uploadGuideModal');retryUpload()">다시 업로드</div></div>
   </div>
 </div><div class="modal-overlay" id="todoCreateModal">
-  <div class="modal slide-up">
+  <div class="modal slide-up" style="width:min(620px,92vw)">
     <div class="modal-title">대응 Todo 생성</div>
     <div class="modal-sub" id="tcModalSub"></div>
     <div style="background:var(--danger-soft);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px;color:var(--danger);margin-bottom:12px;display:flex;align-items:flex-start;gap:6px"><i class="ti ti-alert-triangle" style="font-size:13px;flex-shrink:0"></i><div id="tcModalFrom"></div></div>
@@ -843,6 +845,7 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
     <div style="margin-bottom:8px"><div class="form-label">제목</div><input class="form-input" id="editTitle" type="text"></div>
     <div style="margin-bottom:8px"><div class="form-label">업무내용</div><textarea class="form-input" id="editDescription" rows="3" style="resize:vertical" placeholder="간략한 업무내용"></textarea></div>
     <div><div class="form-label">담당자</div><select class="form-input" id="editAssignee"><option>이성우</option><option>박주원</option><option>김희진</option><option>김성호</option><option>관리자</option></select></div>
+    <div style="margin-top:10px"><div class="form-label">마감일 캘린더</div><input class="form-input" id="editDueDate" type="date"><div id="editDueHint" style="font-size:10px;color:var(--accent);margin-top:5px"></div></div>
     <div class="modal-actions"><div class="tbtn" onclick="closeModal('editModal')">취소</div><div class="tbtn primary" onclick="saveEdit()">저장</div></div>
   </div>
 </div>
@@ -925,5 +928,6 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
 <script src="/static/js/assistant.js"></script>
 <script src="/static/js/settings.js"></script>
 <script src="/static/js/ops-workflow-enhancements.js"></script>
+<script src="/static/js/todo-calendar-enhancements.js"></script>
 </body>
 </html>

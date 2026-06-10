@@ -2696,3 +2696,184 @@ body[data-skin="light"] .toast{background:#172033;color:white}
 .skin-switcher button{border:0;background:transparent;color:var(--text-tertiary);font-size:11px;font-weight:800;padding:7px 10px;border-radius:999px;cursor:pointer;line-height:1}
 .skin-switcher button.active{background:var(--accent-blue);color:#fff}.skin-switcher button:hover:not(.active){background:var(--bg-tertiary);color:var(--text-primary)}
 @media(max-width:760px){.skin-switcher{right:12px;bottom:12px}.skin-switcher button{padding:7px 9px}}
+/* Settings page stability: keep cards content-sized and remove floating shortcuts that overlap the page. */
+#s-settings {
+  min-height: 0;
+}
+
+#s-settings .content.settings-content {
+  box-sizing: border-box;
+  align-content: start;
+  max-width: 1040px;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 72px;
+}
+
+#s-settings .settings-panel,
+#s-settings .settings-card-inner,
+#s-settings .settings-profile-card,
+#s-settings .settings-appearance-row,
+#s-settings .settings-logout-row,
+#s-settings .settings-info-card {
+  height: auto;
+  min-height: 0;
+  overflow: visible;
+}
+
+#s-settings .settings-panel {
+  display: block;
+}
+
+#s-settings .settings-panel-sub,
+#s-settings .settings-appearance-copy p,
+#s-settings .settings-note,
+#s-settings .settings-logout-row p {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+#s-settings .settings-logout-row {
+  flex-wrap: wrap;
+}
+
+#floatAI {
+  display: none !important;
+}
+
+/* Settings page repair: keep the page as a normal vertical stack. */
+#s-settings.screen {
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+#s-settings .content.settings-content {
+  flex: 1 1 auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 24px !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 1440px !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  padding: 24px 32px 88px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+#s-settings .settings-panel {
+  position: relative !important;
+  flex: 0 0 auto !important;
+  display: block !important;
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  overflow: visible !important;
+}
+
+#s-settings .settings-card-inner,
+#s-settings .settings-panel-head,
+#s-settings .settings-profile-card,
+#s-settings .settings-appearance-row,
+#s-settings .settings-logout-row,
+#s-settings .settings-info-card {
+  position: relative !important;
+  box-sizing: border-box !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+#s-settings .settings-panel-head {
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+}
+
+#s-settings .settings-card-inner {
+  display: block !important;
+}
+
+#s-settings .settings-info-strip {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 12px !important;
+  margin-top: 16px !important;
+  min-width: 0 !important;
+}
+
+#s-settings .settings-profile-card,
+#s-settings .settings-appearance-row,
+#s-settings .settings-logout-row {
+  min-width: 0 !important;
+}
+
+#s-settings .settings-logout-row {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  flex-wrap: wrap !important;
+}
+
+#s-settings .settings-logout-row > div {
+  flex: 1 1 360px !important;
+  min-width: 240px !important;
+}
+
+#s-settings .settings-logout-btn,
+#s-settings .settings-current-theme {
+  flex: 0 0 auto !important;
+}
+
+#s-settings .settings-panel-sub,
+#s-settings .settings-appearance-copy p,
+#s-settings .settings-note,
+#s-settings .settings-logout-row p,
+#s-settings .settings-info-card strong {
+  white-space: normal !important;
+  overflow: visible !important;
+  overflow-wrap: anywhere !important;
+  text-overflow: clip !important;
+}
+
+.legacy-settings-screen,
+#floatAI,
+.float-ai {
+  display: none !important;
+  pointer-events: none !important;
+}
+
+@media (max-width: 760px) {
+  #s-settings .content.settings-content {
+    max-width: 100% !important;
+    padding: 16px 14px 80px !important;
+    gap: 18px !important;
+  }
+
+  #s-settings .settings-info-strip {
+    grid-template-columns: 1fr !important;
+  }
+
+  #s-settings .settings-profile-card,
+  #s-settings .settings-appearance-row,
+  #s-settings .settings-logout-row {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+
+  #s-settings .settings-logout-row > div {
+    min-width: 0 !important;
+  }
+}

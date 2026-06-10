@@ -105,7 +105,7 @@ function getHandoffPreviewData(type){
     onboarding: {
       title:'신규 입사자 온보딩 브리핑', target:'신규 입사자 온보딩',
       sections:[
-        ['프로젝트 개요','OpsRadar는 운영 로그, Todo, Risk, Calendar, 인수인계 문맥을 AI가 연결해 운영 상태를 추론하는 SaaS형 운영 인텔리전스 시스템입니다.'],
+        ['프로젝트 개요','WorkRader는 운영 로그, Todo, Risk, Calendar, 인수인계 문맥을 AI가 연결해 운영 상태를 추론하는 SaaS형 운영 인텔리전스 시스템입니다.'],
         ['현재 진행 업무','결제 API 안정화, 등록된 우선 작업 없음, 운영 로그 기반 Todo 추출 정확도 개선이 진행 중입니다.'],
         ['최근 주요 결정','High Risk는 Dashboard에서 먼저 확인하고, AI 생성 Todo는 승인 후 실행 관리로 넘기는 흐름을 유지합니다.'],
         ['반복 발생 이슈','운영 이벤트, 운영 리스크, Risk 데이터 없음가 반복적으로 관찰됩니다.'],
@@ -852,8 +852,105 @@ function confirmCloseAnalysisTodoModal(ok){
   if(ok){document.getElementById('analysisTodoCloseConfirm').style.display='none';closeModal('analysisTodoModal');return;}
   document.getElementById('analysisTodoCloseConfirm').style.display='none';
 }
+function openDashboardTodoTab(tabName){
+  const tabMap={ai:'ai',pending:'ai',inprogress:'inprogress',progress:'inprogress',done:'done',completed:'done',rejected:'rejected'};
+  const targetTab=tabMap[tabName]||'ai';
+  nav('todo');
+  switchTodoTab(targetTab);
+}
+function analysisRiskKey(item){return String(item?.apiId||item?.id||item?.title||'');}
+function getAnalysisRiskItems(){return Array.isArray(G.analysisRiskReview)?G.analysisRiskReview:[];}
+function seedAnalysisRiskItems(){
+  if(getAnalysisRiskItems().length)return;
+  const source=Array.isArray(issues)&&issues.length?issues.filter(item=>item.type!=='resolved'):[];
+  G.analysisRiskReview=source.map(item=>({...item}));
+}
+function openAnalysisRiskReview(){
+  seedAnalysisRiskItems();
+  const items=getAnalysisRiskItems();
+  G.analysisRiskChecked=G.analysisRiskChecked||{};
+  items.forEach(item=>{const key=analysisRiskKey(item);if(G.analysisRiskChecked[key]===undefined)G.analysisRiskChecked[key]=true;});
+  const confirmEl=document.getElementById('analysisRiskCloseConfirm');
+  if(confirmEl)confirmEl.style.display='none';
+  const modal=document.getElementById('analysisRiskModal');
+  if(!modal){showToast('리스크 검토 기능은 현재 연결 준비 중입니다.','info');return;}
+  modal.classList.add('show');
+  renderAnalysisRiskReview();
+}
+function renderAnalysisRiskReview(){
+  const list=document.getElementById('analysisRiskList');if(!list)return;
+  const items=getAnalysisRiskItems();
+  if(!items.length){
+    list.innerHTML='<div style="padding:24px;text-align:center;color:var(--text3);font-size:12px">검토할 Risk 후보가 없습니다. 운영 로그 분석 후 다시 확인해주세요.</div>';
+    updateAnalysisRiskCheckedCount();
+    return;
+  }
+  list.innerHTML=items.map((item,idx)=>{
+    const key=analysisRiskKey(item);const checked=G.analysisRiskChecked?.[key]!==false;
+    const title=escapeHtml(item.title||`Risk 후보 ${idx+1}`);
+    const severity=escapeHtml(item.severity||item.level||'medium');
+    const desc=escapeHtml(item.reason||item.desc||item.description||'운영 로그 기반으로 검토가 필요한 Risk 후보입니다.');
+    const assignee=escapeHtml(item.assignee||'미지정');
+    return `<div style="border:1px solid var(--border);background:var(--surface2);border-radius:var(--radius-sm);padding:10px;display:grid;grid-template-columns:24px 1fr;gap:10px;align-items:start">
+      <input type="checkbox" ${checked?'checked':''} onchange="toggleAnalysisRiskChecked('${escapeHtml(key)}',this.checked)" style="accent-color:var(--danger);margin-top:5px">
+      <div style="min-width:0">
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px"><strong style="font-size:12px;color:var(--text)">${title}</strong><span class="badge b-danger">${severity}</span><span class="badge b-gray">${assignee}</span></div>
+        <div class="text-content" style="font-size:11px;color:var(--text2);line-height:1.6">${desc}</div>
+      </div>
+    </div>`;
+  }).join('');
+  updateAnalysisRiskCheckedCount();
+}
+function toggleAnalysisRiskChecked(key,checked){G.analysisRiskChecked=G.analysisRiskChecked||{};G.analysisRiskChecked[key]=checked;updateAnalysisRiskCheckedCount();}
+function setAllAnalysisRiskChecked(checked){G.analysisRiskChecked=G.analysisRiskChecked||{};getAnalysisRiskItems().forEach(item=>{G.analysisRiskChecked[analysisRiskKey(item)]=checked;});renderAnalysisRiskReview();}
+function selectedAnalysisRisks(){return getAnalysisRiskItems().filter(item=>G.analysisRiskChecked?.[analysisRiskKey(item)]!==false);}
+function updateAnalysisRiskCheckedCount(){const el=document.getElementById('analysisRiskCheckedCount');if(el)el.textContent=selectedAnalysisRisks().length;}
+function moveCheckedAnalysisRisksToConfirmed(){
+  const selected=selectedAnalysisRisks();
+  if(!selected.length){showToast('선택된 Risk 후보가 없습니다.','info');return;}
+  const selectedKeys=new Set(selected.map(analysisRiskKey));
+  selected.forEach(item=>{
+    const existing=issues.find(issue=>issue.id===item.id||issue.apiId===item.apiId);
+    if(existing){existing.type='confirmed';existing.status=existing.status||'open';}
+    else issues.unshift({...item,id:item.id||Date.now()+Math.random(),type:'confirmed',status:item.status||'open'});
+  });
+  G.analysisRiskReview=getAnalysisRiskItems().filter(item=>!selectedKeys.has(analysisRiskKey(item)));
+  selectedKeys.forEach(key=>delete G.analysisRiskChecked[key]);
+  renderAnalysisRiskReview();
+  renderIssues();
+  showToast(`${selected.length}개 Risk 후보를 확정 이슈로 이동했습니다.`,'success');
+  if(!getAnalysisRiskItems().length)closeModal('analysisRiskModal');
+}
+function deleteCheckedAnalysisRisks(){
+  const selected=selectedAnalysisRisks();
+  if(!selected.length){showToast('선택된 Risk 후보가 없습니다.','info');return;}
+  const selectedKeys=new Set(selected.map(analysisRiskKey));
+  G.analysisRiskReview=getAnalysisRiskItems().filter(item=>!selectedKeys.has(analysisRiskKey(item)));
+  selectedKeys.forEach(key=>delete G.analysisRiskChecked[key]);
+  renderAnalysisRiskReview();
+  showToast(`${selected.length}개 Risk 후보를 삭제했습니다.`,'info');
+  if(!getAnalysisRiskItems().length)closeModal('analysisRiskModal');
+}
+function requestCloseAnalysisRiskModal(){
+  const confirmEl=document.getElementById('analysisRiskCloseConfirm');
+  if(getAnalysisRiskItems().length&&confirmEl){confirmEl.style.display='block';return;}
+  closeModal('analysisRiskModal');
+}
+function confirmCloseAnalysisRiskModal(ok){
+  const confirmEl=document.getElementById('analysisRiskCloseConfirm');
+  if(ok){if(confirmEl)confirmEl.style.display='none';closeModal('analysisRiskModal');return;}
+  if(confirmEl)confirmEl.style.display='none';
+}
 window.openAnalysisTodoReview=openAnalysisTodoReview;
 window.renderAnalysisTodoReview=renderAnalysisTodoReview;
+window.openDashboardTodoTab=openDashboardTodoTab;
+window.openAnalysisRiskReview=openAnalysisRiskReview;
+window.renderAnalysisRiskReview=renderAnalysisRiskReview;
+window.requestCloseAnalysisRiskModal=requestCloseAnalysisRiskModal;
+window.setAllAnalysisRiskChecked=setAllAnalysisRiskChecked;
+window.confirmCloseAnalysisRiskModal=confirmCloseAnalysisRiskModal;
+window.moveCheckedAnalysisRisksToConfirmed=moveCheckedAnalysisRisksToConfirmed;
+window.deleteCheckedAnalysisRisks=deleteCheckedAnalysisRisks;
 // ════════════════════════════════════════════════
 // 흐름 2 — Todo 승인/반려
 // ════════════════════════════════════════════════
@@ -1914,7 +2011,7 @@ function kFlowSteps(steps, activeIndex = -1) {
 function kCtxOnboarding() {
   return `
     <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px;line-height:1.4">신규 입사자<br>온보딩</div>
-    <div style="font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:16px">맥락 없이 투입되면 온보딩에 1~2주 낭비. OpsRadar가 현재 운영 상태를 자동 정리해 줍니다.</div>
+    <div style="font-size:11px;color:var(--text2);line-height:1.7;margin-bottom:16px">맥락 없이 투입되면 온보딩에 1~2주 낭비. WorkRader가 현재 운영 상태를 자동 정리해 줍니다.</div>
     <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">온보딩 진행률</div>
     <div style="height:5px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:4px"><div style="height:100%;width:25%;background:var(--success);border-radius:3px" id="onboardingBar"></div></div>
     <div style="font-size:10px;color:var(--text3);margin-bottom:14px">1/4 단계 완료</div>
@@ -1938,7 +2035,7 @@ function kContentOnboarding() {
       <div class="kcard-body">
         <div class="kb-why"><i class="ti ti-info-circle" style="font-size:13px;flex-shrink:0"></i><div><strong>왜 중요한가:</strong> 프로젝트 전체 맥락을 모르면 개별 업무가 왜 필요한지 이해 못 함.</div></div>
         <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:8px">확인 항목</div>
-        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">OpsRadar 서비스 정의 — 운영 인텔리전스 AI 시스템</div></div>
+        <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">WorkRader 서비스 정의 — 운영 인텔리전스 AI 시스템</div></div>
         <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">기술스택: FastAPI · PostgreSQL · FAISS · React · Azure OpenAI</div></div>
         <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">팀 구성 및 역할 (PM·AI·인프라·백엔드·프론트)</div></div>
         <div class="checklist-item"><div class="cl-box"></div><div class="cl-text" style="flex:1">8주 MVP 로드맵 및 현재 주차 확인</div></div>
@@ -2233,7 +2330,7 @@ const floatCtx = {
   calendar:  { label:'캘린더 기반으로 답변합니다.', qs:['이번 달 리스크 구간 알려줘','부재 일정 추가해줘'] },
   knowledge: { label:'인수인계 센터 기반입니다.', qs:['인수인계 문서 생성해줘','부재자 업무 이관 도와줘'] },
   reports:   { label:'보고서 화면입니다.', qs:['주간 보고서 초안 생성해줘','이번 주 운영 요약해줘'] },
-  chat:      { label:'AI Assistant 화면입니다.', qs:['OpsRadar 사용법 알려줘'] },
+  chat:      { label:'AI Assistant 화면입니다.', qs:['WorkRader 사용법 알려줘'] },
 };
 
 function toggleFloatAI() {
@@ -2669,7 +2766,7 @@ function getHandoffPreviewData(type){
     onboarding: {
       title:'신규 입사자 온보딩 브리핑', target:'신규 입사자 온보딩',
       sections:[
-        ['프로젝트 개요','OpsRadar는 운영 로그, Todo, Risk, Calendar, 인수인계 문맥을 AI가 연결해 운영 상태를 추론하는 SaaS형 운영 인텔리전스 시스템입니다.'],
+        ['프로젝트 개요','WorkRader는 운영 로그, Todo, Risk, Calendar, 인수인계 문맥을 AI가 연결해 운영 상태를 추론하는 SaaS형 운영 인텔리전스 시스템입니다.'],
         ['현재 운영 상태','결제 API 장기 미해결, Blocked Todo 누적, 승인 대기 항목이 핵심 관찰 지점입니다.'],
         ['최근 주요 이슈','운영 이벤트, 운영 리스크, Risk 데이터 없음가 반복적으로 관찰됩니다.'],
         ['우선 확인해야 할 문서','연결된 문서가 없습니다.'],
@@ -2891,22 +2988,53 @@ function initOpsRadarSkin(){
   setOpsRadarTheme(saved);
   updateSettingsPage();
 }
+function clearOpsRadarSession(){
+  try{
+    localStorage.removeItem('opsradar_user_role');
+    localStorage.removeItem('opsradar_user_name');
+    localStorage.removeItem('opsradar_user_id');
+    localStorage.removeItem('role');
+    localStorage.removeItem('user');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('token');
+    localStorage.removeItem('auth');
+    sessionStorage.clear();
+  }catch(e){}
+}
 function getStoredUserInfo(){
   let rawUser = null;
   let rawRole = null;
+  let storedName = null;
   try{
+    storedName = localStorage.getItem('opsradar_user_name');
+    rawRole = localStorage.getItem('opsradar_user_role') || localStorage.getItem('role');
     rawUser = localStorage.getItem('user');
-    rawRole = localStorage.getItem('role');
   }catch(e){}
-  let userName = '관리자';
-  if(rawUser){
+  let userName = storedName || '김희진';
+  if(!storedName && rawUser){
     try{
       const parsed = JSON.parse(rawUser);
       userName = parsed.name || parsed.username || parsed.email || rawUser;
     }catch(e){ userName = rawUser; }
   }
   const isMember = (rawRole || '').toLowerCase() === 'member' || document.getElementById('db-tab-member')?.classList.contains('active');
-  return { userName, role: isMember ? 'Team Member' : 'Admin', roleKo: isMember ? '팀원' : '관리자' };
+  return {
+    userName,
+    role: isMember ? 'Team Member' : 'Admin',
+    roleKo: isMember ? '팀원' : '관리자',
+    roleDescription: isMember ? 'Team Member' : 'PM · 팀장'
+  };
+}
+function updateSidebarUserDisplay(){
+  const info = getStoredUserInfo();
+  const sidebarName = document.getElementById('sidebarUserName');
+  const sidebarRole = document.getElementById('sidebarUserRole');
+  const sidebarDescription = document.getElementById('sidebarUserDescription');
+  const sidebarAvatar = document.getElementById('sidebarUserAvatar');
+  if(sidebarName) sidebarName.textContent = info.userName;
+  if(sidebarRole) sidebarRole.textContent = info.roleKo;
+  if(sidebarDescription) sidebarDescription.textContent = info.roleDescription;
+  if(sidebarAvatar) sidebarAvatar.textContent = (info.userName || 'U').trim().slice(0, 1).toUpperCase();
 }
 function updateSettingsPage(){
   const info = getStoredUserInfo();
@@ -2927,24 +3055,25 @@ function updateSettingsPage(){
   if(userMirror) userMirror.textContent = info.userName;
   if(roleMirror) roleMirror.textContent = info.role;
   if(stateMirror) stateMirror.textContent = 'Active';
+  updateSidebarUserDisplay();
   let theme = 'dark';
   try{ theme = localStorage.getItem('theme') || localStorage.getItem('opsradar-skin') || document.body.dataset.theme || 'dark'; }catch(e){}
   setOpsRadarTheme(theme);
 }
 function logout(){
-  try{
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
-    localStorage.removeItem('user');
-  }catch(e){}
-  updateSettingsPage();
-  alert('로그아웃되었습니다.');
-  nav('dashboard');
+  if(typeof window.__workraderLogout === 'function'){
+    window.__workraderLogout();
+    return;
+  }
+  clearOpsRadarSession();
+  document.body.classList.add('opsradar-login-required');
+  window.location.reload();
 }
 window.setOpsRadarTheme = setOpsRadarTheme;
 window.setOpsRadarSkin = setOpsRadarSkin;
 window.updateSettingsPage = updateSettingsPage;
+window.updateSidebarUserDisplay = updateSidebarUserDisplay;
+window.clearOpsRadarSession = clearOpsRadarSession;
 window.logout = logout;
 const ISSUE_DETAIL_MOCK = {
   'payment-api': {
