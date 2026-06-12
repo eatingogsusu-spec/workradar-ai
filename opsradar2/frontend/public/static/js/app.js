@@ -9,6 +9,9 @@ const G = {
   selectedIssueId: null,
   selectedCalDay: null,
   todoChecked: {},
+  todoSearch: { ai: '', inprogress: '', done: '', rejected: '' },
+  todoSearchField: { ai: 'all', inprogress: 'all', done: 'all', rejected: 'all' },
+  todoPage: { ai: 1, inprogress: 1, done: 1, rejected: 1 },
   editTargetId: null,
   createIssueId: null,
   confirmIssueId: null,
@@ -338,6 +341,7 @@ function renderReportDetail(report){
       </div>
       <div class="report-doc-actions">
         <button class="tbtn" type="button" onclick="editReport('${escapeHtml(report.id)}')"><i class="ti ti-pencil"></i> 수정</button>
+        <button class="tbtn" type="button" style="color:var(--danger)" onclick="deleteReport('${escapeHtml(report.id)}')"><i class="ti ti-trash"></i> 삭제</button>
         <button class="tbtn" type="button" onclick="shareReport('${escapeHtml(report.id)}')"><i class="ti ti-share"></i> 공유</button>
       </div>
     </div>
@@ -955,10 +959,31 @@ window.deleteCheckedAnalysisRisks=deleteCheckedAnalysisRisks;
 // 흐름 2 — Todo 승인/반려
 // ════════════════════════════════════════════════
 function getFilteredTodos(){
-  if(G.currentTodoTab==='ai') return todos.filter(t=>t.status==='pending');
-  if(G.currentTodoTab==='inprogress') return todos.filter(t=>t.status==='approved');
-  if(G.currentTodoTab==='rejected') return todos.filter(t=>t.status==='rejected');
-  return todos.filter(t=>t.status==='done');
+  const statuses={ai:'pending',inprogress:'approved',rejected:'rejected',done:'done'};
+  const query=normalizeText(G.todoSearch?.[G.currentTodoTab]||'').toLowerCase().trim();
+  const field=G.todoSearchField?.[G.currentTodoTab]||'all';
+  return todos.filter(t=>t.status===statuses[G.currentTodoTab])
+    .filter(t=>{
+      if(!query)return true;
+      const values={title:t.title||'',description:t.description||'',assignee:todoAssigneeLabel(t),all:`${t.title||''} ${t.description||''} ${todoAssigneeLabel(t)}`};
+      return String(values[field]||values.all).toLowerCase().includes(query);
+    })
+    .sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||''))||b.id-a.id);
+}
+function todoPageItems(list){const page=Math.max(1,G.todoPage?.[G.currentTodoTab]||1);return list.slice((page-1)*12,page*12);}
+function formatTodoCreatedAt(value){return value?String(value).slice(0,10):'-';}
+function updateTodoDateColumns(){
+  const created=document.getElementById('todoCreatedHeader');const updated=document.getElementById('todoUpdatedHeader');
+  if(created)created.style.display=G.currentTodoTab==='ai'?'none':'table-cell';
+  if(updated)updated.style.display=G.currentTodoTab==='inprogress'?'table-cell':'none';
+}
+function setTodoSearch(value){G.todoSearch[G.currentTodoTab]=value;G.todoPage[G.currentTodoTab]=1;renderTodos();}
+function setTodoSearchField(value){G.todoSearchField[G.currentTodoTab]=value;G.todoPage[G.currentTodoTab]=1;renderTodos();}
+function setTodoPage(page){G.todoPage[G.currentTodoTab]=page;renderTodos();}
+function renderTodoPager(total){
+  const pager=document.getElementById('todoPager');if(!pager)return;
+  const pages=Math.max(1,Math.ceil(total/12));const page=Math.min(G.todoPage[G.currentTodoTab]||1,pages);G.todoPage[G.currentTodoTab]=page;
+  pager.innerHTML=pages<=1?'':Array.from({length:pages},(_,i)=>`<button class="todo-page-btn ${page===i+1?'active':''}" onclick="setTodoPage(${i+1})">${i+1}</button>`).join('');
 }
 
 function cleanTodoTitle(title){return normalizeText(title||'').replace(/^\s*\[[^\]]+\]\s*/,'').trim()||'Untitled';}
@@ -967,18 +992,24 @@ function todoAssigneeLabel(t){return t.assignee||(t.status==='pending'?t.recomme
 
 function renderTodos() {
   const list = getFilteredTodos();
+  const pageList = todoPageItems(list);
   const body = document.getElementById('todoBody');
   const empty = document.getElementById('todoEmpty');
+  const search=document.getElementById('todoSearchInput');if(search&&search.value!==G.todoSearch[G.currentTodoTab])search.value=G.todoSearch[G.currentTodoTab]||'';
+  const field=document.getElementById('todoSearchField');if(field&&field.value!==G.todoSearchField[G.currentTodoTab])field.value=G.todoSearchField[G.currentTodoTab]||'all';
+  updateTodoDateColumns();
+  renderTodoPager(list.length);
   if (!list.length){body.innerHTML='';empty.style.display='block';updateTodoCounts();return;}
   empty.style.display='none';
-  body.innerHTML = list.map(t=>{
+  body.innerHTML = pageList.map(t=>{
     const title=cleanTodoTitle(t.title);
     const brief=briefTodoText(t);
     const assignee=todoAssigneeLabel(t);
     return `<tr class="todo-tr ${G.selectedTodoId===t.id?'selected':''} ${t.status}" onclick="toggleTodoRow(event,${t.id})">
       <td class="todo-check-cell"><input type="checkbox" class="row-chk" id="chk-${t.id}" ${G.todoChecked[t.id]?'checked':''} onclick="event.stopPropagation();toggleTodoCheck(event,${t.id},true)" style="accent-color:var(--accent);cursor:pointer"></td>
       <td class="todo-main-cell"><div class="todo-title ${t.status==='rejected'?'done-text':''} text-content" style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span>${escapeHtml(title)}</span>${t.status==='pending'&&!t.assignee&&t.recommendedAssignee?`<span class="badge b-accent" title="${escapeHtml(t.recommendationReason||'업무 내용 기반 추천')}"><i class="ti ti-sparkles"></i> 추천: ${escapeHtml(t.recommendedAssignee)}</span>`:''}</div><div class="todo-src text-content">[담당자: ${escapeHtml(assignee)}] ${escapeHtml(brief)}</div></td>
-      <td class="todo-center-cell">${priB(t.priority)}</td>
+      <td class="todo-center-cell todo-created-at" style="display:${G.currentTodoTab==='ai'?'none':'table-cell'}">${formatTodoCreatedAt(t.createdAt)}</td>
+      <td class="todo-center-cell todo-created-at" style="display:${G.currentTodoTab==='inprogress'?'table-cell':'none'}">${formatTodoCreatedAt(t.updatedAt)}</td>
       <td class="todo-center-cell">${statusB(t.status)}</td>
       <td class="todo-action-cell">${actionB(t)}</td>
     </tr>`;
@@ -1064,7 +1095,7 @@ function updateTodoCounts(){
   document.getElementById('pendingCount').textContent=ai;
   ['t-ai-cnt','t-in-cnt','t-done-cnt','t-rej-cnt'].forEach((id,i)=>{const el=document.getElementById(id);if(!el)return;el.className=i===0&&ai>0?'badge b-warn':'badge b-gray';});
 }
-function switchTodoTab(tab){G.currentTodoTab=tab;G.selectedTodoId=null;document.getElementById('todoDetailEmpty').style.display='flex';document.getElementById('todoDetailContent').style.display='none';document.querySelectorAll('#s-todo .tab').forEach((el,i)=>{el.classList.toggle('active',['ai','inprogress','done','rejected'][i]===tab);});const notice=document.getElementById('todoAINotice');const isAi=tab==='ai';const isProgress=tab==='inprogress';notice.style.display=(isAi||isProgress)?'flex':'none';document.getElementById('todoNoticeIcon').className=isAi?'ti ti-sparkles':'ti ti-rotate-2';document.getElementById('todoNoticeText').textContent=isAi?'AI가 추출한 Todo 제안입니다. 검토 후 승인 또는 반려해주세요.':'체크한 진행 Todo를 AI 제안으로 되돌릴 수 있습니다.';document.getElementById('todoBulkApproveBtn').style.display=isAi?'flex':'none';document.getElementById('todoBulkRejectBtn').style.display=isAi?'flex':'none';document.getElementById('todoBulkUndoBtn').style.display=isProgress?'flex':'none';renderTodos();}
+function switchTodoTab(tab){G.currentTodoTab=tab;G.todoPage[tab]=1;G.selectedTodoId=null;document.getElementById('todoDetailEmpty').style.display='flex';document.getElementById('todoDetailContent').style.display='none';document.querySelectorAll('#s-todo .tab').forEach((el,i)=>{el.classList.toggle('active',['ai','inprogress','done','rejected'][i]===tab);});const notice=document.getElementById('todoAINotice');const isAi=tab==='ai';const isProgress=tab==='inprogress';notice.style.display=(isAi||isProgress)?'flex':'none';document.getElementById('todoNoticeIcon').className=isAi?'ti ti-sparkles':'ti ti-rotate-2';document.getElementById('todoNoticeText').textContent=isAi?'AI가 추출한 Todo 제안입니다. 검토 후 승인 또는 반려해주세요.':'체크한 진행 Todo를 AI 제안으로 되돌릴 수 있습니다.';document.getElementById('todoBulkApproveBtn').style.display=isAi?'flex':'none';document.getElementById('todoBulkRejectBtn').style.display=isAi?'flex':'none';document.getElementById('todoBulkUndoBtn').style.display=isProgress?'flex':'none';renderTodos();}
 function openEditModal(id){G.editTargetId=id;const t=todos.find(x=>x.id===id);document.getElementById('editTitle').value=cleanTodoTitle(t.title);document.getElementById('editDescription').value=briefTodoText(t);document.getElementById('editAssignee').value=t.assignee||t.recommendedAssignee||((window.opsRadarMembers||[])[0]?.name)||'이성우';document.getElementById('editModal').classList.add('show');}
 function saveEdit(){const t=todos.find(x=>x.id===G.editTargetId);t.title=document.getElementById('editTitle').value.trim();t.description=document.getElementById('editDescription').value.trim();t.assignee=document.getElementById('editAssignee').value;closeModal('editModal');renderTodos();if(G.selectedTodoId===G.editTargetId)renderTodoDetail(G.editTargetId);showToast('수정되었습니다.','info');}
 function openManualModal(){document.getElementById('manualModal').classList.add('show');}
@@ -1509,6 +1540,36 @@ function parseScheduleMsg(msg){
   return{person,date,type,impact:type==='회의'?'팀 진행상황 점검':`${person} 담당 업무 공백 예상`};
 }
 
+function isScheduleCreateRequest(msg){
+  return /부재|휴가|외근|외부 일정|일정\s*(추가|등록|생성)|캘린더에|회의\s*(추가|등록|잡아|생성)|미팅\s*(추가|등록|잡아|생성)/.test(msg);
+}
+
+function assistantScheduleTodos(prompt){
+  const member=(window.opsRadarMembers||[]).map(m=>m.name).find(name=>prompt.includes(name))
+    || ['이성우','박주원','김희진','김성호'].find(name=>prompt.includes(name));
+  if(!member || !/일정|스케줄|마감|업무/.test(prompt)) return [];
+  return todos.filter(todo=>todo.status==='approved' && todo.assignee===member);
+}
+
+function assistantTodoCards(prompt){
+  const items=assistantScheduleTodos(prompt);
+  if(!items.length) return '';
+  return `<div class="assistant-todo-schedule">
+    <div class="assistant-todo-schedule-title"><i class="ti ti-calendar-check"></i> 진행 Todo와 마감일</div>
+    ${items.slice(0,6).map(todo=>`<div class="assistant-todo-schedule-item">
+      <div><strong>${escapeHtml(cleanTodoTitle(todo.title))}</strong><span>${escapeHtml(todo.dueDate ? `마감 ${todo.dueDate}` : '마감일 미지정')}</span></div>
+      <button type="button" onclick="openAssistantTodoDetail(${todo.id})">상세보기</button>
+    </div>`).join('')}
+  </div>`;
+}
+
+function openAssistantTodoDetail(id){
+  nav('todo');
+  switchTodoTab('inprogress');
+  openTodoDetailModal(id);
+}
+window.openAssistantTodoDetail=openAssistantTodoDetail;
+
 // ════════════════════════════════════════════════
 // AI Assistant (흐름 5)
 // ════════════════════════════════════════════════
@@ -1666,13 +1727,13 @@ async function sendMsg(text){
     if(res){
       if(res.type==='schedule') showScheduleConfirm(msg,res);
       else appendChatMsg('ai',res.text,res.src);
-    } else if(/부재|외부 일정|휴가|회의|미팅|일정|추가/.test(msg)){
+    } else if(isScheduleCreateRequest(msg)){
       const parsed=parseScheduleMsg(msg);showScheduleConfirmRaw(msg,parsed);
     } else {
       appendChatMsg('ai','운영 데이터에서 관련 정보를 찾고 있습니다. 더 구체적으로 질문해주시면 정확한 답변을 드릴 수 있습니다.',null);
     }
   };
-  if(chatResponses[msg] || /부재|외부 일정|휴가|회의|미팅|일정|추가/.test(msg)){
+  if(chatResponses[msg] || isScheduleCreateRequest(msg)){
     setTimeout(renderLocalReply,900+Math.random()*400);
     return;
   }
@@ -1774,7 +1835,7 @@ function appendChatMsg(role,text,src=null,withBtn=false){
     div.innerHTML=`<div class="msg-av av-user"><i class="ti ti-user" style="font-size:13px"></i></div><div class="bubble bubble-user text-content">${escapeHtml(text)}</div>`;
     saveMessageToCurrentSession('user', text);
   } else {
-    div.innerHTML=`<div class="msg-av av-ai"><i class="ti ti-sparkles" style="font-size:13px"></i></div><div><div class="ai-analysis-card"><div class="ai-card-kicker">AI OPERATION ANALYSIS</div><div class="ai-card-title">운영 데이터 기반 분석 결과</div><p class="text-content">${escapeHtml(text)}</p>${normalizeSources(src).length?`<div class="ai-card-source"><i class="ti ti-file-text" style="font-size:11px"></i> 출처: ${escapeHtml(normalizeSources(src).join(', '))}</div>`:''}</div>${withBtn?'<div style="margin-top:6px"><div class="tbtn" style="font-size:10px;padding:4px 10px;color:var(--accent)" onclick="nav(\'knowledge\')"><i class="ti ti-transfer"></i> 인수인계 문서 생성</div></div>':''}</div>`;
+    div.innerHTML=`<div class="msg-av av-ai"><i class="ti ti-sparkles" style="font-size:13px"></i></div><div><div class="ai-analysis-card"><div class="ai-card-kicker">AI OPERATION ANALYSIS</div><div class="ai-card-title">운영 데이터 기반 분석 결과</div><p class="text-content">${escapeHtml(text)}</p>${normalizeSources(src).length?`<div class="ai-card-source"><i class="ti ti-file-text" style="font-size:11px"></i> 출처: ${escapeHtml(normalizeSources(src).join(', '))}</div>`:''}</div>${assistantTodoCards(G.lastChatPrompt||'')}${withBtn?'<div style="margin-top:6px"><div class="tbtn" style="font-size:10px;padding:4px 10px;color:var(--accent)" onclick="nav(\'knowledge\')"><i class="ti ti-transfer"></i> 인수인계 문서 생성</div></div>':''}</div>`;
     updateChatContextPanel((G.lastChatPrompt || '') + ' ' + text, src);
     saveMessageToCurrentSession('assistant', text, { src, withBtn });
   }
@@ -2422,15 +2483,17 @@ function switchTodoView(mode) {
 
 function renderTodoCards() {
   const filtered = getFilteredTodos();
+  const paged = todoPageItems(filtered);
   const grid = document.getElementById('todoCardGrid');
   if (!filtered.length) {
     grid.innerHTML = `<div style="grid-column:1/-1;padding:32px;text-align:center;color:var(--text3);font-size:12px"><i class="ti ti-checkbox" style="font-size:28px;display:block;margin-bottom:8px"></i>이 탭에 항목이 없습니다.</div>`;
     return;
   }
-  grid.innerHTML = filtered.map(t => `
+  grid.innerHTML = paged.map(t => `
     <div class="todo-card ${G.selectedTodoId===t.id?'selected':''}" onclick="selectTodo(${t.id})">
       <div class="todo-card-meta">
-        ${priB(t.priority)}
+        ${G.currentTodoTab==='ai'?'':`<span class="badge b-gray">등록 ${formatTodoCreatedAt(t.createdAt)}</span>`}
+        ${G.currentTodoTab==='inprogress'?`<span class="badge b-gray">수정 ${formatTodoCreatedAt(t.updatedAt)}</span>`:''}
         ${statusB(t.status)}
         ${t.confidence!==null?`<span style="font-size:10px;font-family:var(--mono);color:${confC(t.confidence)}">${t.confidence}%</span>`:''}
       </div>
@@ -2996,6 +3059,7 @@ function clearOpsRadarSession(){
     localStorage.removeItem('role');
     localStorage.removeItem('user');
     localStorage.removeItem('access_token');
+    localStorage.removeItem('opsradar_session');
     localStorage.removeItem('token');
     localStorage.removeItem('auth');
     sessionStorage.clear();

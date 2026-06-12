@@ -10,9 +10,14 @@
   }
 
   async function request(path, options = {}) {
+    let token = localStorage.getItem("access_token");
+    if (!token) {
+      try { token = JSON.parse(localStorage.getItem("opsradar_session") || "null")?.token || null; } catch (_) {}
+    }
     const headers = options.body instanceof FormData
       ? { ...(options.headers || {}) }
       : { "Content-Type": "application/json", ...(options.headers || {}) };
+    if (token) headers.Authorization = `Bearer ${token}`;
     const res = await fetch(`${API}${path}`, {
       ...options,
       headers,
@@ -73,17 +78,27 @@
       title,
       description: briefTodoApiDescription(todo.description, title),
       src: todo.document_id || null,
+      sourceFileName: todo.source_file_name || null,
       srcChunk: todo.source_chunk_id || null,
       assignee: todo.assignee || null,
       priority: todo.priority || "medium",
       confidence: todo.confidence == null ? null : Number(todo.confidence),
       dueDate: todo.due_at ? String(todo.due_at).slice(0, 10) : null,
+      createdAt: todo.created_at || null,
+      updatedAt: todo.updated_at || todo.created_at || null,
       status: todo.approval_status === "rejected" ? "rejected" : apiStatusToUi(todo.status),
       type: todo.source || "manual",
       chunk: null,
       grounds: [todo.source === "ai" ? "DB AI analysis result" : "DB saved Todo"],
       risk: "",
     };
+  }
+
+  function stripIssueTargetDate(value) {
+    return String(value || "")
+      .replace(/(?:목표\s*날짜|목표일|target\s*date)\s*[:：-]?\s*\d{4}[./-]\d{1,2}[./-]\d{1,2}/gi, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
   }
 
   function normalizeIssue(issue) {
@@ -96,11 +111,12 @@
       severity: issue.risk_level || issue.severity || "medium",
       status,
       confidence: issue.confidence == null ? null : Number(issue.confidence),
-      title: issue.title || "Untitled issue",
+      title: stripIssueTargetDate(issue.title) || "Untitled issue",
       src: issue.document_id || null,
+      sourceFileName: issue.source_file_name || null,
       assignee: issue.assignee || null,
       days: 0,
-      desc: issue.description || issue.title || "",
+      desc: stripIssueTargetDate(issue.description || issue.title),
       chunk: "",
       history: [],
       domino: [],
@@ -347,11 +363,15 @@
 
   function normalizeReport(report) {
     const type = report.period === "monthly" ? "monthly" : "weekly";
+    const parsedSections = typeof window.parseReportMarkdown === "function"
+      ? window.parseReportMarkdown(report.content || "")
+      : { completed: [report.content || "저장된 보고서 본문이 없습니다."], inProgress: [], technical: [], risk: [], retrospective: [], nextPlan: [] };
+    const start = report.start_date || report.week_start || "-";
     return {
       id: report.id,
       apiId: report.id,
       type,
-      title: type === "monthly" ? "월간 운영 보고서" : "주간 운영 보고서",
+      title: type === "monthly" ? `${String(start).slice(0, 7)} 월간 운영 보고서` : `${start} 주간 운영 보고서`,
       period: `${report.start_date || report.week_start || "-"} ~ ${report.end_date || report.week_end || "-"}`,
       createdAt: report.created_at,
       author: "WorkRader",
@@ -359,14 +379,7 @@
       issues: 0,
       doneTodos: 0,
       pendingTodos: 0,
-      sections: {
-        completed: [report.content || "저장된 보고서 본문이 없습니다."],
-        inProgress: [],
-        technical: [],
-        risk: [],
-        retrospective: [],
-        nextPlan: [],
-      },
+      sections: parsedSections,
       docs: ["DB 저장 보고서"],
       html: report.content || "",
     };
@@ -386,7 +399,7 @@
 
   async function loadTodosFromAPI() {
     if (typeof todos === "undefined") return;
-    const data = await request("/todos");
+    const data = await request("/todos?limit=500");
     replaceArray(todos, (data.todos || []).map(normalizeTodo));
     applyTodoRecommendations();
     if (typeof renderTodos === "function") renderTodos();
@@ -835,10 +848,11 @@
       const title = document.getElementById("editTitle")?.value?.trim();
       const description = document.getElementById("editDescription")?.value?.trim() || "";
       const assignee = document.getElementById("editAssignee")?.value || null;
+      const dueAt = document.getElementById("editDueDate")?.value || null;
       if (!todo || !title) return;
       if (todo.apiId) {
         try {
-          await request(`/todos/${todo.apiId}`, { method: "PATCH", body: JSON.stringify({ title, description, assignee }) });
+          await request(`/todos/${todo.apiId}`, { method: "PATCH", body: JSON.stringify({ title, description, assignee, due_at: dueAt }) });
         } catch (error) {
           console.warn("Todo edit API failed", error);
           showToast("Todo 수정 저장에 실패했습니다.", "warn");
@@ -848,6 +862,7 @@
       todo.title = title;
       todo.description = description;
       todo.assignee = assignee;
+      todo.dueDate = dueAt;
       closeModal("editModal");
       renderTodos();
       if (window.G?.selectedTodoId === window.G?.editTargetId) renderTodoDetail(window.G.editTargetId);

@@ -3,13 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OpsRadar AI — Clean Version</title>
+<title>WorkRader AI - Clean Version</title>
 <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="/static/css/theme.css">
 <link rel="stylesheet" href="/static/css/layout.css">
 <link rel="stylesheet" href="/static/css/components.css">
+<link rel="stylesheet" href="/static/css/role-workflow-enhancements.css">
+<link rel="stylesheet" href="/static/css/workflow-v2.css">
 </head>
 <body>
 <div style="display:flex;flex:1;overflow:hidden">
@@ -17,7 +19,7 @@
 <!-- ══ 사이드바 ══ -->
 <div class="sidebar">
   <div class="sb-logo">
-    <div class="sb-logo-name">OpsRadar</div>
+    <div class="sb-logo-name">WorkRader</div>
     <div class="sb-logo-tag">운영 인텔리전스</div>
   </div>
   <div class="sb-nav">
@@ -314,6 +316,12 @@
     <div class="tab" onclick="switchTodoTab('done')">완료 <span class="badge b-gray" id="t-done-cnt">0</span></div>
     <div class="tab" onclick="switchTodoTab('rejected')">반려 <span class="badge b-gray" id="t-rej-cnt">0</span></div>
   </div>
+  <div class="todo-list-tools">
+    <select id="todoSearchField" class="todo-search-field" onchange="setTodoSearchField(this.value)" aria-label="Todo 검색 조건">
+      <option value="all">전체</option><option value="title">제목</option><option value="description">내용</option><option value="assignee">담당자</option>
+    </select>
+    <div class="todo-search-wrap"><i class="ti ti-search"></i><input id="todoSearchInput" type="search" placeholder="제목, 내용, 담당자 검색" oninput="setTodoSearch(this.value)"></div>
+  </div>
   <div style="background:var(--accent-soft);border-bottom:1px solid rgba(66,99,235,.12);padding:8px 16px;font-size:11px;color:var(--accent);display:flex;align-items:center;gap:6px;flex-shrink:0" id="todoAINotice">
     <i class="ti ti-sparkles" id="todoNoticeIcon" style="font-size:13px"></i>
     <span id="todoNoticeText">AI가 추출한 Todo 제안입니다. 검토 후 승인 또는 반려해주세요.</span>
@@ -322,6 +330,7 @@
       <div class="tbtn" id="todoBulkRejectBtn" onclick="bulkReject()" style="color:var(--danger)"><i class="ti ti-ban"></i> 체크항목 반려</div>
       <div class="tbtn" id="todoBulkUndoBtn" onclick="bulkUndoApprove()" style="display:none"><i class="ti ti-rotate-2"></i> 체크항목 되돌리기</div>
       <div class="tbtn" id="todoBulkCompleteBtn" onclick="bulkCompleteTodos()" style="display:none;color:var(--success)"><i class="ti ti-check"></i> 체크항목 완료</div>
+      <div class="tbtn" id="todoBulkRestoreDoneBtn" onclick="bulkRestoreDoneTodos()" style="display:none;color:var(--accent)"><i class="ti ti-arrow-back-up"></i> 선택항목 진행Todo 되돌리기</div>
       <div class="tbtn" id="todoBulkDeleteBtn" onclick="bulkDeleteTodos()" style="display:none;color:var(--danger)"><i class="ti ti-trash"></i> 선택항목 영구삭제</div>
     </div>
   </div>
@@ -329,7 +338,7 @@
     <!-- 테이블 뷰 -->
     <div id="todoTableView" style="flex:1;overflow-y:auto;display:flex;flex-direction:column">
       <table class="todo-table">
-        <thead><tr><th style="width:28px"><input type="checkbox" id="chkAll" onchange="toggleAllChk(this)" style="accent-color:var(--accent)"></th><th>Todo</th><th style="width:68px;text-align:center;white-space:nowrap">우선순위</th><th style="width:84px;text-align:center;white-space:nowrap">상태</th><th style="width:150px">액션</th></tr></thead>
+        <thead><tr><th style="width:28px"><input type="checkbox" id="chkAll" onchange="toggleAllChk(this)" style="accent-color:var(--accent)"></th><th>Todo</th><th id="todoCreatedHeader" style="width:96px;text-align:center;white-space:nowrap">등록일</th><th id="todoUpdatedHeader" style="width:96px;text-align:center;white-space:nowrap;display:none">수정일</th><th style="width:84px;text-align:center;white-space:nowrap">상태</th><th style="width:210px">액션</th></tr></thead>
         <tbody id="todoBody"></tbody>
       </table>
       <!-- 온보딩 가이드 (데이터 없을 때) -->
@@ -349,6 +358,7 @@
           </div>
         </div>
       </div>
+      <div id="todoPager" class="todo-pager"></div>
     </div>
     <!-- 카드 뷰 -->
     <div id="todoCardView" style="display:none;flex:1;overflow-y:auto">
@@ -746,7 +756,7 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
     <div><div class="form-label">Todo 제목</div><input class="form-input" id="tcTitle" type="text"></div>
     <div style="margin-top:8px"><div class="form-label">간단한 Todo 내용</div><textarea class="form-input" id="tcDescription" rows="3" style="resize:vertical"></textarea></div>
     <div class="form-row"><div><div class="form-label">담당자</div><select class="form-input" id="tcAssignee"><option>이성우</option><option>박주원</option><option>김희진</option><option>김성호</option><option>관리자</option></select></div><div><div class="form-label">우선순위</div><select class="form-input" id="tcPriority"><option value="high">높음</option><option value="medium">중간</option><option value="low">낮음</option></select></div></div>
-    <div style="margin-top:8px"><div class="form-label">마감일</div><input class="form-input" id="tcDue" type="date" value="2026-05-23"></div>
+    <div style="margin-top:8px"><div class="form-label">마감일</div><input class="form-input" id="tcDue" type="date" value="2026-05-23"><div id="tcDueHint" style="font-size:10px;color:var(--accent);margin-top:5px"></div></div>
     <div class="modal-actions"><div class="tbtn" onclick="closeModal('todoCreateModal')">취소</div><div class="tbtn primary" onclick="confirmTodoCreate()"><i class="ti ti-plus"></i> Todo 생성 및 이동</div></div>
   </div>
 </div>
@@ -929,5 +939,7 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
 <script src="/static/js/settings.js"></script>
 <script src="/static/js/ops-workflow-enhancements.js"></script>
 <script src="/static/js/todo-calendar-enhancements.js"></script>
+<script src="/static/js/role-workflow-enhancements.js"></script>
+<script src="/static/js/workflow-v2.js"></script>
 </body>
 </html>

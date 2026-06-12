@@ -26,7 +26,73 @@
   }
 
   function dueDateForEdit(todo) {
-    return todo?.dueDate || (todo?.status === "pending" ? today() : today());
+    return todo?.dueDate || (todo?.status === "pending" ? recommendedDueDate(todo) : today());
+  }
+
+  function openDatePicker(input) {
+    document.getElementById("todoCustomDatePicker")?.remove();
+    const selected = new Date(`${input.value || today()}T00:00:00`);
+    let viewYear = selected.getFullYear();
+    let viewMonth = selected.getMonth();
+    const picker = document.createElement("div");
+    picker.id = "todoCustomDatePicker";
+    picker.className = "todo-date-picker";
+    const rect = input.parentElement.getBoundingClientRect();
+    picker.style.left = `${Math.min(rect.left, window.innerWidth - 300)}px`;
+    picker.style.top = `${Math.min(rect.bottom + 5, window.innerHeight - 360)}px`;
+    picker.onclick = (event) => event.stopPropagation();
+    document.body.appendChild(picker);
+    const render = () => {
+      const first = new Date(viewYear, viewMonth, 1).getDay();
+      const last = new Date(viewYear, viewMonth + 1, 0).getDate();
+      const prevLast = new Date(viewYear, viewMonth, 0).getDate();
+      const cells = [];
+      for (let index = 0; index < 42; index += 1) {
+        const day = index - first + 1;
+        const date = day < 1 ? new Date(viewYear, viewMonth - 1, prevLast + day)
+          : day > last ? new Date(viewYear, viewMonth + 1, day - last) : new Date(viewYear, viewMonth, day);
+        const value = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+        cells.push(`<button class="${date.getMonth() !== viewMonth ? "muted" : ""} ${value === input.value ? "selected" : ""}" data-date="${value}">${date.getDate()}</button>`);
+      }
+      picker.innerHTML = `<div class="todo-date-picker-head"><button data-nav="-1" title="이전 달">‹</button><span>${viewYear}년 ${viewMonth + 1}월</span><button data-nav="1" title="다음 달">›</button></div>
+        <div class="todo-date-picker-grid">${["일","월","화","수","목","금","토"].map((day) => `<span style="text-align:center;font-size:10px;color:var(--text3)">${day}</span>`).join("")}${cells.join("")}</div>
+        <div class="todo-date-picker-foot"><button data-today="true">오늘</button><button data-close="true">닫기</button></div>`;
+      picker.querySelectorAll("[data-nav]").forEach((button) => button.onclick = () => {
+        viewMonth += Number(button.dataset.nav);
+        if (viewMonth < 0) { viewMonth = 11; viewYear -= 1; }
+        if (viewMonth > 11) { viewMonth = 0; viewYear += 1; }
+        render();
+      });
+      picker.querySelectorAll("[data-date]").forEach((button) => button.onclick = () => {
+        input.value = button.dataset.date;
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+        picker.remove();
+      });
+      picker.querySelector("[data-today]").onclick = () => {
+        input.value = today();
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+        picker.remove();
+      };
+      picker.querySelector("[data-close]").onclick = () => picker.remove();
+    };
+    render();
+    setTimeout(() => document.addEventListener("click", () => picker.remove(), { once: true }), 0);
+  }
+
+  function enableDateHitbox(input) {
+    if (!input || input.dataset.hitboxBound === "true") return;
+    input.dataset.hitboxBound = "true";
+    const wrap = input.parentElement;
+    if (!wrap) return;
+    wrap.classList.add("todo-date-hitbox");
+    input.readOnly = true;
+    input.onmousedown = (event) => event.preventDefault();
+    input.onclick = (event) => { event.preventDefault(); event.stopPropagation(); openDatePicker(input); };
+    wrap.onclick = (event) => {
+      if (event.target.closest("button, select, textarea")) return;
+      event.stopPropagation();
+      openDatePicker(input);
+    };
   }
 
   const originalOpenEditModal = window.openEditModal;
@@ -36,6 +102,7 @@
     const input = document.getElementById("editDueDate");
     const hint = document.getElementById("editDueHint");
     if (input) input.value = dueDateForEdit(todo);
+    enableDateHitbox(input);
     if (hint) {
       const recommendation = recommendedDueDate(todo);
       hint.textContent = todo?.status === "pending"
@@ -53,10 +120,11 @@
     if (!todo || !title) return;
     try {
       if (todo.apiId) {
-        await api(`/todos/${todo.apiId}`, {
+        const saved = await api(`/todos/${todo.apiId}`, {
           method: "PATCH",
           body: JSON.stringify({ title, description, assignee, due_at: dueDate }),
         });
+        todo.dueDate = saved?.due_at ? String(saved.due_at).slice(0, 10) : dueDate;
       }
       todo.title = title;
       todo.description = description;
@@ -121,13 +189,46 @@
     }
   };
 
+  async function restoreDoneTodos(items) {
+    if (!items.length) return showToast("선택된 완료 Todo가 없습니다.", "info");
+    if (!confirm(`${items.length}개 완료 Todo를 진행 Todo로 되돌리시겠습니까?`)) return;
+    try {
+      await Promise.all(items.filter((todo) => todo.apiId).map((todo) => api(`/todos/${todo.apiId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ status: "in_progress", approval_status: "approved" }),
+      })));
+      items.forEach((todo) => { todo.status = "approved"; G.todoChecked[todo.id] = false; });
+      await window.opsRadarApi.loadTodos();
+      syncTodoCalendar();
+      switchTodoTab("inprogress");
+      showToast(`${items.length}개 Todo를 진행 Todo로 되돌렸습니다.`, "success");
+    } catch (error) {
+      console.warn("Todo restore to progress failed", error);
+      showToast("진행 Todo 되돌리기에 실패했습니다.", "warn");
+    }
+  }
+
+  window.restoreDoneTodo = function (id) {
+    const todo = todos.find((item) => item.id === id && item.status === "done");
+    return restoreDoneTodos(todo ? [todo] : []);
+  };
+
+  window.deleteDoneTodo = function (id) {
+    const todo = todos.find((item) => item.id === id && item.status === "done");
+    return deleteTodos(todo ? [todo] : [], "이 완료 Todo를 영구 삭제하시겠습니까?\n원본 문서와 더미데이터는 삭제되지 않습니다.");
+  };
+
+  window.bulkRestoreDoneTodos = function () {
+    return restoreDoneTodos(selectedTodos("done"));
+  };
+
   const baseActionB = window.actionB || actionB;
   window.actionB = actionB = function (todo) {
     if (todo.status === "rejected") {
       return `<div class="action-btns" onclick="event.stopPropagation()"><div class="ab ab-undo" onclick="undoTodo(${todo.id})">↩ 되돌리기</div><div class="ab ab-reject" onclick="deleteRejectedTodo(${todo.id})">삭제</div></div>`;
     }
     if (todo.status === "done") {
-      return `<div class="action-btns" onclick="event.stopPropagation()"><div class="ab ab-edit" onclick="openTodoDetailModal(${todo.id})">상세보기</div></div>`;
+      return `<div class="action-btns" onclick="event.stopPropagation()"><div class="ab ab-edit" onclick="openTodoDetailModal(${todo.id})">상세보기</div><div class="ab ab-undo" onclick="restoreDoneTodo(${todo.id})">진행Todo로 되돌리기</div><div class="ab ab-reject" onclick="deleteDoneTodo(${todo.id})">삭제</div></div>`;
     }
     return baseActionB(todo);
   };
@@ -140,10 +241,12 @@
     const icon = document.getElementById("todoNoticeIcon");
     const complete = document.getElementById("todoBulkCompleteBtn");
     const remove = document.getElementById("todoBulkDeleteBtn");
+    const restoreDone = document.getElementById("todoBulkRestoreDoneBtn");
     const undo = document.getElementById("todoBulkUndoBtn");
     if (notice) notice.style.display = "flex";
     if (complete) complete.style.display = tab === "inprogress" ? "flex" : "none";
     if (remove) remove.style.display = tab === "done" || tab === "rejected" ? "flex" : "none";
+    if (restoreDone) restoreDone.style.display = tab === "done" ? "flex" : "none";
     if (undo) undo.style.marginLeft = tab === "inprogress" ? "0" : "";
     if (tab === "done") {
       if (icon) icon.className = "ti ti-circle-check";
@@ -249,6 +352,20 @@
     return result;
   };
 
+  const baseLoadTodos = window.opsRadarApi.loadTodos;
+  window.opsRadarApi.loadTodos = async function () {
+    const result = await baseLoadTodos();
+    syncTodoCalendar();
+    return result;
+  };
+
+  const baseLoadCalendar = window.opsRadarApi.loadCalendar;
+  window.opsRadarApi.loadCalendar = async function () {
+    const result = await baseLoadCalendar();
+    syncTodoCalendar();
+    return result;
+  };
+
   ["approveTodo", "doneTodo", "undoTodo"].forEach((name) => {
     const original = window[name];
     if (typeof original !== "function") return;
@@ -318,10 +435,17 @@
     document.getElementById("tcDescription").value = `${issue.title} 대응을 위한 원인 확인 및 조치 결과 공유`;
     document.getElementById("tcAssignee").value = issue.suggestAssignee || issue.assignee || (window.opsRadarMembers || [])[0]?.name || "";
     document.getElementById("tcPriority").value = issue.suggestPriority || issue.severity || "medium";
-    document.getElementById("tcDue").value = recommendedDueDate({ ...issue, priority: issue.suggestPriority || issue.severity });
+    const recommendation = recommendedDueDate({ ...issue, priority: issue.suggestPriority || issue.severity });
+    document.getElementById("tcDue").value = recommendation;
+    const hint = document.getElementById("tcDueHint");
+    if (hint) hint.textContent = `추천 마감일: ${formatDate(recommendation)} · 이슈 위험도 기준`;
+    enableDateHitbox(document.getElementById("tcDue"));
     openModal("todoCreateModal");
   };
   window.openDashboardTodoCreate = window.openTodoCreate;
+  window.createTodoFromIssue = function (issueId) {
+    window.openTodoCreate(issueId);
+  };
 
   window.confirmTodoCreate = async function () {
     const title = document.getElementById("tcTitle")?.value?.trim();
@@ -356,4 +480,5 @@
     syncTodoCalendar();
     if (typeof renderDashboardLive === "function") renderDashboardLive();
   }, 800);
+  setTimeout(syncTodoCalendar, 5000);
 })();

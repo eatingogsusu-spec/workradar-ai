@@ -23,3 +23,4 @@
     ],
   });
 })();
+// Period-aware runtime behavior is implemented in public/static/js/report.js.

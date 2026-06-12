@@ -42,7 +42,7 @@ function Login({ onLogin }) {
       <section className="opsradar-login-copy" aria-labelledby="login-title">
         <div className="opsradar-login-mark">OR</div>
         <p className="opsradar-login-tagline">AI Operational Intelligence</p>
-        <h1 id="login-title">OpsRadar</h1>
+        <h1 id="login-title">WorkRader</h1>
         <div className="opsradar-login-subtitle">
           운영 기록을 근거 있는 Todo · Issue · Report · Handoff 후보로 정리하고,
           <br />
