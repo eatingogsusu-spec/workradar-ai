@@ -18,11 +18,11 @@ FRONTEND_PUBLIC_STATIC = FRONTEND / "public" / "static"
 FRONTEND_STATIC = (
     FRONTEND_OUTPUT / "static" if (FRONTEND_OUTPUT / "static").exists() else FRONTEND_PUBLIC_STATIC
 )
-# Prefer the git-tracked public/index.html over compiled build output
+# Prefer the React build entry when it exists so the login shell is mounted.
 _public_entry = FRONTEND / "public" / "index.html"
 FRONTEND_ENTRY = (
+    FRONTEND_OUTPUT / "index.html" if (FRONTEND_OUTPUT / "index.html").exists() else
     _public_entry if _public_entry.exists() else
-    FRONTEND_OUTPUT / "index.html" if FRONTEND_OUTPUT.exists() else
     FRONTEND / "index.html"
 )
 

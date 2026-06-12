@@ -6,7 +6,10 @@ function App() {
     if (typeof window === "undefined") return null;
     try {
       const raw = window.localStorage.getItem("opsradar_session");
-      return raw ? JSON.parse(raw) : null;
+      if (raw) return JSON.parse(raw);
+      const token = window.localStorage.getItem("access_token");
+      const user = JSON.parse(window.localStorage.getItem("user") || "null");
+      return token && user ? { token, user } : null;
     } catch {
       return null;
     }
@@ -27,6 +30,10 @@ function App() {
       user: data.user,
     };
     window.localStorage.setItem("opsradar_session", JSON.stringify(sessionData));
+    window.localStorage.setItem("access_token", data.access_token);
+    window.localStorage.setItem("token", data.access_token);
+    window.localStorage.setItem("user", JSON.stringify(data.user));
+    window.localStorage.setItem("role", data.user.role);
     window.localStorage.setItem("opsradar_user_role", data.user.role);
     window.localStorage.setItem("opsradar_user_name", data.user.name);
     setSession(sessionData);
@@ -34,6 +41,10 @@ function App() {
 
   function handleLogout() {
     window.localStorage.removeItem("opsradar_session");
+    window.localStorage.removeItem("access_token");
+    window.localStorage.removeItem("token");
+    window.localStorage.removeItem("user");
+    window.localStorage.removeItem("role");
     window.localStorage.removeItem("opsradar_user_role");
     window.localStorage.removeItem("opsradar_user_name");
     setSession(null);
@@ -41,19 +52,8 @@ function App() {
 
   if (!session) return <Login onLogin={handleLogin} />;
 
-  const { user } = session;
-  const roleLabel = user.role === "admin" ? "관리자" : "팀원";
-
   if (hasStaticShell) {
-    return (
-      <div className="app-session-control" aria-label="현재 로그인 세션">
-        <span>{user.name}</span>
-        <span>{roleLabel}</span>
-        <button type="button" onClick={handleLogout}>
-          로그아웃
-        </button>
-      </div>
-    );
+    return null;
   }
 
   return (
