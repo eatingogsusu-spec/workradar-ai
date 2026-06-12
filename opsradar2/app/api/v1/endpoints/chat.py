@@ -19,13 +19,26 @@ from app.services.assistant_context_service import AssistantContextService
 
 router = APIRouter()
 
+ACTIVE_TODO_STATUSES = {"pending", "in_progress", "blocked", "approved"}
+COMPLETED_TODO_STATUSES = {"completed", "done", "resolved"}
+TERM_GLOSSARY = {
+    "rag": (
+        "RAG(Retrieval-Augmented Generation)는 질문과 관련된 사내 문서나 운영 데이터를 먼저 검색한 뒤, "
+        "검색 결과를 근거로 AI가 답변을 생성하는 방식입니다. WorkRader에서는 업로드 문서를 chunk로 나누고 "
+        "임베딩하여 FAISS에서 관련 내용을 찾은 다음, 현재 Todo·Issue·Calendar 데이터와 함께 답변에 사용합니다."
+    ),
+    "faiss": "FAISS는 문장 임베딩 간 유사도를 빠르게 검색하는 벡터 검색 엔진입니다. WorkRader의 문서 RAG 검색에 사용됩니다.",
+    "임베딩": "임베딩은 문장이나 문서를 의미를 보존한 숫자 벡터로 변환하는 과정입니다. 비슷한 내용일수록 가까운 벡터가 됩니다.",
+}
+
+
 class ExtractRequest(BaseModel):
     text: str = Field(min_length=1)
 
 
 @router.post("", response_model=ChatResponse)
 async def chat(payload: ChatRequest, db: AsyncSession = Depends(get_db)):
-    """Answer with current OpsRadar data, plus document RAG when available."""
+    """Answer with current WorkRader data, plus document RAG when available."""
     operational_context, operational_sources = await AssistantContextService(db).build_context()
     team_members = await _load_team_members(db)
 
@@ -47,8 +60,13 @@ async def chat(payload: ChatRequest, db: AsyncSession = Depends(get_db)):
         rag_context = ""
 
     context = "\n\n".join(part for part in [rag_context, operational_context] if part.strip())
-    if _is_operational_question(payload.message) or settings.AI_PROVIDER.lower() != "azure":
+    knowledge_answer = _local_knowledge_answer(payload.message, rag_context)
+    if knowledge_answer:
+        answer = knowledge_answer
+    elif _is_operational_question(payload.message):
         answer = _local_answer(payload.message, operational_context, team_members)
+    elif settings.AI_PROVIDER.lower() != "azure":
+        answer = _local_knowledge_answer(payload.message, rag_context) or _local_answer(payload.message, operational_context, team_members)
     else:
         try:
             answer_result = await answer_question(payload.message, context)
@@ -87,12 +105,27 @@ async def extract_from_text(payload: ExtractRequest):
 
 def _is_operational_question(message: str) -> bool:
     lowered = message.lower()
+    if any(term in lowered for term in TERM_GLOSSARY) and any(token in message for token in ("뭐야", "무엇", "설명", "뜻")):
+        return False
     tokens = (
         "todo", "issue", "calendar",
         "할 일", "미완료", "이슈", "위험", "리스크", "일정", "캘린더",
-        "업무", "담당", "알려줘", "뭐야", "현황", "요약",
+        "업무", "담당", "현황", "완료", "진행", "구현", "상태",
     )
     return any(token in lowered or token in message for token in tokens)
+
+
+def _local_knowledge_answer(message: str, rag_context: str) -> str | None:
+    """Answer terminology questions without incorrectly falling back to an operations summary."""
+    lowered = message.lower()
+    for term, definition in TERM_GLOSSARY.items():
+        if term in lowered:
+            return f"**{term.upper() if term.isascii() else term}란?**\n\n{definition}"
+    if rag_context.strip() and any(token in message for token in ("뭐야", "무엇", "설명", "알려줘")):
+        excerpts = [line.strip() for line in rag_context.splitlines() if line.strip() and not line.startswith("[source:")]
+        if excerpts:
+            return "관련 문서에서 확인한 내용입니다.\n\n" + "\n".join(f"- {line}" for line in excerpts[:5])
+    return None
 
 
 async def _load_team_members(db: AsyncSession) -> list[str]:
@@ -127,6 +160,113 @@ def _filter_by_assignee(items: list[str], assignee: str) -> list[str]:
         if f"assignee={assignee}" in item:
             filtered.append(item)
     return filtered
+
+
+def _field(item: str, name: str, default: str = "") -> str:
+    prefix = f"{name}="
+    return next((part[len(prefix):].strip() for part in item.split(" | ") if part.startswith(prefix)), default)
+
+
+def _title(item: str) -> str:
+    return item.lstrip("- ").split(" | ", 1)[0].strip()
+
+
+def _is_task_lookup_question(message: str) -> bool:
+    lowered = message.lower()
+    if ("todo" in lowered or "할 일" in message or "할일" in message) and any(
+        marker in message for marker in ("미완료", "완료 목록", "전체", "목록")
+    ):
+        return False
+    markers = ("담당", "누구", "구현", "완료", "끝났", "됐어", "되었", "진행", "상태", "맡")
+    return any(marker in lowered or marker in message for marker in markers)
+
+
+def _task_keywords(message: str, team_members: list[str] | None = None) -> list[str]:
+    lowered = message.lower()
+    stopwords = {
+        "현재", "지금", "업무", "관련", "누가", "누구", "담당", "담당자", "상태", "진행", "진행중",
+        "구현", "완료", "했어", "했나요", "됐어", "되었어", "알려줘", "무엇", "뭐야", "인가요",
+        "todo", "issue", "이슈", "할일", "해줘", "씨",
+    }
+    words = re.findall(r"[a-zA-Z0-9_/-]{2,}|[가-힣]{2,}", lowered)
+    member_names = {member.lower() for member in (team_members or [])}
+    return [word for word in words if word not in stopwords and word not in member_names]
+
+
+def _find_matching_items(message: str, items: list[str], team_members: list[str] | None = None) -> list[str]:
+    keywords = _task_keywords(message, team_members)
+    if not keywords:
+        return []
+    scored = []
+    for item in items:
+        haystack = f"{_title(item)} {_field(item, 'description')}".lower()
+        score = sum(3 if keyword in _title(item).lower() else 1 for keyword in keywords if keyword in haystack)
+        if score:
+            scored.append((score, item))
+    if not scored:
+        return []
+
+    strongest = max(score for score, _ in scored)
+    relevant = [(score, item) for score, item in scored if score >= max(2, strongest * 0.6)]
+    status_rank = {
+        "completed": 6,
+        "done": 6,
+        "resolved": 6,
+        "in_progress": 5,
+        "blocked": 4,
+        "approved": 3,
+        "pending": 2,
+        "rejected": 1,
+    }
+    selected: dict[str, tuple[int, int, str]] = {}
+    for score, item in relevant:
+        key = re.sub(r"\s+", " ", _title(item).lower()).strip()
+        rank = status_rank.get(_field(item, "status"), 0)
+        if _field(item, "assignee") not in ("", "담당자 미지정"):
+            rank += 1
+        previous = selected.get(key)
+        if previous is None or (score, rank) > (previous[0], previous[1]):
+            selected[key] = (score, rank, item)
+    return [item for _, _, item in sorted(selected.values(), key=lambda row: (row[0], row[1]), reverse=True)]
+
+
+def _status_label(status: str) -> str:
+    return {
+        "pending": "대기",
+        "approved": "승인됨",
+        "in_progress": "진행 중",
+        "blocked": "차단됨",
+        "completed": "완료",
+        "done": "완료",
+        "resolved": "해결됨",
+        "rejected": "반려",
+    }.get(status, status or "상태 미지정")
+
+
+def _answer_task_lookup(
+    message: str,
+    sections: dict[str, list[str]],
+    team_members: list[str] | None = None,
+) -> str | None:
+    matches = _find_matching_items(message, sections.get("Todos", []), team_members)
+    if not matches:
+        return None
+    lines = ["🔎 **질문과 관련된 Todo를 확인했습니다.**\n"]
+    for item in matches[:5]:
+        title = _title(item)
+        status = _field(item, "status")
+        assignee = _field(item, "assignee", "담당자 미지정")
+        description = _field(item, "description")
+        due = _field(item, "due")
+        lines.append(f"- **{title}**")
+        lines.append(f"  상태: {_status_label(status)} · 담당자: {assignee}")
+        if description and description != "설명 없음":
+            lines.append(f"  내용: {description}")
+        if due and due != "no due date":
+            lines.append(f"  마감: {due}")
+    if len(matches) > 5:
+        lines.append(f"\n관련 항목이 {len(matches)}개이며, 연관도가 높은 5개를 표시했습니다.")
+    return "\n".join(lines)
 
 
 def _query_year(message: str) -> int:
@@ -199,8 +339,17 @@ def _local_answer(message: str, context: str, team_members: list[str] | None = N
     member_name = _extract_member_name(message, team_members or [])
     target_date = _extract_date_filter(message)
 
+    if _is_task_lookup_question(message):
+        task_answer = _answer_task_lookup(message, sections, team_members)
+        if task_answer:
+            return task_answer
+
     if "todo" in lowered or "할 일" in message or "미완료" in message:
         all_todos = sections.get("Todos", [])
+        if "완료" in message and "미완료" not in message:
+            all_todos = [todo for todo in all_todos if _field(todo, "status") in COMPLETED_TODO_STATUSES]
+        else:
+            all_todos = [todo for todo in all_todos if _field(todo, "status") in ACTIVE_TODO_STATUSES]
         scoped_todos = _filter_by_date(all_todos, target_date) if target_date else all_todos
         todos = _filter_by_assignee(scoped_todos, member_name) if member_name else scoped_todos
 
@@ -266,15 +415,32 @@ def _local_answer(message: str, context: str, team_members: list[str] | None = N
 
     if "calendar" in lowered or "일정" in message or "캘린더" in message:
         events = sections.get("Calendar", [])
+        member_todos = []
+        if member_name:
+            events = [event for event in events if member_name in event]
+            member_todos = [
+                todo for todo in _filter_by_assignee(sections.get("Todos", []), member_name)
+                if "status=in_progress" in todo or "status=approved" in todo
+            ]
         if target_date:
             events = _filter_by_date(events, target_date)
-        if not events:
+            member_todos = _filter_by_date(member_todos, target_date)
+        if not events and not member_todos:
             when = f"{target_date}에 " if target_date else "현재 "
-            return f"📅 {when}등록된 일정이 없습니다."
+            owner = f"{member_name}님의 " if member_name else ""
+            return f"📅 {when}{owner}등록된 일정 또는 진행 Todo가 없습니다."
         date_prefix = f"{target_date} 시작일 기준 " if target_date else ""
-        lines = [f"📅 **{date_prefix}일정 현황**\n"]
+        owner = f"{member_name}님의 " if member_name else ""
+        lines = [f"📅 **{date_prefix}{owner}일정 현황**\n"]
         for event in events[:8]:
             lines.append(f"  · {event.lstrip('- ').strip()}")
+        if member_todos:
+            lines.append("\n📋 진행 Todo와 마감일")
+            for todo in member_todos[:8]:
+                parts = todo.lstrip("- ").split(" | ")
+                title = parts[0].strip()
+                due = next((part.replace("due=", "") for part in parts if "due=" in part), "no due date")
+                lines.append(f"  · {title} · 마감 {due if due != 'no due date' else '미지정'}")
         return "\n".join(lines)
 
     if member_name:
@@ -284,10 +450,13 @@ def _local_answer(message: str, context: str, team_members: list[str] | None = N
         scoped_issues = _filter_by_date(all_issues, target_date) if target_date else all_issues
         todos = _filter_by_assignee(scoped_todos, member_name)
         issues = _filter_by_assignee(scoped_issues, member_name)
+        active_todos = [todo for todo in todos if _field(todo, "status") in ACTIVE_TODO_STATUSES]
+        completed_todos = [todo for todo in todos if _field(todo, "status") in COMPLETED_TODO_STATUSES]
 
         date_prefix = f"{target_date} 기준 " if target_date else ""
         lines = [f"📊 **{date_prefix}{member_name}님의 업무 현황**\n"]
-        lines.append(f"📋 Todo: 총 {len(todos)}개 진행 중")
+        lines.append(f"📋 진행 Todo: {len(active_todos)}개")
+        lines.append(f"✅ 완료 Todo: {len(completed_todos)}개")
         lines.append(f"🚨 Issue: 총 {len(issues)}개 등록됨")
         high_issues = [issue for issue in issues if "severity=high" in issue]
         if high_issues:
@@ -299,9 +468,10 @@ def _local_answer(message: str, context: str, team_members: list[str] | None = N
                 title = parts[0].strip()
                 priority = next((p.replace("priority=", "") for p in parts if "priority=" in p), "")
                 due = next((p.replace("due=", "") for p in parts if "due=" in p), "")
+                status = next((p.replace("status=", "") for p in parts if "status=" in p), "")
                 due_str = f" · 마감 {due}" if due and due != "no due date" else ""
                 priority_str = f" · {priority}" if priority else ""
-                lines.append(f"  · {title}{priority_str}{due_str}")
+                lines.append(f"  · {title} · {_status_label(status)}{priority_str}{due_str}")
         if issues:
             lines.append("\n🚨 Issue 항목")
             for issue in issues[:5]:
@@ -320,8 +490,11 @@ def _local_answer(message: str, context: str, team_members: list[str] | None = N
 
     todos = sections.get("Todos", [])
     issues = sections.get("Issues", [])
-    lines = ["📊 **OpsRadar 운영 현황 요약**\n"]
-    lines.append(f"📋 Todo: 총 {len(todos)}개 진행 중")
+    active_todos = [todo for todo in todos if _field(todo, "status") in ACTIVE_TODO_STATUSES]
+    completed_todos = [todo for todo in todos if _field(todo, "status") in COMPLETED_TODO_STATUSES]
+    lines = ["📊 **WorkRader 운영 현황 요약**\n"]
+    lines.append(f"📋 진행 Todo: {len(active_todos)}개")
+    lines.append(f"✅ 완료 Todo: {len(completed_todos)}개")
     lines.append(f"🚨 Issue: 총 {len(issues)}개 등록됨")
     high_issues = [issue for issue in issues if "severity=high" in issue]
     if high_issues:

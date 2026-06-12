@@ -1,7 +1,9 @@
 """Focused service tests for persistence decisions."""
 
 import asyncio
+from datetime import date, datetime
 
+from app.repositories.todo_repository import _normalize_due_at
 from app.services.report_service import ReportService
 from app.services.issue_service import IssueService
 from app.services.todo_service import TodoService
@@ -77,6 +79,19 @@ def test_report_service_preserves_monthly_period():
     assert repo.generated_period == "monthly"
 
 
+def test_report_period_range_uses_selected_week_and_month():
+    from app.repositories.report_repository import ReportRepository
+
+    assert ReportRepository._period_range("weekly", "2026-06-10") == (
+        date(2026, 6, 8),
+        date(2026, 6, 14),
+    )
+    assert ReportRepository._period_range("monthly", "2026-05-17") == (
+        date(2026, 5, 1),
+        date(2026, 5, 31),
+    )
+
+
 def test_issue_service_links_created_todo_to_existing_issue():
     todo_repo = LinkedTodoRepoStub()
 
@@ -107,3 +122,15 @@ def test_issue_service_does_not_create_todo_for_missing_issue():
 
     assert todo_id is None
     assert todo_repo.created is None
+
+
+def test_todo_due_date_string_is_normalized_for_asyncpg():
+    due_at = _normalize_due_at("2026-06-30")
+
+    assert isinstance(due_at, datetime)
+    assert due_at.isoformat() == "2026-06-30T00:00:00"
+
+
+def test_empty_todo_due_date_is_normalized_to_none():
+    assert _normalize_due_at("") is None
+    assert _normalize_due_at(None) is None

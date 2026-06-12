@@ -42,6 +42,7 @@ class IssueUpdate(BaseModel):
     risk_level: Optional[IssueSeverity] = None
     assignee: Optional[str] = None
     approval_status: Optional[ApprovalStatus] = None
+    due_at: Optional[str] = None
 
 
 class IssueResponse(BaseModel):

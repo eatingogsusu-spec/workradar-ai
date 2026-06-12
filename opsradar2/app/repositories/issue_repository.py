@@ -1,5 +1,6 @@
 """Issue persistence for the v4 OpsRadar schema."""
 
+from datetime import date, datetime, time
 from typing import Optional
 
 from sqlalchemy import text
@@ -8,6 +9,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 
 _COLUMNS_CACHE: dict[str, set[str]] = {}
+
+
+def _normalize_due_at(value):
+    if value in (None, ""):
+        return None
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, date):
+        return datetime.combine(value, time.min)
+    return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
 
 
 class IssueRepository:
@@ -280,11 +291,11 @@ class IssueRepository:
         if "risk_level" in normalized and "severity" not in normalized:
             normalized["severity"] = normalized["risk_level"]
         allowed = {
-            key: value
+            key: _normalize_due_at(value) if key == "due_at" else value
             for key, value in normalized.items()
-            if key in {"title", "description", "status", "severity", "approval_status"}
+            if key in {"title", "description", "status", "severity", "approval_status", "due_at"}
         }
-        assignments = [f"{key} = :{key}" for key in allowed]
+        assignments = ["due_at = CAST(:due_at AS timestamptz)" if key == "due_at" else f"{key} = :{key}" for key in allowed]
         params = {"issue_id": issue_id, **allowed}
         if "assignee" in normalized:
             assignments.append(

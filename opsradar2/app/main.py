@@ -27,9 +27,9 @@ FRONTEND_ENTRY = (
 )
 
 app = FastAPI(
-    title="OpsRadar API",
+    title="WorkRader API",
     version="1.0.0",
-    description="OpsRadar operations intelligence API",
+    description="WorkRader operations intelligence API",
 )
 
 app.add_middleware(
@@ -69,7 +69,7 @@ def root():
 def health_check():
     return {
         "status": "ok",
-        "service": "OpsRadar",
+        "service": "WorkRader",
         "app": "opsradar2",
         "db_schema": settings.DB_SCHEMA,
     }

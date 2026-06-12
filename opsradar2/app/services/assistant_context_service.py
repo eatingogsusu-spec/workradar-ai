@@ -13,7 +13,6 @@ class AssistantContextService:
     async def build_context(self, *, project_id: str | None = None) -> tuple[str, list[dict]]:
         params = {"project_id": project_id} if project_id else {}
         todo_conditions = [
-            "t.status IN ('pending', 'in_progress', 'blocked')",
             "COALESCE(t.approval_status, 'approved') <> 'rejected'",
         ]
         if project_id:
@@ -28,7 +27,7 @@ class AssistantContextService:
                 text(
                     f"""
                     SELECT
-                      t.title, t.status, t.priority, t.due_at, t.assignee_member_id,
+                      t.title, t.description, t.status, t.priority, t.due_at, t.assignee_member_id,
                       u.name AS assignee_name, t.created_at
                     FROM todos t
                     LEFT JOIN project_members pm ON t.assignee_member_id = pm.id
@@ -37,7 +36,7 @@ class AssistantContextService:
                     ORDER BY
                       CASE WHEN t.status IN ('blocked', 'pending', 'in_progress') THEN 0 ELSE 1 END,
                       t.created_at DESC
-                    LIMIT 80
+                    LIMIT 200
                     """
                 ),
                 params,
@@ -108,7 +107,7 @@ class AssistantContextService:
                 due = row["due_at"].isoformat() if row["due_at"] else "no due date"
                 assignee = row["assignee_name"] or "담당자 미지정"
                 lines.append(
-                    f"- {row['title']} | status={row['status']} | priority={row['priority']} | assignee={assignee} | due={due} | created={row['created_at'].date().isoformat() if row['created_at'] else 'no date'}"
+                    f"- {row['title']} | description={row['description'] or '설명 없음'} | status={row['status']} | priority={row['priority']} | assignee={assignee} | due={due} | created={row['created_at'].date().isoformat() if row['created_at'] else 'no date'}"
                 )
             sources.append({"title": "Todo data", "type": "todos", "count": len(todos)})
         else:

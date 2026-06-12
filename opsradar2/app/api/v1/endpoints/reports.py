@@ -16,8 +16,13 @@ router = APIRouter()
 async def generate_report(body: dict | None = None, db: AsyncSession = Depends(get_db)):
     period = (body or {}).get("period", "weekly")
     project_id = (body or {}).get("project_id")
+    start_date = (body or {}).get("start_date")
     try:
-        return await ReportService(ReportRepository(db)).generate_report(period, project_id=project_id)
+        return await ReportService(ReportRepository(db)).generate_report(
+            period,
+            project_id=project_id,
+            start_date=start_date,
+        )
     except ValueError as exc:
         raise HTTPException(400, str(exc)) from exc
 
@@ -37,6 +42,13 @@ async def update_report(report_id: str, body: dict, db: AsyncSession = Depends(g
     if not updated:
         raise HTTPException(404, "report not found")
     return {"status": "success", "report_id": report_id}
+
+
+@router.delete("/{report_id}", status_code=204)
+async def delete_report(report_id: str, db: AsyncSession = Depends(get_db)):
+    deleted = await ReportService(ReportRepository(db)).delete_report(report_id)
+    if not deleted:
+        raise HTTPException(404, "report not found")
 
 
 @router.get("")

@@ -38,7 +38,7 @@ class Settings:
     DB_SCHEMA: str = os.getenv("DB_SCHEMA", "opsradar2")
     FRONTEND_ORIGINS: tuple[str, ...] = parse_csv_env(
         "FRONTEND_ORIGINS",
-        "http://127.0.0.1:8002,http://localhost:8002,http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:3000,http://localhost:3000",
+        "http://127.0.0.1:8002,http://localhost:8002,http://127.0.0.1:8010,http://localhost:8010,http://127.0.0.1:5173,http://localhost:5173,http://127.0.0.1:3000,http://localhost:3000,http://127.0.0.1:3001,http://localhost:3001",
     )
     MAX_UPLOAD_BYTES: int = parse_int_env("MAX_UPLOAD_BYTES", 25 * 1024 * 1024)
     AI_PROVIDER: str = os.getenv("AI_PROVIDER", "disabled")

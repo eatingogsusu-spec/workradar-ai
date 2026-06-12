@@ -1,5 +1,6 @@
 """Todo persistence for the v4 OpsRadar schema."""
 
+from datetime import date, datetime, time
 from typing import Optional
 
 from sqlalchemy import text
@@ -7,7 +8,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 
-_COLUMNS_CACHE: dict[str, set[str]] = {}
+
+def _normalize_due_at(value):
+    if value in (None, ""):
+        return None
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, date):
+        return datetime.combine(value, time.min)
+    return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
 
 
 class TodoRepository:
@@ -15,8 +24,6 @@ class TodoRepository:
         self.db = db
 
     async def _columns(self, table_name: str) -> set[str]:
-        if table_name in _COLUMNS_CACHE:
-            return _COLUMNS_CACHE[table_name]
         result = await self.db.execute(
             text(
                 """
@@ -28,8 +35,7 @@ class TodoRepository:
             ),
             {"schema": settings.DB_SCHEMA, "table_name": table_name},
         )
-        _COLUMNS_CACHE[table_name] = {row[0] for row in result.all()}
-        return _COLUMNS_CACHE[table_name]
+        return {row[0] for row in result.all()}
 
     async def count(
         self,
@@ -50,10 +56,7 @@ class TodoRepository:
             filters.append("source_type = :source")
             params["source"] = source
         where_clause = f"WHERE {' AND '.join(filters)}" if filters else ""
-        result = await self.db.execute(
-            text(f"SELECT COUNT(*) FROM todos {where_clause}"),
-            params,
-        )
+        result = await self.db.execute(text(f"SELECT COUNT(*) FROM todos {where_clause}"), params)
         return result.scalar_one()
 
     async def get_all(
@@ -61,7 +64,7 @@ class TodoRepository:
         status: Optional[str] = None,
         source: Optional[str] = None,
         project_id: Optional[str] = None,
-        limit: int = 15,
+        limit: int = 100,
         offset: int = 0,
     ) -> list[dict]:
         todo_columns = await self._columns("todos")
@@ -144,11 +147,12 @@ class TodoRepository:
                   {evidence_section_expr} AS evidence_section,
                   {approval_expr} AS approval_status,
                   {due_expr} AS due_at,
-                  t.created_at
+                  t.created_at,
+                  COALESCE(t.updated_at, t.created_at) AS updated_at
                 FROM todos t
                 {joins_sql}
                 {where_clause}
-                ORDER BY t.created_at DESC
+                ORDER BY COALESCE(t.updated_at, t.created_at) DESC
                 LIMIT :limit OFFSET :offset
                 """
             ),
@@ -160,8 +164,6 @@ class TodoRepository:
             evidence_snippet = item.pop("evidence_snippet", None)
             evidence_section = item.pop("evidence_section", None)
             has_evidence = bool(item.get("source_chunk_id") or evidence_snippet)
-            missing_assignee = not bool(item.get("assignee"))
-            missing_due_date = item.get("due_at") is None
             item["evidence"] = {
                 "document_id": item.get("document_id"),
                 "file_name": item.get("source_file_name"),
@@ -173,8 +175,8 @@ class TodoRepository:
                 "approval_status": item.get("approval_status"),
                 "has_evidence": has_evidence,
                 "missing_evidence": not has_evidence,
-                "missing_assignee": missing_assignee,
-                "missing_due_date": missing_due_date,
+                "missing_assignee": not bool(item.get("assignee")),
+                "missing_due_date": item.get("due_at") is None,
             }
             todos.append(item)
         return todos
@@ -234,7 +236,7 @@ class TodoRepository:
                 "source": data.get("source"),
                 "approval_status": data.get("approval_status"),
                 "confidence": data.get("confidence"),
-                "due_at": data.get("due_at"),
+                "due_at": _normalize_due_at(data.get("due_at")),
                 "linked_issue_id": data.get("linked_issue_id"),
                 "source_document_id": data.get("source_document_id"),
                 "source_chunk_id": data.get("source_chunk_id"),
@@ -250,11 +252,14 @@ class TodoRepository:
 
     async def update(self, todo_id: str, data: dict) -> bool:
         allowed = {
-            key: value
+            key: _normalize_due_at(value) if key == "due_at" else value
             for key, value in data.items()
             if key in {"title", "description", "status", "priority", "approval_status", "due_at"}
         }
-        assignments = [f"{key} = :{key}" for key in allowed]
+        assignments = [
+            "due_at = CAST(:due_at AS timestamptz)" if key == "due_at" else f"{key} = :{key}"
+            for key in allowed
+        ]
         params = {"todo_id": todo_id, **allowed}
         if "assignee" in data:
             assignments.append(
