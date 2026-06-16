@@ -50,11 +50,26 @@
   - 안전조치: 미커밋 상태였던 handoff.js(+502줄)를 `.backups/handoff.js.20260616-uncommitted.bak`로
     백업(.backups는 gitignore됨). handoff.js 자체는 사용자 확인 전까지 커밋 안 함.
 
+## handoff.js 되돌리기 조사 결과 (2026-06-16, Claude, [1]-a 확인 단계)
+- 사용자 결정: 미완성 +502줄(Codex WIP)은 폐기, "어제 손대기 전 정상 디자인"으로 되돌림.
+- 마지막 커밋본 = dc49ee8 / 2026-06-15 15:53 / PJW0314 /
+  "integrate document analysis review flow" (22줄).
+  내용: "신규 입사자 온보딩" 모듈. selectKnowledgeType('onboarding') 전용 렌더.
+  헤더 주석: "Other handoff flows remain in app.js" → 인수인계 센터의 나머지
+  흐름(퇴사/부재 등)은 app.js가 렌더. handoff.js는 온보딩 서브화면만 담당.
+  이전 이력: b3b4f4a(06-12 merge), 9b89eca(06-09 feat).
+- 작업트리 504줄본(미커밋, Codex) = 인수인계 센터 전면 재설계.
+  initHandoffCenter/renderHandoffHome/openHandoffPreview/runHandoffOneClick/
+  selectHandoffType 등 신규 전역 추가, 데모데이터·퇴사/부재 플로우로 app.js 렌더를 덮어씀.
+- 둘은 사실상 다른 화면. dc49ee8로 restore하면 온보딩 중심의 원래 커밋 상태로 복귀.
+- 다음: 사용자가 "dc49ee8가 원래 디자인 맞다" 확인 → [1]-b restore → [1]-c 서버 확인.
+
 ## 다음 작업 (다음 AI가 할 일)
-- 사용자에게 미커밋 handoff.js(+502줄, 인수인계 센터 대규모 수정) 처리 방침 확인:
-  별도 커밋할지 / 계속 작업 중인지. (백업본 존재: .backups/)
-- 기존 8002 서버를 새 main.py로 재기동해야 최신 서빙 로직 반영됨(현재 구 프로세스 PID 25776).
-  단, 재기동은 사용자 확인 후.
+- [1]-b: 사용자 확인 시 `git restore` 또는 `git checkout HEAD --` 로 handoff.js를
+  dc49ee8 상태로 되돌림(미커밋 504줄 폐기). .backups/ 백업본은 유지.
+- [1]-c: 8002 재기동(아래 [2]) 후 인수인계 센터 화면이 원래 디자인 정상인지 확인.
+- [2]: 기존 8002 서버(PID 25776) 멈추고 `python scripts/dev_server.py` 재기동
+  → 새 main.py 서빙 로직 + 되돌린 handoff.js 한 번에 반영. ([1] 완료 후 실행)
 - 1단계 착수: Vite 골격을 frontend/에 추가하되 기존 public/ 바닐라 앱과 공존(스트랭글러).
   package.json이 현재 create-react-app(react-scripts)임 → Vite로 교체 필요(사용자 확인).
 
