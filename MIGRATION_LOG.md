@@ -93,6 +93,15 @@
   - 폴백: localStorage.opsradar_react_reports='off' +새로고침 → 바닐라 복귀.
   - 검증(헤드리스 Chrome 실측): 픽셀 동일, React 마운트(설정·보고서 둘 다), 목록 3건/탭 전환/선택/AI초안
     버튼 정상, 9개 화면 무영향(설정 안 깨짐), 콘솔/페이지/HTTP 4xx·5xx 에러 0.
+- 2026-06-16, nav() 방어수정 (전역 라우터 안정화 — React 전환 아님, app.js 국소 수정):
+  - `nav(screen)`에 ① `getElementById('s-'+screen)`/`'nav-'+screen` **null 가드**(없으면 그 부분만
+    건너뛰고 nav는 끝까지 진행, throw 금지) ② 화면별 init 호출(renderTodos/initReportsScreen/
+    updateSettingsPage 등) **try/catch**(한 화면 init이 에러나도 nav 안 멈춤, console.warn만) 추가.
+  - 기존 정상 동작 100% 동일(전환 결과 무변경) — "에러가 나도 안 멈춘다"만 추가.
+  - 검증(헤드리스 Chrome): 9화면 순회·설정↔보고서 반복·동일화면 연타 전부 정상, React 마운트 유지,
+    콘솔/페이지/HTTP 에러 0, **존재하지 않는 화면명 nav → throw 없이(NO_THROW) 조용히 넘어가고
+    직후 정상 nav 완전 복구**.
+  - ⏸ 로그아웃은 이번에 손대지 않음(제품 결정 대기 — 아래 주의사항 참고).
 
 ## handoff.js 보존 결정 기록 (2026-06-16, 최종)
 - 정정: 한때 "미커밋 504줄을 폐기하고 dc49ee8로 되돌린다"는 방침이 있었으나 **취소됨**.
@@ -128,6 +137,15 @@
   단 React가 재렌더하면 vanilla가 채운 DOM(목록/contenteditable/탭 active)을 되돌릴 수 있으니
   **memo + 재렌더 0**(MutationObserver 미사용)으로 둘 것. contenteditable은 uncontrolled(+
   suppressContentEditableWarning)로 두어 vanilla의 innerHTML 읽기/쓰기를 방해하지 말 것.
+- ★방어수정(2026-06-16): `nav()`에 **null 가드 + 화면별 init try/catch** 적용 완료. 이제 화면 노드가
+  없거나 한 화면 init이 에러나도 nav 전체가 throw로 멈추지 않음(에러는 console.warn). 향후 React 전환에서
+  `#s-OOO` 노드를 없애는 변경을 하더라도 nav가 죽지 않는다(단 가능하면 컨테이너 노드는 유지할 것).
+- ⏸ **로그아웃은 제품 결정 대기 중**(이번 nav 수정엔 미포함): 진단 결과 로그인/로그아웃 플로우가
+  반쪽만 이식됨 — `__workraderLogout`·로그인 화면(`src/Login.js`)·login CSS는 **CRA `src/`에만** 있고
+  서빙되는 vite 번들(`react-mount/main.jsx`)엔 없음(죽은 코드). 그래서 `logout()`은 reload 후
+  로그인 화면이 없어 같은 대시보드(기본 정체성 김희진)로 복귀 → "로그아웃 무효". 인증 강제 환경이면
+  reload 후 401로 화면 깨질 수 있음. **발표 시나리오에서 로그아웃이 무엇을 해야 하는지 확정 후 처리**
+  (옵션: ㄱ 데모용 숨김/토스트 / ㄴ 토큰 클리어 후 안내 / ㄷ 로그인 화면 신설).
 - app.js(3305줄)에 거의 모든 화면 로직이 몰려있음. 화면 전환 = app.js에서 해당 부분 추출.
 - workflow-v2.js는 이슈/리스크 검토(renderPendingIssues 등). 이슈 화면 전환 시 반드시 함께 보존.
 - frontend/build/ = 어제의 CRA 전면교체 시도본(깨짐). 삭제 금지, 무시만. main.py가 이미 무시함.

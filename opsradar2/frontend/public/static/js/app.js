@@ -558,29 +558,37 @@ function nav(screen) {
 
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
-  document.getElementById('s-' + screen).classList.add('active');
-  document.getElementById('nav-' + screen).classList.add('active');
+  // 방어: 노드가 없으면(잘못된 화면명/미마운트) 그 부분만 건너뛰고 nav는 끝까지 진행(throw 금지).
+  const screenEl = document.getElementById('s-' + screen);
+  if (screenEl) screenEl.classList.add('active');
+  else console.warn('nav: screen node not found: s-' + screen);
+  const navEl = document.getElementById('nav-' + screen);
+  if (navEl) navEl.classList.add('active');
   G.currentScreen = screen;
   const floatAI = document.getElementById('floatAI');
   if(floatAI) floatAI.style.display = screen === 'chat' ? 'none' : '';
 
-  if (screen === 'todo') renderTodos();
-  if (screen === 'issues') renderIssues();
-  if (screen === 'calendar') { renderCalendar(); showCalBanner(); }
-  if (screen === 'settings') updateSettingsPage();
-  if (screen === 'reports') initReportsScreen();
-  if (screen === 'chat') initChatSessions();
-  if (screen === 'knowledge') {
-
-setTimeout(initDocumentGenerationActions, 0);
-setTimeout(bindRemainingActionButtons, 0);
-    // 버튼 전체 초기화 후 온보딩으로 바로 시작
-    ['onboarding','absence','offboard'].forEach(t => {
-      const btn = document.getElementById('kbtn-'+t);
-      if (btn) btn.removeAttribute('style');
-    });
-    renderKnowledgeAbsence();
-    selectKnowledgeType('onboarding');
+  // 방어: 화면별 init이 에러나도 nav 자체는 멈추지 않게 감싼다(에러는 console.warn으로만).
+  try {
+    if (screen === 'todo') renderTodos();
+    if (screen === 'issues') renderIssues();
+    if (screen === 'calendar') { renderCalendar(); showCalBanner(); }
+    if (screen === 'settings') updateSettingsPage();
+    if (screen === 'reports') initReportsScreen();
+    if (screen === 'chat') initChatSessions();
+    if (screen === 'knowledge') {
+      setTimeout(initDocumentGenerationActions, 0);
+      setTimeout(bindRemainingActionButtons, 0);
+      // 버튼 전체 초기화 후 온보딩으로 바로 시작
+      ['onboarding','absence','offboard'].forEach(t => {
+        const btn = document.getElementById('kbtn-'+t);
+        if (btn) btn.removeAttribute('style');
+      });
+      renderKnowledgeAbsence();
+      selectKnowledgeType('onboarding');
+    }
+  } catch (e) {
+    console.warn('nav: screen init failed for "' + screen + '":', e);
   }
 }
 
