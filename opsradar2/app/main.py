@@ -11,15 +11,18 @@ from app.core.config import settings
 
 ROOT = Path(__file__).resolve().parents[1]
 FRONTEND = ROOT / "frontend"
-FRONTEND_BUILD = FRONTEND / "build"
+FRONTEND_PUBLIC = FRONTEND / "public"
 FRONTEND_DIST = FRONTEND / "dist"
-FRONTEND_OUTPUT = FRONTEND_BUILD if FRONTEND_BUILD.exists() else FRONTEND_DIST
-FRONTEND_PUBLIC_STATIC = FRONTEND / "public" / "static"
+# Step 0 (see MIGRATION_LOG.md): the create-react-app `frontend/build/` shell
+# broke every screen, so we ignore it for now and serve the working vanilla app
+# from `public/`. The Vite output (`dist/`) is preferred automatically once a
+# screen is actually migrated. The CRA `build/` dir is intentionally NOT used.
+FRONTEND_OUTPUT = FRONTEND_DIST if FRONTEND_DIST.exists() else FRONTEND_PUBLIC
+FRONTEND_PUBLIC_STATIC = FRONTEND_PUBLIC / "static"
 FRONTEND_STATIC = (
     FRONTEND_OUTPUT / "static" if (FRONTEND_OUTPUT / "static").exists() else FRONTEND_PUBLIC_STATIC
 )
-# Prefer the React build entry when it exists so the login shell is mounted.
-_public_entry = FRONTEND / "public" / "index.html"
+_public_entry = FRONTEND_PUBLIC / "index.html"
 FRONTEND_ENTRY = (
     FRONTEND_OUTPUT / "index.html" if (FRONTEND_OUTPUT / "index.html").exists() else
     _public_entry if _public_entry.exists() else
