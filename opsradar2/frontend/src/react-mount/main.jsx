@@ -1,7 +1,7 @@
 // Strangler-fig React entry (see MIGRATION_LOG.md).
 //
 // 전환된 화면을 기존 바닐라 노드 안에 React로 렌더한다. 현재: 설정(s-settings),
-// 보고서(s-reports), 캘린더(s-calendar) 3개. 아직 안 옮긴 화면은 전부 바닐라가 그대로 소유한다.
+// 보고서(s-reports), 캘린더(s-calendar), Todo(s-todo) 4개. 아직 안 옮긴 화면은 전부 바닐라가 그대로 소유한다.
 //
 // 안전 설계:
 //  - window.nav 를 건드리지 않는다. 대신 #s-settings 가 .active 가 되는 것을
@@ -13,6 +13,7 @@ import { createRoot } from 'react-dom/client'
 import SettingsScreen from './SettingsScreen.jsx'
 import ReportsScreen from './ReportsScreen.jsx'
 import CalendarScreen from './CalendarScreen.jsx'
+import TodoScreen from './TodoScreen.jsx'
 
 const USE_REACT_SETTINGS = (() => {
   try {
@@ -33,6 +34,14 @@ const USE_REACT_REPORTS = (() => {
 const USE_REACT_CALENDAR = (() => {
   try {
     return localStorage.getItem('opsradar_react_calendar') !== 'off'
+  } catch (_) {
+    return true
+  }
+})()
+
+const USE_REACT_TODO = (() => {
+  try {
+    return localStorage.getItem('opsradar_react_todo') !== 'off'
   } catch (_) {
     return true
   }
@@ -91,10 +100,24 @@ function mountReactCalendar() {
   )
 }
 
+// Todo(s-todo) — 스트랭글러 4번째. Todo 탭/목록/카드/상세는 React state 로 렌더한다.
+// 기존 renderTodos()/switchTodoTab()/openDashboardTodoTab() 호출자는 app.js compatibility wrapper 로
+// React 이벤트를 발생시켜 유지한다. 다른 화면은 계속 바닐라 소유.
+function mountReactTodo() {
+  const el = document.getElementById('s-todo')
+  if (!el) return
+  createRoot(el).render(
+    <StrictMode>
+      <TodoScreen />
+    </StrictMode>,
+  )
+}
+
 function bootstrap() {
   if (USE_REACT_SETTINGS) mountReactSettings()
   if (USE_REACT_REPORTS) mountReactReports()
   if (USE_REACT_CALENDAR) mountReactCalendar()
+  if (USE_REACT_TODO) mountReactTodo()
 }
 
 if (document.readyState === 'loading') {

@@ -303,7 +303,7 @@
     if (isLead()) {
       upload.forEach((node) => { if (node && ["uploadSection", "analysisGuide"].includes(node.id)) node.style.display = ""; });
     } else {
-      const aiTab = document.querySelector("#todoTabs .tab:first-child");
+      const aiTab = document.getElementById("t-ai-cnt")?.closest(".tab");
       if (aiTab) { aiTab.style.display = ""; aiTab.childNodes[0].nodeValue = "승인 대기중 Todo "; }
     }
     configureTodoTabs();
@@ -317,7 +317,8 @@
     const tabs = document.getElementById("todoTabs");
     if (!tabs) return;
     document.getElementById("adminFileAnalysisTab")?.remove();
-    const byTab = (tab) => tabs.querySelector(`.tab[onclick*="'${tab}'"]`);
+    const tabBadgeIds = { inprogress: "t-in-cnt", ai: "t-ai-cnt", done: "t-done-cnt", rejected: "t-rej-cnt" };
+    const byTab = (tab) => document.getElementById(tabBadgeIds[tab])?.closest(".tab");
     const labels = { inprogress: "진행 Todo", done: "완료", rejected: "반려", ai: "승인 대기 Todo" };
     ["inprogress", "done", "rejected", "ai"].forEach((tab) => {
       const node = byTab(tab); if (!node) return;
@@ -384,8 +385,9 @@
   const baseSwitchTodo = window.switchTodoTab;
   window.switchTodoTab = switchTodoTab = function (tab) {
     const result = baseSwitchTodo(tab);
-    document.querySelectorAll("#todoTabs .tab").forEach((node) => {
-      node.classList.toggle("active", String(node.getAttribute("onclick") || "").includes(`'${tab}'`));
+    const tabBadgeIds = { inprogress: "t-in-cnt", ai: "t-ai-cnt", done: "t-done-cnt", rejected: "t-rej-cnt" };
+    Object.entries(tabBadgeIds).forEach(([key, badgeId]) => {
+      document.getElementById(badgeId)?.closest(".tab")?.classList.toggle("active", key === tab);
     });
     return result;
   };
@@ -489,20 +491,6 @@
   const baseRenderTodos = window.renderTodos;
   window.renderTodos = renderTodos = function () {
     baseRenderTodos();
-    const pageItems = todoPageItems(getFilteredTodos());
-    document.querySelectorAll("#todoBody tr").forEach((row, index) => {
-      const item = pageItems[index];
-      if (!item) return;
-      const dates = row.querySelectorAll(".todo-created-at");
-      if (dates[0]) dates[0].style.display = G.currentTodoTab === "ai" ? "none" : "table-cell";
-      if (dates[1]) {
-        dates[1].textContent = item.dueDate || "-";
-        dates[1].style.display = G.currentTodoTab === "ai" ? "none" : "table-cell";
-      }
-      const title = row.querySelector(".todo-title");
-      if (title) title.onclick = (event) => { event.stopPropagation(); selectTodo(item.id); };
-      row.classList.toggle("wr-own-todo", !isLead() && item.assignee === memberName());
-    });
   };
 
   const baseDateColumns = window.updateTodoDateColumns;
@@ -517,13 +505,6 @@
   const baseTodoDetail = window.renderTodoDetail;
   window.renderTodoDetail = renderTodoDetail = function (id) {
     baseTodoDetail(id);
-    const item = todos.find((todo) => todo.id === id);
-    const host = document.getElementById("todoDetailContent")?.firstElementChild;
-    if (!item || !host) return;
-    host.querySelector(".wr-detail-description")?.remove();
-    host.insertAdjacentHTML("afterbegin", `<section class="wr-detail-description"><b>업무 내용</b><p>${esc(description(item))}</p></section>`);
-    host.querySelector(".wr-todo-source")?.remove();
-    host.insertAdjacentHTML("beforeend", `<div class="wr-todo-source"><b>출처</b>${item.src ? `<button class="wr-source-link" onclick="downloadSource('${esc(item.src)}','${esc(item.sourceFileName || "")}')"><i class="ti ti-download"></i> ${esc(item.sourceFileName || "출처 파일")}</button>` : "<span>수동 등록</span>"}</div>`);
   };
 
   const baseIssueDetail = window.renderIssueDetail;

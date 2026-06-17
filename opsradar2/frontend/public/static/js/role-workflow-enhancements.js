@@ -198,7 +198,7 @@
     document.body.classList.toggle("wr-team-member", !lead);
     document.querySelector(".app-session-control")?.remove();
     document.querySelector(".ops-role-switch")?.remove();
-    const aiTab = document.querySelector("#todoTabs .tab[onclick*=\"'ai'\"]");
+    const aiTab = document.getElementById("t-ai-cnt")?.closest(".tab");
     if (aiTab) aiTab.style.display = lead ? "" : "none";
     const candidateTab = document.querySelector("#s-issues .tabs .tab[onclick*=\"'candidate'\"]");
     if (candidateTab) candidateTab.style.display = lead ? "" : "none";

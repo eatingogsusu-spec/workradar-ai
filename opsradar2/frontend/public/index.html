@@ -1032,8 +1032,8 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
 <script src="/static/js/todo-calendar-enhancements.js?v=20260617"></script>
 <script src="/static/js/role-workflow-enhancements.js?v=20260617"></script>
 <script src="/static/js/workflow-v2.js?v=20260617"></script>
-<!-- React strangler-fig mount (1단계): 비어있음, 화면 변화 없음. MIGRATION_LOG.md 참고 -->
+<!-- React strangler-fig mount: Todo 탭/목록/카드/상세는 React 렌더링, 기존 Todo 전역 함수는 compatibility wrapper 유지. -->
 <div id="react-mount"></div>
-<script type="module" src="/static/react/main.js?v=20260616"></script>
+<script type="module" src="/static/react/main.js?v=20260617"></script>
 <div id="root"></div></body>
 </html>

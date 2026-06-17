@@ -2528,6 +2528,113 @@ function renderTodoCards() {
     </div>`).join('');
 }
 
+function emitTodoReactEvent(name, detail = {}) {
+  window.dispatchEvent(new CustomEvent(name, { detail }));
+}
+
+function emitTodoRefresh(reason = 'compat') {
+  emitTodoReactEvent('opsradar:todo-refresh', { reason });
+}
+
+window.opsRadarTodoBridge = {
+  getSnapshot() {
+    return {
+      todos: todos.map((todo) => ({ ...todo })),
+      G: {
+        currentTodoTab: G.currentTodoTab,
+        selectedTodoId: G.selectedTodoId,
+        todoChecked: { ...G.todoChecked },
+        todoSearch: { ...G.todoSearch },
+        todoSearchField: { ...G.todoSearchField },
+        todoPage: { ...G.todoPage },
+      },
+      viewMode: todoViewMode,
+    };
+  },
+  setTab(tab) {
+    G.currentTodoTab = tab;
+    G.todoPage[tab] = 1;
+    G.selectedTodoId = null;
+  },
+  setViewMode(mode) {
+    todoViewMode = mode;
+  },
+  setSearch(value) {
+    G.todoSearch[G.currentTodoTab] = value;
+    G.todoPage[G.currentTodoTab] = 1;
+  },
+  setSearchField(value) {
+    G.todoSearchField[G.currentTodoTab] = value;
+    G.todoPage[G.currentTodoTab] = 1;
+  },
+  setPage(page) {
+    G.todoPage[G.currentTodoTab] = page;
+  },
+  selectTodo(id) {
+    G.selectedTodoId = id;
+  },
+  toggleCheck(id, checked) {
+    G.todoChecked[id] = checked;
+  },
+  toggleAll(ids, checked) {
+    ids.forEach((id) => { G.todoChecked[id] = checked; });
+  },
+};
+
+window.renderTodos = renderTodos = function renderTodosCompat() {
+  emitTodoRefresh('renderTodos');
+};
+window.renderTodoCards = renderTodoCards = function renderTodoCardsCompat() {
+  emitTodoRefresh('renderTodoCards');
+};
+window.renderTodoDetail = renderTodoDetail = function renderTodoDetailCompat(id) {
+  G.selectedTodoId = id;
+  emitTodoReactEvent('opsradar:todo-select', { id });
+  emitTodoRefresh('renderTodoDetail');
+};
+window.selectTodo = selectTodo = function selectTodoCompat(id) {
+  G.selectedTodoId = id;
+  emitTodoReactEvent('opsradar:todo-select', { id });
+  emitTodoRefresh('selectTodo');
+};
+window.switchTodoView = switchTodoView = function switchTodoViewCompat(mode) {
+  todoViewMode = mode;
+  emitTodoReactEvent('opsradar:todo-view-change', { mode });
+  emitTodoRefresh('switchTodoView');
+};
+window.setTodoSearch = setTodoSearch = function setTodoSearchCompat(value) {
+  G.todoSearch[G.currentTodoTab] = value;
+  G.todoPage[G.currentTodoTab] = 1;
+  emitTodoRefresh('setTodoSearch');
+};
+window.setTodoSearchField = setTodoSearchField = function setTodoSearchFieldCompat(value) {
+  G.todoSearchField[G.currentTodoTab] = value;
+  G.todoPage[G.currentTodoTab] = 1;
+  emitTodoRefresh('setTodoSearchField');
+};
+window.setTodoPage = setTodoPage = function setTodoPageCompat(page) {
+  G.todoPage[G.currentTodoTab] = page;
+  emitTodoRefresh('setTodoPage');
+};
+window.toggleTodoCheck = toggleTodoCheck = function toggleTodoCheckCompat(event, id, fromCheckbox = false) {
+  const checked = fromCheckbox && event?.target ? event.target.checked : !G.todoChecked[id];
+  G.todoChecked[id] = checked;
+  if (fromCheckbox) event.stopPropagation();
+  emitTodoRefresh('toggleTodoCheck');
+};
+window.toggleAllChk = toggleAllChk = function toggleAllChkCompat(el) {
+  const filtered = todoPageItems(getFilteredTodos());
+  filtered.forEach((todo) => { G.todoChecked[todo.id] = !!el.checked; });
+  emitTodoRefresh('toggleAllChk');
+};
+window.switchTodoTab = switchTodoTab = function switchTodoTabCompat(tab) {
+  G.currentTodoTab = tab;
+  G.todoPage[tab] = 1;
+  G.selectedTodoId = null;
+  emitTodoReactEvent('opsradar:todo-tab-change', { tabId: tab });
+  emitTodoRefresh('switchTodoTab');
+};
+
 // ════════════════════════════════════════════════
 // UX 개선 4, 5, 6 — 배너 / 알림 트리거
 // ════════════════════════════════════════════════

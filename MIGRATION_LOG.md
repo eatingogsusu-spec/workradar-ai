@@ -25,7 +25,7 @@
 |------|----|----|----|
 | Dashboard | s-dashboard | app.js + workflow-v2.js | 기존바닐라 |
 | 운영 로그 분석 | s-analysis | app.js | 기존바닐라 |
-| Todo | s-todo | app.js + todo-calendar-enhancements.js | 기존바닐라 |
+| Todo | s-todo | React(TodoScreen.jsx) + app.js compatibility wrapper + todo-calendar-enhancements.js | **전환완료** |
 | 이슈 로그 | s-issues | app.js + workflow-v2.js | 기존바닐라 |
 | 캘린더 | s-calendar | React(CalendarScreen.jsx) + 동작 vanilla 공존 | **전환완료** |
 | 인수인계 센터 | s-knowledge | handoff.js (504줄·월요일작업 03b02ca) | 기존바닐라 |
@@ -115,6 +115,16 @@
   - 검증(헤드리스 Chrome): 9화면 순회 정상, React 마운트(설정·보고서·캘린더 셋 다), 날짜셀 35개·월이동
     (6월→5월→6월 복원)·AI모달·미니챗 정상, "+N 더보기" 데코레이터 실측(태그3개→"+1 더보기"·표시2개),
     9화면 무영향, 콘솔/HTTP 에러 0. 사용자 브라우저 직접 확인 완료.
+- 2026-06-17, Codex, Todo(s-todo) 화면 React 렌더링 전환 — 스트랭글러 4번째:
+  - TodoScreen.jsx를 React shell에서 실제 React 렌더링 화면으로 확장. 탭 active, 검색 조건/키워드,
+    페이지, 테이블/카드 뷰, 선택 Todo 상세, empty state를 React state로 관리.
+  - TodoTabs.jsx / TodoList.jsx / TodoDetail.jsx / TodoEmptyState.jsx / todoStateAdapter.js 추가.
+    기존 class/id 구조는 유지하고, 기존 Todo 데이터 source(todos/G)는 app.js bridge로 읽어 React state에 반영.
+  - app.js의 renderTodos/selectTodo/renderTodoDetail/switchTodoTab/switchTodoView 등 기존 전역 함수는
+    삭제하지 않고 compatibility wrapper로 전환해 `opsradar:todo-*` 이벤트를 발생시킴.
+    Dashboard의 openDashboardTodoTab 및 api-integration/workflow/todo-calendar 기존 호출 흐름 유지.
+  - workflow-v2.js의 Todo 목록/상세 DOM 후처리는 React 렌더링과 중복되어 wrapper 호출만 남김.
+  - Vite 산출물은 기존 규칙대로 public/static/react/main.js만 갱신(dist 미생성).
 
 ## handoff.js 보존 결정 기록 (2026-06-16, 최종)
 - 정정: 한때 "미커밋 504줄을 폐기하고 dc49ee8로 되돌린다"는 방침이 있었으나 **취소됨**.
@@ -129,8 +139,8 @@
   CRA src에만 있고 서빙 vite 번들엔 없음 → `logout()`이 reload만 하고 같은 대시보드로 복귀).
   **사용자가 "발표 때 로그아웃이 무엇을 해야 하는지" 정한 뒤** app.js의 `logout()`을 그에 맞게 수정.
   (옵션: ㄱ 데모용 숨김/토스트 / ㄴ 토큰 클리어 후 안내 / ㄷ 로그인 화면 신설) — 자세한 건 주의사항 참고.
-- 4번째 화면 전환 — 대상 미정(사용자와 상의). 남은 바닐라 6개: Dashboard / 운영 로그 분석 /
-  Todo / 이슈 로그 / 인수인계 센터 / AI Assistant.
+- 5번째 화면 전환 — 대상 미정(사용자와 상의). 남은 바닐라 5개: Dashboard / 운영 로그 분석 /
+  이슈 로그 / 인수인계 센터 / AI Assistant.
   - 후보 검토 시 반드시 **api-integration.js 런타임 주입 여부 + 바닐라 리스너 바인딩 방식까지** 조사할 것(아래 교훈 참고).
   - 패턴: 기존 노드에 createRoot 렌더(ID 스코프 CSS 상속), 전역 함수 재사용.
     화면 전체가 vanilla 소유면 보고서·캘린더처럼 **memo 1회 렌더(재렌더 0)**, React 관리 상태가 있으면
