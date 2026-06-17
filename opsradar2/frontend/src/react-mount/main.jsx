@@ -14,6 +14,7 @@ import SettingsScreen from './SettingsScreen.jsx'
 import ReportsScreen from './ReportsScreen.jsx'
 import CalendarScreen from './CalendarScreen.jsx'
 import IssuesScreen from './IssuesScreen.jsx'
+import DashboardScreen from './DashboardScreen.jsx'
 
 const USE_REACT_SETTINGS = (() => {
   try {
@@ -42,6 +43,14 @@ const USE_REACT_CALENDAR = (() => {
 const USE_REACT_ISSUES = (() => {
   try {
     return localStorage.getItem('opsradar_react_issues') !== 'off'
+  } catch (_) {
+    return true
+  }
+})()
+
+const USE_REACT_DASHBOARD = (() => {
+  try {
+    return localStorage.getItem('opsradar_react_dashboard') !== 'off'
   } catch (_) {
     return true
   }
@@ -114,11 +123,26 @@ function mountReactIssues() {
   )
 }
 
+// 대시보드(s-dashboard) — 보고서/캘린더와 동일: 화면 전체 vanilla 소유라 memo 로 1회만 렌더(재렌더 0).
+// renderDashboardLive(4중 몽키패치)가 nav('dashboard')/init/reload 에서 카운트·리스크그리드·AI리스트·
+// 멤버뷰를 채우고, applyRoleVisibility 가 .ops-role-switch 제거 + switchDbRole 로 뷰 .active 토글.
+// ⚠️ 재렌더하면 vanilla 가 제거한 role-switch 가 되살아나고 뷰 상태가 꼬임 → 반드시 1회 렌더만.
+function mountReactDashboard() {
+  const el = document.getElementById('s-dashboard')
+  if (!el) return
+  createRoot(el).render(
+    <StrictMode>
+      <DashboardScreen />
+    </StrictMode>,
+  )
+}
+
 function bootstrap() {
   if (USE_REACT_SETTINGS) mountReactSettings()
   if (USE_REACT_REPORTS) mountReactReports()
   if (USE_REACT_CALENDAR) mountReactCalendar()
   if (USE_REACT_ISSUES) mountReactIssues()
+  if (USE_REACT_DASHBOARD) mountReactDashboard()
 }
 
 if (document.readyState === 'loading') {

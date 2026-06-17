@@ -23,7 +23,7 @@
 ## 화면 전환 현황 (9개)
 | 화면 | ID | 담당 기존 JS | 상태 |
 |------|----|----|----|
-| Dashboard | s-dashboard | app.js + workflow-v2.js | **전환중** (박주원, feature/issues-dashboard-react) |
+| Dashboard | s-dashboard | React(DashboardScreen.jsx) + renderDashboardLive 등 동작 vanilla 공존 | **전환완료** (박주원) |
 | 운영 로그 분석 | s-analysis | app.js | 기존바닐라 |
 | Todo | s-todo | app.js + todo-calendar-enhancements.js | 기존바닐라 |
 | 이슈 로그 | s-issues | React(IssuesScreen.jsx) + workflow-v2/app.js 동작 vanilla 공존 | **전환완료** (박주원) |
@@ -131,6 +131,23 @@
     9화면 무영향. ⚠️ 반려 탭 클릭 시 401/login-required는 `/workflow/risks/rejected` 인증 필요로
     발생하는 **기존 토큰만료 이슈**(폴백 바닐라에서도 동일 발생 확인 → 전환 무관). 카드→상세는
     현재 데이터에 confirmed 이슈 0개라 미실행(상세 패널 노드는 정상 렌더, 메커니즘 vanilla 무변경).
+- 2026-06-17, 박주원, 대시보드(s-dashboard) 화면 React 전환 (feature/issues-dashboard-react 브랜치):
+  - DashboardScreen.jsx: 두 직계 자식(.topbar / .content)만 **verbatim dangerouslySetInnerHTML**로
+    렌더(클래스·인라인 onclick·스타일 100% 보존, 여분 래퍼 0 → flex 레이아웃 유지). memo 1회 렌더(재렌더 0).
+    동작은 전부 vanilla: renderDashboardLive(4중 몽키패치 — ops/role/todo-calendar/workflow-v2)가
+    nav('dashboard')/init/reload 에서 카운트(textContent)·#db-high-risk-grid·#db-ai-todo-list·
+    #db-member-view(innerHTML) 채움. **app.js·4개 enhancement js·workflow-v2.js 무수정.** main.jsx 1줄 추가.
+  - ★핵심(재렌더 0): applyRoleVisibility 가 `.ops-role-switch` 를 런타임 제거 + switchDbRole 로
+    #db-admin-view/#db-member-view `.active` 토글(isLead 가 그 .active 를 상태소스로 읽음). React 가
+    재렌더하면 제거된 role-switch 가 되살아나고 뷰 상태가 꼬임 → memo + 1회 렌더로 완전 회피.
+    (대시보드엔 이슈 같은 onclick 속성 셀렉터 결합 없음, 차트 라이브러리 없음 → 추가 처리 불요.)
+  - 날짜 칩 함정(이슈 화면도 동일): `[data-current-date]` 를 채우는 app.js renderCurrentDateLabels 가
+    init 1회만 실행 → React 마운트가 placeholder 로 덮음. 마운트 시 useEffect 로 renderCurrentDateLabels()
+    1회 호출(전역·멱등)로 해결. IssuesScreen 에도 동일 적용.
+  - 폴백: localStorage.opsradar_react_dashboard='off' +새로고침 → 바닐라 복귀.
+  - 검증(헤드리스 Chrome): 픽셀 동일(날짜 칩 포함), React 마운트 5개 다, **재렌더 0 스트레스(nav 5회 왕복)
+    후 .ops-role-switch 제거 유지 + 뷰 .active 일관 + 카운트/그리드/리스트/멤버뷰 보존**, switchDbRole
+    뷰 토글 정상, openDashboardTodoTab 클릭(→todo 이동) 정상, 9화면 무영향, 콘솔/페이지/HTTP 에러 0.
 
 ## handoff.js 보존 결정 기록 (2026-06-16, 최종)
 - 정정: 한때 "미커밋 504줄을 폐기하고 dc49ee8로 되돌린다"는 방침이 있었으나 **취소됨**.
@@ -145,9 +162,8 @@
   CRA src에만 있고 서빙 vite 번들엔 없음 → `logout()`이 reload만 하고 같은 대시보드로 복귀).
   **사용자가 "발표 때 로그아웃이 무엇을 해야 하는지" 정한 뒤** app.js의 `logout()`을 그에 맞게 수정.
   (옵션: ㄱ 데모용 숨김/토스트 / ㄴ 토큰 클리어 후 안내 / ㄷ 로그인 화면 신설) — 자세한 건 주의사항 참고.
-- 🟦 **선점(2026-06-17, 박주원)**: 이슈 로그(s-issues) + 대시보드(s-dashboard) 두 화면은
-  `feature/issues-dashboard-react` 브랜치에서 박주원이 작업 중(둘 다 workflow-v2 의존이라 묶음).
-  이슈 로그 먼저 진행. 다른 사람은 이 두 화면 손대지 말 것.
+- ✅ **이슈 로그 + 대시보드 전환완료(2026-06-17, 박주원, feature/issues-dashboard-react)** —
+  두 화면 다 React 전환 끝. 머지 대기 중. (둘 다 workflow-v2 의존이라 한 사람이 묶어서 진행함)
 - 4번째 화면 전환 — 대상 미정(사용자와 상의). 남은 바닐라 6개: Dashboard / 운영 로그 분석 /
   Todo / 이슈 로그 / 인수인계 센터 / AI Assistant.
   - 후보 검토 시 반드시 **api-integration.js 런타임 주입 여부 + 바닐라 리스너 바인딩 방식까지** 조사할 것(아래 교훈 참고).
