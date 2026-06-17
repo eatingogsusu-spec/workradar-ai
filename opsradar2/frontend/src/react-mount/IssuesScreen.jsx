@@ -14,7 +14,7 @@
 //   React 의 onClick 은 onclick 속성을 만들지 않으므로, .tabs 만 dangerouslySetInnerHTML 로
 //   리터럴 onclick 을 보존한다(여분 래퍼 회피 위해 나머지는 JSX 프래그먼트).
 //   #issueCreateModal 은 body 레벨이라 #s-issues 밖 → 전환 무관.
-import { memo } from 'react'
+import { memo, useEffect } from 'react'
 
 // 탭은 리터럴 onclick 보존이 필수 → 정적 HTML 그대로(workflow-v2 의 onclick 속성 셀렉터 대상).
 const TABS_HTML =
@@ -24,6 +24,12 @@ const TABS_HTML =
   '<span class="badge b-warn" id="i-cand-cnt">0</span></div>'
 
 const IssuesScreen = memo(function IssuesScreen() {
+  // 날짜 칩([data-current-date])은 app.js renderCurrentDateLabels 가 init 시 1회만 채운다.
+  // React 마운트가 그 후 placeholder 로 덮으므로 마운트 직후 1회 다시 채운다(전역·멱등, vanilla 무수정).
+  useEffect(() => {
+    if (typeof window.renderCurrentDateLabels === 'function') window.renderCurrentDateLabels()
+  }, [])
+
   return (
     <>
       <div className="topbar">
