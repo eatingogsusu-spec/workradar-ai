@@ -23,10 +23,10 @@
 ## 화면 전환 현황 (9개)
 | 화면 | ID | 담당 기존 JS | 상태 |
 |------|----|----|----|
-| Dashboard | s-dashboard | app.js + workflow-v2.js | 기존바닐라 |
+| Dashboard | s-dashboard | app.js + workflow-v2.js | **전환중** (박주원, feature/issues-dashboard-react) |
 | 운영 로그 분석 | s-analysis | app.js | 기존바닐라 |
 | Todo | s-todo | app.js + todo-calendar-enhancements.js | 기존바닐라 |
-| 이슈 로그 | s-issues | app.js + workflow-v2.js | 기존바닐라 |
+| 이슈 로그 | s-issues | app.js + workflow-v2.js | **전환중** (박주원, feature/issues-dashboard-react) |
 | 캘린더 | s-calendar | React(CalendarScreen.jsx) + 동작 vanilla 공존 | **전환완료** |
 | 인수인계 센터 | s-knowledge | handoff.js (504줄·월요일작업 03b02ca) | 기존바닐라 |
 | 보고서 | s-reports | React(ReportsScreen.jsx) + report.js/app.js 동작 vanilla 공존 | **전환완료** |
@@ -129,6 +129,9 @@
   CRA src에만 있고 서빙 vite 번들엔 없음 → `logout()`이 reload만 하고 같은 대시보드로 복귀).
   **사용자가 "발표 때 로그아웃이 무엇을 해야 하는지" 정한 뒤** app.js의 `logout()`을 그에 맞게 수정.
   (옵션: ㄱ 데모용 숨김/토스트 / ㄴ 토큰 클리어 후 안내 / ㄷ 로그인 화면 신설) — 자세한 건 주의사항 참고.
+- 🟦 **선점(2026-06-17, 박주원)**: 이슈 로그(s-issues) + 대시보드(s-dashboard) 두 화면은
+  `feature/issues-dashboard-react` 브랜치에서 박주원이 작업 중(둘 다 workflow-v2 의존이라 묶음).
+  이슈 로그 먼저 진행. 다른 사람은 이 두 화면 손대지 말 것.
 - 4번째 화면 전환 — 대상 미정(사용자와 상의). 남은 바닐라 6개: Dashboard / 운영 로그 분석 /
   Todo / 이슈 로그 / 인수인계 센터 / AI Assistant.
   - 후보 검토 시 반드시 **api-integration.js 런타임 주입 여부 + 바닐라 리스너 바인딩 방식까지** 조사할 것(아래 교훈 참고).
