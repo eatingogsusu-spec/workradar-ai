@@ -24,7 +24,7 @@
 | 화면 | ID | 담당 기존 JS | 상태 |
 |------|----|----|----|
 | Dashboard | s-dashboard | app.js + workflow-v2.js | 기존바닐라 |
-| 운영 로그 분석 | s-analysis | app.js | 기존바닐라 |
+| 운영 로그 분석 | s-analysis | React(AnalysisScreen.jsx) + 동작 vanilla 공존 | **전환완료** |
 | Todo | s-todo | app.js + todo-calendar-enhancements.js | 기존바닐라 |
 | 이슈 로그 | s-issues | app.js + workflow-v2.js | 기존바닐라 |
 | 캘린더 | s-calendar | React(CalendarScreen.jsx) + 동작 vanilla 공존 | **전환완료** |
@@ -116,6 +116,23 @@
     (6월→5월→6월 복원)·AI모달·미니챗 정상, "+N 더보기" 데코레이터 실측(태그3개→"+1 더보기"·표시2개),
     9화면 무영향, 콘솔/HTTP 에러 0. 사용자 브라우저 직접 확인 완료.
 
+- 2026-06-17, Claude Code, 운영 로그 분석(s-analysis) 화면 React 전환 — 스트랭글러 4번째 (dangerouslySetInnerHTML verbatim):
+  - AnalysisScreen.jsx: 기존 `#s-analysis` 내부 HTML(index.html 215~294줄)을 **dangerouslySetInnerHTML 로
+    verbatim 주입**. inline onclick/onchange/ondragover/ondragleave/ondrop/style 전부 보존 →
+    브라우저가 innerHTML 파싱 시 네이티브 이벤트로 등록 → 기존 전역 함수(startAnalysis/resetUpload/
+    toggleHistory/onFileSelect/ondov/ondl/handleUploadDrop/openAnalysisTodoReview/openAnalysisRiskReview/
+    applyDashboard/resetFlow 등)를 그대로 호출. **React 관리 상태 0개.**
+  - 구조 보존: `#s-analysis`(.screen flex column)의 직계 자식은 `.topbar`/`.content` 두 개.
+    래퍼 div 를 끼우면 flex 가 깨지므로 프래그먼트로 `.topbar`/`.content` 를 각각 직접 렌더하고
+    그 안쪽만 dangerouslySetInnerHTML 로 채움(원본 직계 구조 동일, 픽셀 동일).
+  - **app.js / api-integration.js / workflow-v2.js / role-workflow-enhancements.js 무수정.**
+    특히 api-integration.js 의 startAnalysis 몽키패치(실제 문서 업로드→분석→todos/issues API)는 그대로 둠.
+  - 폴백: localStorage.opsradar_react_analysis='off' +새로고침 → 바닐라 복귀. main.jsx 에
+    mountReactAnalysis() 추가(캘린더와 동일: createRoot 1회 render, MutationObserver/key 미사용).
+  - 검증(사용자 직접): 픽셀 동일(업로드존/플로우/결과), 파일 업로드→AI 분석 4단계 끝까지 정상
+    (DB documents/todos/issues 반영), **주입 패널 2개(승인 대기 Todo 큐 + 이슈 자동탐지) 재렌더로 안 사라짐 확인**,
+    콘솔 빨간 에러 없음(401 토큰 기존 이슈 제외).
+
 ## handoff.js 보존 결정 기록 (2026-06-16, 최종)
 - 정정: 한때 "미커밋 504줄을 폐기하고 dc49ee8로 되돌린다"는 방침이 있었으나 **취소됨**.
 - 최종: 504줄은 월요일(2026-06-15) 사용자+Codex가 만든 인수인계 센터 핵심 작업 →
@@ -129,7 +146,7 @@
   CRA src에만 있고 서빙 vite 번들엔 없음 → `logout()`이 reload만 하고 같은 대시보드로 복귀).
   **사용자가 "발표 때 로그아웃이 무엇을 해야 하는지" 정한 뒤** app.js의 `logout()`을 그에 맞게 수정.
   (옵션: ㄱ 데모용 숨김/토스트 / ㄴ 토큰 클리어 후 안내 / ㄷ 로그인 화면 신설) — 자세한 건 주의사항 참고.
-- 4번째 화면 전환 — 대상 미정(사용자와 상의). 남은 바닐라 6개: Dashboard / 운영 로그 분석 /
+- 5번째 화면 전환 — 대상 미정(사용자와 상의). 남은 바닐라 5개: Dashboard /
   Todo / 이슈 로그 / 인수인계 센터 / AI Assistant.
   - 후보 검토 시 반드시 **api-integration.js 런타임 주입 여부 + 바닐라 리스너 바인딩 방식까지** 조사할 것(아래 교훈 참고).
   - 패턴: 기존 노드에 createRoot 렌더(ID 스코프 CSS 상속), 전역 함수 재사용.
@@ -164,6 +181,13 @@
   단 React가 재렌더하면 vanilla가 채운 DOM(목록/contenteditable/탭 active)을 되돌릴 수 있으니
   **memo + 재렌더 0**(MutationObserver 미사용)으로 둘 것. contenteditable은 uncontrolled(+
   suppressContentEditableWarning)로 두어 vanilla의 innerHTML 읽기/쓰기를 방해하지 말 것.
+- ★교훈(운영 로그 분석 전환에서 배움): `#s-analysis .content` 에는 **두 외부 JS 가 런타임에 패널을
+  prepend** 한다 — workflow-v2.js `ensureQueues()`→`#workflowQueueCenter`(승인 대기 Todo/Risk 큐),
+  role-workflow-enhancements.js `ensureApprovalCenter()`→`#analysisApprovalCenter`(관리자 승인함).
+  React 가 `.content` 를 한 번이라도 재렌더하면 이 주입 패널이 사라진다.
+  → **재렌더 0 필수 — memo 1회 렌더(MutationObserver/key 미사용)로 해결.** dangerouslySetInnerHTML 로
+  `.content` 를 진짜 element 로 두면, React 가 다시 안 그리는 한 vanilla 가 prepend 한 자식은 보존된다.
+  (설정 멤버패널과 같은 주입형 위험이지만 여기선 패널이 2개 + 역할 기반이라 더 주의.)
 - ★방어수정(2026-06-16): `nav()`에 **null 가드 + 화면별 init try/catch** 적용 완료. 이제 화면 노드가
   없거나 한 화면 init이 에러나도 nav 전체가 throw로 멈추지 않음(에러는 console.warn). 향후 React 전환에서
   `#s-OOO` 노드를 없애는 변경을 하더라도 nav가 죽지 않는다(단 가능하면 컨테이너 노드는 유지할 것).
