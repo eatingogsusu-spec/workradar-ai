@@ -30,7 +30,7 @@
 | 캘린더 | s-calendar | React(CalendarScreen.jsx) + 동작 vanilla 공존 | **전환완료** |
 | 인수인계 센터 | s-knowledge | handoff.js (504줄·월요일작업 03b02ca) | 기존바닐라 |
 | 보고서 | s-reports | React(ReportsScreen.jsx) + report.js/app.js 동작 vanilla 공존 | **전환완료** |
-| AI Assistant | s-chat | app.js | 기존바닐라 |
+| AI Assistant | s-chat | React(ChatScreen.jsx) + 동작 vanilla 공존 | **전환완료** |
 | 설정 | s-settings | React(SettingsScreen.jsx) + 멤버패널 vanilla 공존 | **전환완료** (e6ff5a4) |
 (상태값: 기존바닐라 / 전환중 / 전환완료)
 
@@ -133,6 +133,24 @@
     (DB documents/todos/issues 반영), **주입 패널 2개(승인 대기 Todo 큐 + 이슈 자동탐지) 재렌더로 안 사라짐 확인**,
     콘솔 빨간 에러 없음(401 토큰 기존 이슈 제외).
 
+- 2026-06-17, Claude Code, AI Assistant(s-chat) 화면 React 전환 — 스트랭글러 5번째 (dangerouslySetInnerHTML verbatim):
+  - ChatScreen.jsx: 기존 `#s-chat` 내부 HTML(index.html 597~652줄)을 **dangerouslySetInnerHTML 로
+    verbatim 주입**. 직계 자식 `.topbar.chat-topbar` + `.chat-workspace` 를 프래그먼트 2개로 각각
+    직접 렌더하고 안쪽만 채움(원본 직계 구조 동일, 픽셀 동일). inline onclick/onkeydown/oninput/style
+    전부 보존 → 기존 전역 함수(sendMsg/autoResize/createNewChatSession/clearCurrentChatSession 등)
+    그대로 호출. **React 관리 상태 0개.**
+  - **app.js / api-integration.js / workflow-v2.js / role-workflow-enhancements.js 무수정.**
+    특히 app.js `sendMsg`(RAG `POST /chat` API 내장)는 그대로 둠. api-integration.js 는 s-chat 을
+    아예 안 건드림(운영분석의 startAnalysis 몽키패치와 달리 채팅은 RAG 가 app.js 에 직접 내장).
+  - 폴백: localStorage.opsradar_react_chat='off' +새로고침 → 바닐라 복귀. main.jsx 에
+    mountReactChat() 추가(운영분석/캘린더와 동일: createRoot 1회 render, MutationObserver/key 미사용).
+  - 검증(사용자 직접): 픽셀 동일(세션/채팅/컨텍스트 3패널), 메시지 전송→응답 카드 렌더 정상,
+    **재렌더 0 검증 통과 — 메시지 주고받고 다른 화면 갔다 와도 #chatArea 대화 그대로 보존**,
+    타화면 무영향, 콘솔 빨간 JS 에러 없음.
+  - ⚠️ 채팅 RAG 응답이 "Azure OpenAI 연결 실패"로 옴 — **프론트 전환과 무관한 백엔드 문제**
+    (서버 Azure OpenAI API 키 재발급 미완료). sendMsg→POST /chat 호출까지는 정상, LLM 연결만 실패.
+    아래 백로그 참고.
+
 ## handoff.js 보존 결정 기록 (2026-06-16, 최종)
 - 정정: 한때 "미커밋 504줄을 폐기하고 dc49ee8로 되돌린다"는 방침이 있었으나 **취소됨**.
 - 최종: 504줄은 월요일(2026-06-15) 사용자+Codex가 만든 인수인계 센터 핵심 작업 →
@@ -146,8 +164,8 @@
   CRA src에만 있고 서빙 vite 번들엔 없음 → `logout()`이 reload만 하고 같은 대시보드로 복귀).
   **사용자가 "발표 때 로그아웃이 무엇을 해야 하는지" 정한 뒤** app.js의 `logout()`을 그에 맞게 수정.
   (옵션: ㄱ 데모용 숨김/토스트 / ㄴ 토큰 클리어 후 안내 / ㄷ 로그인 화면 신설) — 자세한 건 주의사항 참고.
-- 5번째 화면 전환 — 대상 미정(사용자와 상의). 남은 바닐라 5개: Dashboard /
-  Todo / 이슈 로그 / 인수인계 센터 / AI Assistant.
+- 6번째 화면 전환 — 대상 미정(사용자와 상의). 남은 바닐라 4개: Dashboard /
+  Todo / 이슈 로그 / 인수인계 센터.
   - 후보 검토 시 반드시 **api-integration.js 런타임 주입 여부 + 바닐라 리스너 바인딩 방식까지** 조사할 것(아래 교훈 참고).
   - 패턴: 기존 노드에 createRoot 렌더(ID 스코프 CSS 상속), 전역 함수 재사용.
     화면 전체가 vanilla 소유면 보고서·캘린더처럼 **memo 1회 렌더(재렌더 0)**, React 관리 상태가 있으면
@@ -157,6 +175,9 @@
 - 그 외 화면(인수인계 센터 포함)은 계속 바닐라 유지, 한 번에 한 화면씩.
 
 ## 백로그 (나중에 할 일)
+- [ ] AI Assistant: 채팅 RAG 응답이 "Azure OpenAI 연결 실패"로 안 옴. 프론트 무관, 서버
+      Azure OpenAI API 키 재발급/설정 필요. sendMsg→POST /chat 호출까지는 정상, LLM 연결만 실패.
+      백엔드/DB 담당 작업.
 - [ ] 멤버 관리: 담당자별 ID/이메일 수정 + 비밀번호 변경 기능.
       ⚠️ 백엔드 API 없음 → PATCH /members/{id}, 비번 변경 엔드포인트 + DB 스키마
       (멤버 비번 필드) 먼저 필요. 보안: 비번 평문 노출 금지, '변경' 폼만. DB 담당이 작업.
@@ -181,6 +202,14 @@
   단 React가 재렌더하면 vanilla가 채운 DOM(목록/contenteditable/탭 active)을 되돌릴 수 있으니
   **memo + 재렌더 0**(MutationObserver 미사용)으로 둘 것. contenteditable은 uncontrolled(+
   suppressContentEditableWarning)로 두어 vanilla의 innerHTML 읽기/쓰기를 방해하지 말 것.
+- ★교훈(AI Assistant 전환에서 배움): 채팅 메시지는 app.js `appendChatMsg()` 가 `#chatArea` 에
+  **appendChild 로 live 하게 쌓는다**(+ `renderCurrentChatMessages()` 가 innerHTML 교체로 세션 복원).
+  → **재렌더 0 필수 — memo 1회 렌더.** 운영분석과 동일 패턴이지만, 여기는 런타임 주입 패널이 없는 대신
+  메시지가 live append 되므로 React 가 재렌더하면 진행 중 **대화 전체가 intro 로 리셋**된다(운영분석은
+  주입 패널 소실, 채팅은 대화 소실 — 위험 형태만 다름). dangerouslySetInnerHTML 로 `#chatArea` 를 진짜
+  element 로 두면 vanilla 의 append/innerHTML 교체가 그대로 작동하고, React 가 안 그리는 한 보존된다.
+  참고: RAG `POST /chat` 은 api-integration.js 몽키패치가 아니라 app.js `sendMsg` 에 직접 내장이라
+  채팅 전환은 api-integration.js 와 무관(운영분석의 startAnalysis 몽키패치와 대비).
 - ★교훈(운영 로그 분석 전환에서 배움): `#s-analysis .content` 에는 **두 외부 JS 가 런타임에 패널을
   prepend** 한다 — workflow-v2.js `ensureQueues()`→`#workflowQueueCenter`(승인 대기 Todo/Risk 큐),
   role-workflow-enhancements.js `ensureApprovalCenter()`→`#analysisApprovalCenter`(관리자 승인함).

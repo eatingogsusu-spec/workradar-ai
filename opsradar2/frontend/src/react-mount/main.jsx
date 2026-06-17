@@ -1,8 +1,8 @@
 // Strangler-fig React entry (see MIGRATION_LOG.md).
 //
 // 전환된 화면을 기존 바닐라 노드 안에 React로 렌더한다. 현재: 설정(s-settings),
-// 보고서(s-reports), 캘린더(s-calendar), 운영 로그 분석(s-analysis) 4개.
-// 아직 안 옮긴 화면은 전부 바닐라가 그대로 소유한다.
+// 보고서(s-reports), 캘린더(s-calendar), 운영 로그 분석(s-analysis),
+// AI Assistant(s-chat) 5개. 아직 안 옮긴 화면은 전부 바닐라가 그대로 소유한다.
 //
 // 안전 설계:
 //  - window.nav 를 건드리지 않는다. 대신 #s-settings 가 .active 가 되는 것을
@@ -15,6 +15,7 @@ import SettingsScreen from './SettingsScreen.jsx'
 import ReportsScreen from './ReportsScreen.jsx'
 import CalendarScreen from './CalendarScreen.jsx'
 import AnalysisScreen from './AnalysisScreen.jsx'
+import ChatScreen from './ChatScreen.jsx'
 
 const USE_REACT_SETTINGS = (() => {
   try {
@@ -43,6 +44,14 @@ const USE_REACT_CALENDAR = (() => {
 const USE_REACT_ANALYSIS = (() => {
   try {
     return localStorage.getItem('opsradar_react_analysis') !== 'off'
+  } catch (_) {
+    return true
+  }
+})()
+
+const USE_REACT_CHAT = (() => {
+  try {
+    return localStorage.getItem('opsradar_react_chat') !== 'off'
   } catch (_) {
     return true
   }
@@ -117,11 +126,28 @@ function mountReactAnalysis() {
   )
 }
 
+// AI Assistant(s-chat) — 스트랭글러 5번째. 운영분석/캘린더와 동일: 화면 전체 vanilla 소유라
+// React 는 구조를 memo 로 1회만 렌더하고, inline 핸들러(onclick="sendMsg()" 등)가 기존 전역
+// 함수를 그대로 호출한다. nav('chat') 가 initChatSessions()→renderCurrentChatMessages() 로
+// 이 노드의 #chatArea/#chatSessionList 를 채운다.
+// ⚠️ 재렌더 0(key/MutationObserver 미사용): 메시지는 #chatArea 에 appendChild 로 쌓이므로,
+// React 가 재렌더하면 진행 중 대화가 intro 로 리셋된다. 1회 렌더 이후 절대 다시 그리지 않는다.
+function mountReactChat() {
+  const el = document.getElementById('s-chat')
+  if (!el) return
+  createRoot(el).render(
+    <StrictMode>
+      <ChatScreen />
+    </StrictMode>,
+  )
+}
+
 function bootstrap() {
   if (USE_REACT_SETTINGS) mountReactSettings()
   if (USE_REACT_REPORTS) mountReactReports()
   if (USE_REACT_CALENDAR) mountReactCalendar()
   if (USE_REACT_ANALYSIS) mountReactAnalysis()
+  if (USE_REACT_CHAT) mountReactChat()
 }
 
 if (document.readyState === 'loading') {
