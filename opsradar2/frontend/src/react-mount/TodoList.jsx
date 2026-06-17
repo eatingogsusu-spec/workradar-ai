@@ -87,7 +87,7 @@ export function TodoTable({ activeTab, checked, selectedTodoId, todos, visible, 
                 className={`todo-tr ${String(selectedTodoId) === String(todo.id) ? 'selected' : ''} ${todo.status}`}
                 onClick={(event) => {
                   if (event.target.closest('.action-btns, input, button, select, textarea, a')) return
-                  onCheck(todo.id, !checked[todo.id])
+                  onSelect(todo.id)
                 }}
               >
                 <td className="todo-check-cell">

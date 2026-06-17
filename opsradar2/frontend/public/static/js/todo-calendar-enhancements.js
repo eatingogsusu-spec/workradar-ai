@@ -189,6 +189,26 @@
     }
   };
 
+  window.bulkRejectProgressTodos = async function () {
+    const items = selectedTodos("approved");
+    if (!items.length) return showToast("체크된 진행 Todo가 없습니다.", "info");
+    try {
+      await Promise.all(items.filter((todo) => todo.apiId).map((todo) => api(`/todos/${todo.apiId}`, {
+        method: "PATCH",
+        body: JSON.stringify({ approval_status: "rejected" }),
+      })));
+      items.forEach((todo) => { todo.status = "rejected"; G.todoChecked[todo.id] = false; });
+      if (items.some((todo) => G.selectedTodoId === todo.id)) G.selectedTodoId = null;
+      await window.opsRadarApi.loadTodos();
+      syncTodoCalendar();
+      switchTodoTab("rejected");
+      showToast(`${items.length}개 Todo를 반려 처리했습니다.`, "warn");
+    } catch (error) {
+      console.warn("Todo bulk reject failed", error);
+      showToast("체크항목 반려 처리에 실패했습니다.", "warn");
+    }
+  };
+
   async function restoreDoneTodos(items) {
     if (!items.length) return showToast("선택된 완료 Todo가 없습니다.", "info");
     if (!confirm(`${items.length}개 완료 Todo를 진행 Todo로 되돌리시겠습니까?`)) return;

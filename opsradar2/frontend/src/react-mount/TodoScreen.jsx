@@ -85,6 +85,8 @@ function TodoScreen() {
   const isAi = activeTab === 'ai'
   const isProgress = activeTab === 'inprogress'
   const showDelete = activeTab === 'done' || activeTab === 'rejected'
+  const checkedProgressCount = allTodos.filter((todo) => todo.status === 'approved' && snapshot.checked[todo.id]).length
+  const showProgressBulk = isProgress && checkedProgressCount > 0
 
   const changeTab = (tab) => {
     clearSelectedTodo()
@@ -222,14 +224,19 @@ function TodoScreen() {
           <div className="tbtn" id="todoBulkApproveBtn" onClick={() => window.bulkApprove?.()} style={{ display: isAi ? 'flex' : 'none' }}>
             <i className="ti ti-checks"></i> 체크항목 전체승인
           </div>
-          <div className="tbtn" id="todoBulkRejectBtn" onClick={() => window.bulkReject?.()} style={{ display: isAi ? 'flex' : 'none', color: 'var(--danger)' }}>
-            <i className="ti ti-ban"></i> 체크항목 반려
+          <div
+            className="tbtn"
+            id="todoBulkRejectBtn"
+            onClick={() => (isAi ? window.bulkReject?.() : window.bulkRejectProgressTodos?.())}
+            style={{ display: isAi || showProgressBulk ? 'flex' : 'none', color: 'var(--danger)' }}
+          >
+            <i className="ti ti-ban"></i> {isAi ? '체크항목 반려' : '선택 반려'}
           </div>
-          <div className="tbtn" id="todoBulkUndoBtn" onClick={() => window.bulkUndoApprove?.()} style={{ display: isProgress ? 'flex' : 'none', marginLeft: isProgress ? '0' : '' }}>
+          <div className="tbtn" id="todoBulkUndoBtn" onClick={() => window.bulkUndoApprove?.()} style={{ display: showProgressBulk ? 'flex' : 'none', marginLeft: isProgress ? '0' : '' }}>
             <i className="ti ti-rotate-2"></i> 체크항목 되돌리기
           </div>
-          <div className="tbtn" id="todoBulkCompleteBtn" onClick={() => window.bulkCompleteTodos?.()} style={{ display: isProgress ? 'flex' : 'none', color: 'var(--success)' }}>
-            <i className="ti ti-check"></i> 체크항목 완료
+          <div className="tbtn" id="todoBulkCompleteBtn" onClick={() => window.bulkCompleteTodos?.()} style={{ display: showProgressBulk ? 'flex' : 'none', color: 'var(--success)' }}>
+            <i className="ti ti-check"></i> 선택 완료
           </div>
           <div className="tbtn" id="todoBulkRestoreDoneBtn" onClick={() => window.bulkRestoreDoneTodos?.()} style={{ display: activeTab === 'done' ? 'flex' : 'none', color: 'var(--accent)' }}>
             <i className="ti ti-arrow-back-up"></i> 선택항목 진행Todo 되돌리기

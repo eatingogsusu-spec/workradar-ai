@@ -1,6 +1,7 @@
 import {
   briefTodoText,
   cleanTodoTitle,
+  formatTodoDate,
   priorityBadgeClass,
   priorityLabel,
   statusBadgeClass,
@@ -67,6 +68,14 @@ export default function TodoDetail({ todo }) {
                   <i className="ti ti-sparkles"></i> 승인 시 {todo.recommendedAssignee} 배정
                 </div>
               ) : null}
+            </div>
+            <div className="detail-cell">
+              <div className="detail-label">등록일</div>
+              <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text)' }}>{formatTodoDate(todo.createdAt)}</div>
+            </div>
+            <div className="detail-cell">
+              <div className="detail-label">마감일</div>
+              <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text)' }}>{formatTodoDate(todo.dueDate || todo.updatedAt)}</div>
             </div>
           </div>
           {todo.chunk ? (
