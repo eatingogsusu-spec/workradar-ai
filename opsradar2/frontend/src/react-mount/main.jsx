@@ -13,6 +13,7 @@ import { createRoot } from 'react-dom/client'
 import SettingsScreen from './SettingsScreen.jsx'
 import ReportsScreen from './ReportsScreen.jsx'
 import CalendarScreen from './CalendarScreen.jsx'
+import IssuesScreen from './IssuesScreen.jsx'
 
 const USE_REACT_SETTINGS = (() => {
   try {
@@ -33,6 +34,14 @@ const USE_REACT_REPORTS = (() => {
 const USE_REACT_CALENDAR = (() => {
   try {
     return localStorage.getItem('opsradar_react_calendar') !== 'off'
+  } catch (_) {
+    return true
+  }
+})()
+
+const USE_REACT_ISSUES = (() => {
+  try {
+    return localStorage.getItem('opsradar_react_issues') !== 'off'
   } catch (_) {
     return true
   }
@@ -91,10 +100,25 @@ function mountReactCalendar() {
   )
 }
 
+// 이슈 로그(s-issues) — 보고서/캘린더와 동일: 화면 전체 vanilla 소유라 memo 로 1회만 렌더(재렌더 0).
+// nav('issues') 가 renderIssues() 를, workflow-v2 가 setTimeout/interval 로 configureRoleScreen
+// (반려탭 주입)을 React 마운트 후 실행 → 그 React 노드에 바인딩한다.
+// 탭은 IssuesScreen 내부에서 dangerouslySetInnerHTML 로 리터럴 onclick 을 보존(workflow-v2 셀렉터 대상).
+function mountReactIssues() {
+  const el = document.getElementById('s-issues')
+  if (!el) return
+  createRoot(el).render(
+    <StrictMode>
+      <IssuesScreen />
+    </StrictMode>,
+  )
+}
+
 function bootstrap() {
   if (USE_REACT_SETTINGS) mountReactSettings()
   if (USE_REACT_REPORTS) mountReactReports()
   if (USE_REACT_CALENDAR) mountReactCalendar()
+  if (USE_REACT_ISSUES) mountReactIssues()
 }
 
 if (document.readyState === 'loading') {

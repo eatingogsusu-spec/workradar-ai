@@ -26,7 +26,7 @@
 | Dashboard | s-dashboard | app.js + workflow-v2.js | **전환중** (박주원, feature/issues-dashboard-react) |
 | 운영 로그 분석 | s-analysis | app.js | 기존바닐라 |
 | Todo | s-todo | app.js + todo-calendar-enhancements.js | 기존바닐라 |
-| 이슈 로그 | s-issues | app.js + workflow-v2.js | **전환중** (박주원, feature/issues-dashboard-react) |
+| 이슈 로그 | s-issues | React(IssuesScreen.jsx) + workflow-v2/app.js 동작 vanilla 공존 | **전환완료** (박주원) |
 | 캘린더 | s-calendar | React(CalendarScreen.jsx) + 동작 vanilla 공존 | **전환완료** |
 | 인수인계 센터 | s-knowledge | handoff.js (504줄·월요일작업 03b02ca) | 기존바닐라 |
 | 보고서 | s-reports | React(ReportsScreen.jsx) + report.js/app.js 동작 vanilla 공존 | **전환완료** |
@@ -115,6 +115,22 @@
   - 검증(헤드리스 Chrome): 9화면 순회 정상, React 마운트(설정·보고서·캘린더 셋 다), 날짜셀 35개·월이동
     (6월→5월→6월 복원)·AI모달·미니챗 정상, "+N 더보기" 데코레이터 실측(태그3개→"+1 더보기"·표시2개),
     9화면 무영향, 콘솔/HTTP 에러 0. 사용자 브라우저 직접 확인 완료.
+- 2026-06-17, 박주원, 이슈 로그(s-issues) 화면 React 전환 (feature/issues-dashboard-react 브랜치):
+  - IssuesScreen.jsx: 기존 #s-issues HTML 100% 복제(픽셀 동일), `createRoot(#s-issues)` memo 1회 렌더
+    (재렌더 0). 동작은 전부 vanilla: app.js(renderIssues/selectIssue) + role-workflow-enhancements.js
+    (renderIssues 몽키패치) + workflow-v2.js(반려탭 주입·renderPendingRisks/RejectedRisks). **app.js/
+    api-integration.js/workflow-v2.js 무수정.** main.jsx 마운트 등록 1줄만 추가.
+  - ★핵심 함정(해결): workflow-v2 가 탭을 **리터럴 onclick 속성 문자열**로 찾는다
+    (`.tab[onclick*="'candidate'"]`, `getAttribute("onclick")`). React onClick 은 onclick 속성을
+    안 만들어 깨짐 → **.tabs 만 dangerouslySetInnerHTML 로 리터럴 onclick 보존**(나머지는 JSX
+    프래그먼트로 여분 래퍼 회피). "반려" 탭은 configureRoleScreen 이 setTimeout(900/2800)+
+    setInterval(800)로 React 마운트 *후* 주입 → memo 1회 렌더라 보존됨.
+  - 폴백: localStorage.opsradar_react_issues='off' +새로고침 → 바닐라 복귀(검증됨).
+  - 검증(헤드리스 Chrome): 픽셀 동일, React 마운트(설정·보고서·캘린더·이슈 넷 다), **반려탭 주입 확인 +
+    onclick 속성 셀렉터 매칭(핵심 게이트 통과)**, 탭 토글(진행중↔승인대기↔반려) 정상, 수동등록 모달 정상,
+    9화면 무영향. ⚠️ 반려 탭 클릭 시 401/login-required는 `/workflow/risks/rejected` 인증 필요로
+    발생하는 **기존 토큰만료 이슈**(폴백 바닐라에서도 동일 발생 확인 → 전환 무관). 카드→상세는
+    현재 데이터에 confirmed 이슈 0개라 미실행(상세 패널 노드는 정상 렌더, 메커니즘 vanilla 무변경).
 
 ## handoff.js 보존 결정 기록 (2026-06-16, 최종)
 - 정정: 한때 "미커밋 504줄을 폐기하고 dc49ee8로 되돌린다"는 방침이 있었으나 **취소됨**.
