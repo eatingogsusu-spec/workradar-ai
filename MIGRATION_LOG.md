@@ -205,6 +205,24 @@
   - workflow-v2.js의 Todo 목록/상세 DOM 후처리는 React 렌더링과 중복되어 wrapper 호출만 남김.
   - Vite 산출물은 기존 규칙대로 public/static/react/main.js만 갱신(dist 미생성).
 
+- 2026-06-18, Claude Code, **pgvector RAG 백필 230/230 + 끝단 검증** (codex의 pgvector(2a9f324 박주원)
+  + embedder dimensions 픽스(1d93716, PR #15) 위에서 수행. DB 쓰기는 백필만, 통제된 방식):
+  - 배경: codex pgvector는 `chunk_embeddings.embedding vector(1536)` + `EMBEDDING_DIMENSION=1536`. 임베딩 모델은
+    text-embedding-3-large(native 3072)이므로 embedder가 `dimensions=1536`으로 단축 출력해야 정합(이게 PR #15 픽스).
+  - `scripts/backfill_pgvector_embeddings.py` 단계 실행: dry-run(pending 191 확인) → `--execute --limit 16`(1배치 16/16 성공)
+    → `--execute`(나머지 175, 11배치 전부 성공). **결과: completed 39→230, pending 191→0, 실패 0.** 활성 문서 청크 230개 전부 임베딩.
+    (document_chunks 660 중 삭제 문서 청크 430 제외 = 활성 230. `azag-embedding-prod` 440행은 failed+벡터 NULL이라 search 무시·무해.)
+  - 멱등·resumable·차원(1536) 정합 실증. backfill은 배치별 커밋이라 중간 실패해도 재실행으로 이어감(이번엔 실패 0).
+  - **검색 검증(읽기)**: 4개 주제 쿼리(API 지연/단가 인상/인수인계/납기 클레임) 모두 0.41 임계 통과 + 주제별 정확 매칭
+    (납기 클레임→클레임 관리표 DOC-0093/0090/0139 등). FAISS 1벡터 → pgvector 230벡터로 코퍼스 충실해짐.
+  - **채팅 끝단 검증(임시 8003 서버, 사용자 8002 무영향)**: `POST /api/v1/chat` 분석형 질문(운영토큰 회피) →
+    **진짜 LLM(gpt-4o) 답변이 RAG 문서 기반으로 합성됨**(BE-ORDER-0128~0130 납기, Global Harness Vietnam AP-CB-510 통관지연,
+    원자재 품질 등 문서 청크의 구체 엔티티 인용). sources에 RAG 문서 3건(주간보고서/인수인계 회의록/구매발주) 포함.
+    ※ 운영토큰(issue/todo/calendar/이슈/리스크/일정 등)이 들어가면 chat.py가 LLM 안 타고 로컬 DB 템플릿으로 답함(설계).
+  - ⚠️ 검색 score 일부 0.42~0.51로 낮은 편 → 임계값 0.41이 다소 빡빡. 추후 검색 품질 튜닝(임계/top_k) 여지 있음(현재 정상 범위).
+  - **→ pgvector RAG 통합 완료** (pgvector 2a9f324 + dimensions 픽스 1d93716 + 백필 230 + 검색·채팅 끝단 검증).
+  - (출처: feature/pgvector-integration 의 7aa1bc3 기록을 codex 라인으로 구제한 것.)
+
 ## handoff.js 보존 결정 기록 (2026-06-16, 최종)
 - 정정: 한때 "미커밋 504줄을 폐기하고 dc49ee8로 되돌린다"는 방침이 있었으나 **취소됨**.
 - 최종: 504줄은 월요일(2026-06-15) 사용자+Codex가 만든 인수인계 센터 핵심 작업 →
