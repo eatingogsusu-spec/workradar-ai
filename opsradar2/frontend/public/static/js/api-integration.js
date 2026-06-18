@@ -573,7 +573,26 @@
     if (resultFname) resultFname.textContent = file.name;
     if (rChunkMeta) rChunkMeta.textContent = `${file.name} · ${chunkCount} chunks · document ${documentId.slice(0, 8)}`;
     if (rChunkContent) rChunkContent.textContent = firstChunkText(chunks);
-    if (rSrcDoc) rSrcDoc.textContent = file.name;
+    if (rSrcDoc) {
+      // [B4] 출처 문서를 다운로드 링크로 노출. documentId 가 있으면 클릭 시 원본 파일 다운로드
+      // (downloadSource → GET /documents/{id}/download). 안전하게 DOM 으로 구성(파일명 인젝션 방지).
+      rSrcDoc.textContent = "";
+      if (documentId) {
+        const dlBtn = document.createElement("button");
+        dlBtn.type = "button";
+        dlBtn.className = "wr-source-link";
+        dlBtn.title = "원본 파일 다운로드";
+        dlBtn.style.cssText = "background:none;border:none;padding:0;cursor:pointer;color:var(--accent);display:inline-flex;align-items:center;gap:4px;font:inherit;text-align:left";
+        dlBtn.innerHTML = '<i class="ti ti-download"></i>';
+        dlBtn.appendChild(document.createTextNode(" " + file.name));
+        dlBtn.addEventListener("click", () => {
+          if (typeof window.downloadSource === "function") window.downloadSource(documentId, file.name);
+        });
+        rSrcDoc.appendChild(dlBtn);
+      } else {
+        rSrcDoc.textContent = file.name;
+      }
+    }
     if (rSrcRange) rSrcRange.textContent = chunk ? `chunk #${chunk.chunk_index ?? 0}` : "-";
     if (rSrcReason) {
       rSrcReason.textContent = issueCount || todoCount
