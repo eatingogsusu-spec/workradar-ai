@@ -19,7 +19,7 @@ from app.ai.summarizer import extract_todos, summarize_document
 from app.core.config import PROJECT_ROOT, settings
 from app.core.database import AsyncSessionLocal
 from app.models import Document, DocumentChunk, Issue, Project, Todo
-from app.vectorstores.faiss_store import FAISSStore
+from app.repositories.embedding_repository import EmbeddingRepository
 
 
 UPLOAD_DIR = PROJECT_ROOT / "uploads"
@@ -149,16 +149,59 @@ async def run_document_pipeline(document_id: str) -> None:
 
             await _update_document(db, document, analysis_status="embedding", progress=65)
             notes: list[str] = []
+            embedding_repository = EmbeddingRepository(
+                db,
+                dimension=settings.EMBEDDING_DIMENSION,
+            )
+            embedding_model = settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT or "unconfigured"
+            embedding_job_id = await embedding_repository.create_job(
+                project_id=document.project_id,
+                document_id=document.id,
+            )
+            await db.commit()
             if settings.AI_PROVIDER.lower() == "azure":
                 try:
                     texts = [chunk["text"] for chunk in chunks]
                     embeddings = await embed_texts(texts)
-                    metadatas = [chunk["metadata"] for chunk in chunks]
-                    FAISSStore().add(texts, embeddings, metadatas)
+                    await embedding_repository.save_embeddings(
+                        chunk_ids=[row.id for row in chunk_rows],
+                        embeddings=embeddings,
+                        model=embedding_model,
+                    )
+                    await embedding_repository.finish_job(
+                        embedding_job_id,
+                        status="completed",
+                    )
+                    await db.commit()
                 except Exception as exc:
-                    notes.append(f"embedding skipped: {exc}")
+                    error_message = str(exc)
+                    await db.rollback()
+                    await embedding_repository.record_failures(
+                        chunk_ids=[row.id for row in chunk_rows],
+                        model=embedding_model,
+                        error_message=error_message,
+                    )
+                    await embedding_repository.finish_job(
+                        embedding_job_id,
+                        status="failed",
+                        error_message=error_message,
+                    )
+                    await db.commit()
+                    notes.append(f"embedding failed: {error_message}")
             else:
-                notes.append("embedding skipped: AI_PROVIDER is not azure")
+                error_message = "AI_PROVIDER is not azure"
+                await embedding_repository.record_failures(
+                    chunk_ids=[row.id for row in chunk_rows],
+                    model=embedding_model,
+                    error_message=error_message,
+                )
+                await embedding_repository.finish_job(
+                    embedding_job_id,
+                    status="failed",
+                    error_message=error_message,
+                )
+                await db.commit()
+                notes.append(f"embedding failed: {error_message}")
 
             await _update_document(db, document, analysis_status="analyzing", progress=85)
             summary = await summarize_document(text)

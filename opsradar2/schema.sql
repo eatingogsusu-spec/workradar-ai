@@ -1,4 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS vector;
 
 CREATE TABLE IF NOT EXISTS teams (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -93,13 +94,19 @@ CREATE TABLE IF NOT EXISTS faiss_indexes (
 CREATE TABLE IF NOT EXISTS chunk_embeddings (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     chunk_id UUID NOT NULL REFERENCES document_chunks(id) ON DELETE CASCADE,
-    faiss_index_id UUID NOT NULL REFERENCES faiss_indexes(id) ON DELETE CASCADE,
-    vector_external_id INTEGER NOT NULL,
+    faiss_index_id UUID REFERENCES faiss_indexes(id) ON DELETE CASCADE,
+    vector_external_id INTEGER,
+    embedding vector(1536),
     embedding_model VARCHAR(100) NOT NULL,
     embedding_dimension INTEGER NOT NULL,
+    embedding_status VARCHAR(50) NOT NULL DEFAULT 'completed'
+        CHECK (embedding_status IN ('completed', 'failed')),
+    error_message TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     CONSTRAINT uq_chunk_embeddings_index_vector UNIQUE (faiss_index_id, vector_external_id),
-    CONSTRAINT uq_chunk_embeddings_chunk_index UNIQUE (chunk_id, faiss_index_id)
+    CONSTRAINT uq_chunk_embeddings_chunk_index UNIQUE (chunk_id, faiss_index_id),
+    CONSTRAINT uq_chunk_embeddings_chunk_model UNIQUE (chunk_id, embedding_model)
 );
 
 CREATE TABLE IF NOT EXISTS embedding_jobs (
@@ -264,6 +271,11 @@ CREATE INDEX IF NOT EXISTS idx_document_chunks_project_id ON document_chunks(pro
 CREATE INDEX IF NOT EXISTS idx_faiss_indexes_project_id ON faiss_indexes(project_id);
 CREATE INDEX IF NOT EXISTS idx_chunk_embeddings_chunk_id ON chunk_embeddings(chunk_id);
 CREATE INDEX IF NOT EXISTS idx_chunk_embeddings_faiss_index_id ON chunk_embeddings(faiss_index_id);
+CREATE INDEX IF NOT EXISTS idx_chunk_embeddings_model_status ON chunk_embeddings(embedding_model, embedding_status);
+CREATE INDEX IF NOT EXISTS idx_chunk_embeddings_embedding_cosine
+    ON chunk_embeddings USING ivfflat (embedding vector_cosine_ops)
+    WITH (lists = 100)
+    WHERE embedding IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_embedding_jobs_project_id ON embedding_jobs(project_id);
 CREATE INDEX IF NOT EXISTS idx_embedding_jobs_document_id ON embedding_jobs(document_id);
 CREATE INDEX IF NOT EXISTS idx_embedding_jobs_faiss_index_id ON embedding_jobs(faiss_index_id);
