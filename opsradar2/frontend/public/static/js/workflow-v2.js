@@ -533,6 +533,14 @@
       const result = await api("/documents");
       const docs = result.documents || [];
       if (!docs.length) { host.innerHTML = '<div class="wr-empty">업로드 이력이 없습니다.</div>'; return; }
+      // [B5] 업로드 시간순(최신 먼저)으로 명시 정렬. 백엔드도 created_at DESC 지만,
+      //   created_at 누락/동시간 tie 에도 순서가 흔들리지 않도록 프론트에서 결정적으로 한 번 더 정렬한다.
+      docs.sort((a, b) => {
+        const ta = Date.parse(a.created_at || a.uploaded_at || "") || 0;
+        const tb = Date.parse(b.created_at || b.uploaded_at || "") || 0;
+        if (tb !== ta) return tb - ta;
+        return String(b.id || b.document_id || "").localeCompare(String(a.id || a.document_id || ""));
+      });
       const admin = isLead();
       const toolbar = admin
         ? `<div style="display:flex;align-items:center;gap:10px;padding:6px 0 10px;border-bottom:1px solid var(--border);margin-bottom:6px">
