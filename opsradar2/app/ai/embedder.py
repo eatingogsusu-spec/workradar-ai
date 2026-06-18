@@ -23,9 +23,21 @@ async def embed_texts(texts: list[str]) -> list[list[float]]:
     if settings.AI_PROVIDER.lower() != "azure":
         raise AzureOpenAIConfigError("AI_PROVIDER=azure is required for embeddings")
 
+    if not texts:
+        return []
+
     _require_embedding_deployment()
-    response = await get_azure_openai_client().embeddings.create(
-        model=settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
-        input=texts,
-    )
-    return [item.embedding for item in response.data]
+    batch_size = max(1, settings.EMBEDDING_BATCH_SIZE)
+    vectors: list[list[float]] = []
+    client = get_azure_openai_client()
+    for start in range(0, len(texts), batch_size):
+        response = await client.embeddings.create(
+            model=settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
+            input=texts[start : start + batch_size],
+            dimensions=settings.EMBEDDING_DIMENSION,
+        )
+        batch = [item.embedding for item in sorted(response.data, key=lambda item: item.index)]
+        if len(batch) != len(texts[start : start + batch_size]):
+            raise RuntimeError("Azure OpenAI returned an incomplete embedding batch")
+        vectors.extend(batch)
+    return vectors
