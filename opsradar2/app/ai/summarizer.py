@@ -77,12 +77,14 @@ Todo title은 담당자가 목록만 보고도 할 일을 즉시 이해하도록
 Todo description은 title을 반복하지 말고 업무 배경, 수행 범위, 산출물 또는 완료 기준을 1~3문장으로 구체적으로 작성하세요.
 이미 완료되었거나 해결되었다고 명확히 표현된 문장은 Todo 또는 Issue 후보로 추출하지 마세요.
 이미 완료/해결/반영된 과거 작업은 todos 또는 issues에 포함하지 마세요. 완료 여부를 확인해야 하는 후속 작업만 포함하세요.
+각 issue에는 reason 필드를 반드시 포함하세요. reason에는 그 항목을 리스크로 판단한 근거와 원인을
+1~2문장으로 구체적으로 적으세요(어떤 표현·반복 패턴·예상 영향 때문에 위험한지). 결과만 적지 말고 원인을 설명하세요.
 
 형식:
 {{
   "todos": [{{"title": "해야 할 일", "description": "업무 수행 방법과 완료 기준", "assignee": null, "due_date": null}}],
   "decisions": [""],
-  "issues": [{{"title": "", "description": "", "severity": "medium"}}]
+  "issues": [{{"title": "", "description": "", "severity": "medium", "reason": "리스크로 판단한 근거와 원인"}}]
 }}
 
 [문서]
@@ -144,7 +146,9 @@ def _normalize_extraction(data: dict[str, Any]) -> dict:
         if isinstance(item, str) and not _is_resolved_issue(item):
             cleaned = _strip_issue_target_date(item)
             if cleaned:
-                normalized_issues.append({"title": cleaned, "description": cleaned, "severity": "medium"})
+                normalized_issues.append(
+                    {"title": cleaned, "description": cleaned, "severity": "medium", "reason": _derive_issue_reason(cleaned)}
+                )
         elif isinstance(item, dict):
             title = item.get("title") or item.get("description")
             if title and not _is_resolved_issue(f"{title} {item.get('description') or ''}"):
@@ -152,11 +156,13 @@ def _normalize_extraction(data: dict[str, Any]) -> dict:
                 cleaned_description = _strip_issue_target_date(str(item.get("description") or title))
                 if not cleaned_title:
                     continue
+                reason = str(item.get("reason") or "").strip() or _derive_issue_reason(f"{cleaned_title} {cleaned_description}")
                 normalized_issues.append(
                     {
                         "title": cleaned_title,
                         "description": cleaned_description or cleaned_title,
                         "severity": item.get("severity") or "medium",
+                        "reason": reason,
                     }
                 )
 
@@ -176,6 +182,18 @@ def _strip_issue_target_date(text: str) -> str:
         flags=re.IGNORECASE,
     )
     return re.sub(r"\s{2,}", " ", cleaned).strip(" \t\r\n-·,")
+
+
+def _derive_issue_reason(text: str) -> str:
+    """LLM 이 reason 을 주지 않았을 때(폴백/문자열 추출) 원인 근거를 휴리스틱으로 만든다."""
+    markers = [
+        marker
+        for marker in ("지연", "초과", "실패", "오류", "장애", "blocked", "위험", "리스크", "미해결", "누락", "타임아웃", "고갈", "병목", "중단")
+        if marker.lower() in text.lower()
+    ]
+    if markers:
+        return f"운영 리스크 신호({', '.join(markers[:3])})가 문서에서 감지되어 후속 점검이 필요합니다."
+    return "문서에서 후속 점검이 필요한 리스크 표현이 감지되었습니다."
 
 
 def _concise_todo_title(title: str, description: str = "") -> str:
@@ -260,7 +278,14 @@ def _heuristic_extract(text: str) -> dict:
         if not _is_resolved_issue(line) and any(token in line for token in ("이슈", "문제", "blocked", "Blocked", "리스크", "주의 필요")):
             cleaned_issue = _strip_issue_target_date(line)
             if cleaned_issue:
-                issues.append({"title": cleaned_issue[:160], "description": cleaned_issue[:300], "severity": "medium"})
+                issues.append(
+                    {
+                        "title": cleaned_issue[:160],
+                        "description": cleaned_issue[:300],
+                        "severity": "medium",
+                        "reason": _derive_issue_reason(cleaned_issue),
+                    }
+                )
     return {"todos": todos[:20], "decisions": decisions[:20], "issues": issues[:20]}
 
 

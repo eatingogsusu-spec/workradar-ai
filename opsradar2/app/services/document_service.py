@@ -267,6 +267,7 @@ async def _create_extracted_items(
                     title=str(title)[:500],
                     description=item.get("description") or str(title),
                     severity=item.get("severity", "medium"),
+                    risk_reason=item.get("reason") or None,
                     status="open",
                     source_type="ai",
                     approval_status="pending",
