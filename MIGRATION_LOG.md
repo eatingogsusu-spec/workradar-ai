@@ -223,6 +223,22 @@
   - **→ pgvector RAG 통합 완료** (pgvector 2a9f324 + dimensions 픽스 1d93716 + 백필 230 + 검색·채팅 끝단 검증).
   - (출처: feature/pgvector-integration 의 7aa1bc3 기록을 codex 라인으로 구제한 것.)
 
+- 2026-06-19, Claude Code, **발표 baseline 적재 완료** (공유 DB 프로젝트 7fc2594d AutoParts One Korea):
+  - 배경: 기존 278문서(비정제 더미 포함)를 비우고 dummy 브랜치 정제 raw 문서 149개를 업로드 파이프라인으로 재적재.
+    비우기 전 pg_dump 백업 `backups/azag_db_backup_20260619.sql` (5.9 MB) 생성 후 진행.
+  - 적재: 정제 문서 151개 중 라이브 데모용 2개(DOC-0001 meeting_notes / DOC-0007 quality_claims) 제외한
+    149개를 `baseline_upload.py`(멱등·재개 가능, MESSY 84개 제외)로 업로드. 149/149 성공, 실패 0.
+  - 결과: documents 149 / document_chunks 239 / chunk_embeddings 239 / analysis_status 전부 completed.
+    임베딩 누락 0 → 백필 불필요.
+  - ⚠️ Todo/이슈/ai_summaries 삭제(444/213/149건): baseline은 RAG 과거데이터 전용으로 설계.
+    1년치 자료가 미결 Todo로 뜨는 건 비현실적 → Todo/이슈는 라이브 업로드 데모 때만 생성하는 설계.
+  - 남긴 것: documents + document_chunks + chunk_embeddings (RAG 핵심) / calendar_events 136 / 마스터(teams 2 / users 18 / departments 6).
+  - RAG 검증: `POST /chat` 분석형 질문 → gpt-4o가 baseline 문서 인용 답변 생성(DOC-0096/0075/0045 등),
+    retrieve score 0.47~0.54로 임계(0.41) 통과. "monthly operation status report" 쿼리만 임계 미달(정상 — 해당 주제 문서 없음).
+  - 라이브 데모용 2개(`C:\Users\soldesk\demo_docs\`): DOC-0001_meeting_notes_2025-06-25.md /
+    DOC-0007_quality_claims_2025-06-07.md — baseline 미포함 확인, 발표 때 직접 업로드.
+  - MESSY 84개는 baseline 미포함(필요 시 추후 적재 또는 라이브 추가 가능).
+
 ## handoff.js 보존 결정 기록 (2026-06-16, 최종)
 - 정정: 한때 "미커밋 504줄을 폐기하고 dc49ee8로 되돌린다"는 방침이 있었으나 **취소됨**.
 - 최종: 504줄은 월요일(2026-06-15) 사용자+Codex가 만든 인수인계 센터 핵심 작업 →
