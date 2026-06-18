@@ -124,6 +124,7 @@
       assignee: issue.assignee || null,
       days: 0,
       desc: stripIssueTargetDate(issue.description || issue.title),
+      reason: issue.risk_reason || "",
       chunk: "",
       history: [],
       domino: [],
