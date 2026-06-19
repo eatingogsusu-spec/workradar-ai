@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import csv
+import io
 import re
 from typing import Any
 
@@ -67,6 +69,9 @@ async def extract_todos(document_text: str) -> dict:
     text = document_text.strip()
     if not text:
         return {"todos": [], "decisions": [], "issues": []}
+    csv_claims = _extract_claims_csv(text)
+    if csv_claims:
+        return csv_claims
     if settings.AI_PROVIDER.lower() != "azure":
         return _heuristic_extract(text)
 
@@ -287,6 +292,138 @@ def _heuristic_extract(text: str) -> dict:
                     }
                 )
     return {"todos": todos[:20], "decisions": decisions[:20], "issues": issues[:20]}
+
+
+def _extract_claims_csv(text: str) -> dict | None:
+    rows = _parse_claim_rows(text)
+    if not rows:
+        return None
+
+    required = {"claim_id", "defect_type", "claim_status"}
+    if not required.issubset({key for row in rows for key in row}):
+        return None
+
+    open_statuses = {"received", "under analysis", "corrective action", "in_progress", "in progress", "open"}
+    open_rows = [row for row in rows if _claim_status(row) in open_statuses]
+    if not open_rows:
+        return {"todos": [], "decisions": [], "issues": []}
+
+    ordered = sorted(open_rows, key=_claim_sort_key)
+    issues = [_claim_issue(row) for row in ordered[:20]]
+    todos = [_claim_todo(row) for row in ordered[:20]]
+    return {"todos": todos, "decisions": [], "issues": issues}
+
+
+def _parse_claim_rows(text: str) -> list[dict[str, str]]:
+    rows = _parse_key_value_rows(text)
+    if rows:
+        return rows
+
+    try:
+        reader = csv.DictReader(io.StringIO(text))
+        return [
+            {str(key or "").strip(): str(value or "").strip() for key, value in row.items()}
+            for row in reader
+            if any(str(value or "").strip() for value in row.values())
+        ]
+    except csv.Error:
+        return []
+
+
+def _parse_key_value_rows(text: str) -> list[dict[str, str]]:
+    rows: list[dict[str, str]] = []
+    for line in text.splitlines():
+        if "claim_id:" not in line or " / " not in line:
+            continue
+        row: dict[str, str] = {}
+        for part in line.split(" / "):
+            if ":" not in part:
+                continue
+            key, value = part.split(":", 1)
+            key = key.strip()
+            value = value.strip()
+            if key:
+                row[key] = value
+        if row:
+            rows.append(row)
+    return rows
+
+
+def _claim_status(row: dict[str, str]) -> str:
+    return str(row.get("claim_status") or row.get("status") or "").strip().lower()
+
+
+def _claim_sort_key(row: dict[str, str]) -> tuple[int, int]:
+    severity_rank = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+    status_rank = {"received": 0, "under analysis": 1, "corrective action": 2, "in_progress": 2, "in progress": 2, "open": 3}
+    severity = str(row.get("severity") or "").strip().lower()
+    return (severity_rank.get(severity, 4), status_rank.get(_claim_status(row), 4))
+
+
+def _claim_issue(row: dict[str, str]) -> dict[str, str]:
+    claim_id = row.get("claim_id") or "claim"
+    product = row.get("product_id") or "제품"
+    defect = row.get("defect_type") or "품질 이상"
+    quantity = row.get("defect_quantity") or row.get("quantity") or ""
+    severity = _normalize_claim_severity(row.get("severity"))
+    title = f"{product} {defect} 클레임"
+    if quantity:
+        title = f"{title} {quantity}건"
+    description = _claim_description(row)
+    reason = (
+        f"{claim_id}가 {row.get('claim_status') or 'open'} 상태이고 "
+        f"심각도 {row.get('severity') or '미지정'}, 불량 수량 {quantity or '미지정'}건으로 기록되어 "
+        "품질 리스크 추적이 필요합니다."
+    )
+    return {
+        "title": title,
+        "description": description,
+        "severity": severity,
+        "reason": reason,
+    }
+
+
+def _claim_todo(row: dict[str, str]) -> dict[str, str | None]:
+    claim_id = row.get("claim_id") or "claim"
+    product = row.get("product_id") or "제품"
+    defect = row.get("defect_type") or "품질 이상"
+    status = _claim_status(row)
+    action = {
+        "received": "접수 내용 확인 및 초기 대응 계획 수립",
+        "under analysis": "원인 분석 결과 정리",
+        "corrective action": "시정조치 진행 상황 확인",
+        "in_progress": "시정조치 진행 상황 확인",
+        "in progress": "시정조치 진행 상황 확인",
+    }.get(status, "후속 조치 계획 수립")
+    return {
+        "title": f"{claim_id} {action}",
+        "description": f"{product} {defect} 클레임에 대해 {_claim_description(row)}",
+        "assignee": row.get("quality_owner") or None,
+        "due_date": None,
+        "priority": _normalize_claim_severity(row.get("severity")),
+    }
+
+
+def _claim_description(row: dict[str, str]) -> str:
+    parts = [
+        f"클레임 ID {row.get('claim_id')}" if row.get("claim_id") else "",
+        f"접수일 {row.get('claim_date')}" if row.get("claim_date") else "",
+        f"고객 {row.get('customer_id')}" if row.get("customer_id") else "",
+        f"제품 {row.get('product_id')}" if row.get("product_id") else "",
+        f"불량 유형 {row.get('defect_type')}" if row.get("defect_type") else "",
+        f"수량 {row.get('defect_quantity')}건" if row.get("defect_quantity") else "",
+        f"상태 {row.get('claim_status')}" if row.get("claim_status") else "",
+        f"담당자 {row.get('quality_owner')}" if row.get("quality_owner") else "",
+        f"관련 이슈 {row.get('related_issue_id')}" if row.get("related_issue_id") else "",
+    ]
+    return ", ".join(part for part in parts if part) + "."
+
+
+def _normalize_claim_severity(value: str | None) -> str:
+    severity = str(value or "medium").strip().lower()
+    if severity in {"critical", "high", "medium", "low"}:
+        return severity
+    return "medium"
 
 
 def _fallback_answer(query: str, context: str) -> str:

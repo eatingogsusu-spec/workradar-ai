@@ -627,6 +627,17 @@ function readTextFile(file){
     reader.readAsText(file);
   });
 }
+function looksLikeClaimsCsv(text){
+  const value = normalizeText(text).trim();
+  if(!value) return false;
+  const firstLine = value.split(/\r?\n/).find(line => line.trim());
+  if(!firstLine) return false;
+  const headers = firstLine
+    .split(',')
+    .map(col => col.trim().replace(/^"|"$/g, '').toLowerCase());
+  const required = ['claim_id', 'defect_type', 'claim_status'];
+  return required.every(name => headers.includes(name));
+}
 function looksLikeBusinessRecord(text){
   const value = normalizeText(text).trim();
   if(!value) return false;
@@ -641,6 +652,7 @@ async function validateUploadedFiles(files){
     if(!basic.ok) return basic;
     if(/\.(txt|csv)$/i.test(file.name)){
       const text = await readTextFile(file);
+      if(/\.csv$/i.test(file.name) && looksLikeClaimsCsv(text)) continue;
       if(!looksLikeBusinessRecord(text)) return { ok:false, reason:'structure' };
     }
   }
