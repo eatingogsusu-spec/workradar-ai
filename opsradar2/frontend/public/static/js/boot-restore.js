@@ -106,12 +106,21 @@
 
   function boot() {
     wrapNavPersist();
-    // 가드는 이 체인이 끝나는 시점(=role 확정 + 새 role 재렌더 + 경로 복원)에만 풀린다.
+    // role 캐시(localStorage)만 먼저 확정한 뒤, 경로 복원과 가드 해제를 진행한다.
+    // ⚠️ [C] 경로 복원을 [A6] renderDashboardLive 에 await 로 묶지 않는다.
+    //   renderDashboardLive 는 4중 몽키패치(ops/todo-calendar/role/workflow-v2)를 거치며 내부
+    //   await 체인이 boot 시점에 resolve 되지 않는 경우가 있어, 묶으면 restoreScreen 이 영영
+    //   실행되지 않아 F5 때 항상 dashboard 로 떨어졌다(실측 버그). 그래서 분리한다.
     refreshRole()
-      .then(applyRoleAndRender)
-      .then(restoreScreen)
-      .then(removeGuard)
-      .catch(removeGuard);
+      .catch(function () {})
+      .then(function () {
+        // [A6] 역할 UI 재렌더는 백그라운드(await 안 함). role 캐시는 위에서 이미 갱신됨.
+        try { applyRoleAndRender(); } catch (e) {}
+        // [C] 저장된 경로 복원 → 복원 화면이 갱신된 role 로 렌더된다.
+        restoreScreen();
+        // [A5] 가드 해제.
+        removeGuard();
+      });
   }
 
   // [A5] 가능한 빨리 가드 ON(+ head 인라인에서 선반영). 안전 타임아웃으로 무한로딩 방지.
