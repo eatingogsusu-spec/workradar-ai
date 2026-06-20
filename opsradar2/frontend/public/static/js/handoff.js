@@ -1,6 +1,35 @@
 // 인수인계센터 전용 화면 제어.
 // 기존 Knowledge 화면 위에 프런트 데모를 구성하며, 백엔드 API/DB 계약은 변경하지 않는다.
 (function () {
+  if (window.__HANDOFF_REACT_ENABLED__) {
+    const dispatch = (command, detail = {}) => {
+      window.dispatchEvent(new CustomEvent('opsradar:handoff-command', {
+        detail: { command, ...detail },
+      }));
+    };
+    const normalizeMode = (type) => {
+      if (type === 'onboarding') return 'onboarding';
+      if (type === 'archive' || type === 'history') return 'archive';
+      if (type === 'home' || !type) return 'home';
+      return 'handoff';
+    };
+
+    window.initHandoffCenter = () => dispatch('open', { mode: 'home' });
+    window.selectKnowledgeType = (type) => dispatch('open', { mode: normalizeMode(type) });
+    window.selectHandoffType = window.selectKnowledgeType;
+    window.renderKnowledgeFlow = window.selectKnowledgeType;
+    window.openHandoffPreview = (type) => {
+      const mode = normalizeMode(type) === 'onboarding' ? 'onboarding' : 'handoff';
+      dispatch('preview', { mode });
+      return window.__handoffReactState?.getPreviewData(mode) || null;
+    };
+    window.generateHandoffPreview = window.openHandoffPreview;
+    window.getHandoffPreviewData = (type) => (
+      window.__handoffReactState?.getPreviewData(type) || null
+    );
+    return;
+  }
+
   const DEMO_SOURCE = {
     label: '데모 데이터',
     path: 'dummy_data/05_db_seed_v2 · expected_handover_sample.md',

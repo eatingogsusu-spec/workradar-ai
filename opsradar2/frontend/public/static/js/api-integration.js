@@ -442,7 +442,10 @@
     const [year, month, day] = date.split("-").map(Number);
     if (!year || !month || !day) return null;
     const range = rangeMeta?.get(event.id) || null;
-    const eventTime = event.event_time && event.event_time !== "00:00" ? event.event_time : "";
+    const rawEventTime = String(event.event_time || "").trim();
+    const eventTime = /^([01]\d|2[0-3]):[0-5]\d$/.test(rawEventTime) && rawEventTime !== "00:00"
+      ? rawEventTime
+      : "";
     const tagTitle = range && !range.isStart
       ? [eventTime, event.title].filter(Boolean).join(" ")
       : [event.person, eventTime, event.title].filter(Boolean).join(" ");
