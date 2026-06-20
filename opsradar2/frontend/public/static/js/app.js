@@ -1462,7 +1462,7 @@ function showCalBanner(){
   const badge=document.getElementById('calUpdatedBadge');badge.style.display='inline-flex';setTimeout(()=>badge.style.display='none',3000);
   const names=[...new Set(G.newCalEvents.map(e=>e.person))].join(', ');
   document.getElementById('calAIText').textContent=`5/22(금) 마감 4건 집중. ${names} 부재 일정 추가됨. AI 리스크 재계산 완료.`;
-  G.newCalEvents.filter(e=>e.type!=='회의').forEach(e=>{const div=document.createElement('div');div.style.cssText='padding:6px 0;border-top:1px solid var(--border);font-size:11px';div.innerHTML=`<div style="font-size:10px;color:var(--success);font-family:var(--mono)">${e.date} ${e.person} ✦ 신규</div><div style="color:var(--text)">${e.type} — ${e.impact}</div>`;document.getElementById('calAbsenceList').appendChild(div);});
+  G.newCalEvents.filter(e=>e.type!=='회의').forEach(e=>{const div=document.createElement('div');div.style.cssText='padding:6px 0;border-top:1px solid var(--border);font-size:11px';div.innerHTML=`<div style="font-size:10px;color:var(--success);font-family:var(--mono)">${e.date} ${e.person} ✦ 신규</div><div style="color:var(--text)">${e.type} — ${e.impact}</div>`;document.getElementById('calAbsenceList')?.appendChild(div);});
 }
 
 function registerCalEvent(parsed, calDate){

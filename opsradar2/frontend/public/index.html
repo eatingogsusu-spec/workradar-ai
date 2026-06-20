@@ -284,8 +284,6 @@ window.OPSRADAR_API_BASE = ["8002", "3001"].includes(window.location.port)
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-        <div class="tbtn" onclick="openAnalysisTodoReview()" style="color:var(--accent)"><i class="ti ti-checkbox"></i> Todo 확인</div>
-        <div class="tbtn" onclick="openAnalysisRiskReview()" style="color:var(--danger)"><i class="ti ti-alert-triangle"></i> 이슈 확인</div>
         <div class="tbtn primary" onclick="applyDashboard()"><i class="ti ti-layout-dashboard"></i> Dashboard 반영 →</div>
         <div class="tbtn" onclick="resetFlow()" style="margin-left:auto"><i class="ti ti-plus"></i> 다른 파일 분석</div>
       </div>
@@ -473,19 +471,7 @@ window.OPSRADAR_API_BASE = ["8002", "3001"].includes(window.location.port)
       </div>
     </div>
     <div class="cal-side">
-      <div style="flex:1;overflow-y:auto;padding:14px">
-        <div style="font-size:11px;font-weight:500;color:var(--text);margin-bottom:10px;display:flex;align-items:center;gap:5px"><i class="ti ti-alert-triangle" style="font-size:13px;color:var(--text2)"></i> 리스크 구간</div>
-        <div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:11px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:2px">5/21~22 (목~금)</div><div style="color:var(--text)">마감 4건 + 부재 겹침</div><span class="badge b-danger" style="margin-top:4px;display:inline-block">최고 위험</span></div>
-        <div style="font-size:11px;font-weight:500;color:var(--text);margin:14px 0 8px;display:flex;align-items:center;gap:5px"><i class="ti ti-user-off" style="font-size:13px;color:var(--text2)"></i> 부재 현황</div>
-        <div id="calAbsenceList">
-          <div style="padding:6px 0;border-bottom:1px solid var(--border);font-size:11px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">5/19 이성우</div><div style="color:var(--text)">외부 일정 — 업무 공백</div></div>
-          <div style="padding:6px 0;font-size:11px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">5/21 관리자</div><div style="color:var(--text)">외부 일정 — 업무 지연</div></div>
-        </div>
-        <div style="font-size:11px;font-weight:500;color:var(--text);margin:14px 0 8px;display:flex;align-items:center;gap:5px"><i class="ti ti-flag" style="font-size:13px;color:var(--text2)"></i> 마일스톤</div>
-        <div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:11px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">5/29</div><div style="color:var(--text)">4주차 시연</div><span class="badge b-accent" style="margin-top:4px;display:inline-block">—</span></div>
-        <div style="padding:7px 0;font-size:11px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">6/26</div><div style="color:var(--text)">MVP 최종 시연</div><span class="badge b-accent" style="margin-top:4px;display:inline-block">—</span></div>
-      </div>
-      <div class="cal-mini-chat" style="border-top:1px solid var(--border);background:var(--surface2)">
+      <div class="cal-mini-chat" style="background:var(--surface2)">
         <div class="mini-chat-hd"><i class="ti ti-sparkles" style="font-size:13px;color:var(--accent)"></i><span style="font-size:11px;font-weight:500;color:var(--accent)">일정 등록</span></div>
         <div class="mini-log" id="miniLog">
         <div style="font-size:10px;color:var(--text3);line-height:1.5">일정을 입력하면 내용을 검토하고 수정한 뒤 등록합니다.</div>
@@ -1044,6 +1030,6 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
 <script src="/static/js/workflow-v2.js?v=20260620-member-issue-actions"></script>
 <!-- React strangler-fig mount: Todo 탭/목록/카드/상세는 React 렌더링, 기존 Todo 전역 함수는 compatibility wrapper 유지. -->
 <div id="react-mount"></div>
-<script type="module" src="/static/react/main.js?v=20260620-grounded-assistant"></script>
+<script type="module" src="/static/react/main.js?v=20260621-schedule-bottom"></script>
 <div id="root"></div></body>
 </html>

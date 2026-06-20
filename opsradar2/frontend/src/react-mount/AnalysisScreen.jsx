@@ -95,8 +95,6 @@ const CONTENT_INNER = `
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
-        <div class="tbtn" onclick="openAnalysisTodoReview()" style="color:var(--accent)"><i class="ti ti-checkbox"></i> Todo 확인</div>
-        <div class="tbtn" onclick="openAnalysisRiskReview()" style="color:var(--danger)"><i class="ti ti-alert-triangle"></i> 이슈 확인</div>
         <div class="tbtn primary" onclick="applyDashboard()"><i class="ti ti-layout-dashboard"></i> Dashboard 반영 →</div>
         <div class="tbtn" onclick="resetFlow()" style="margin-left:auto"><i class="ti ti-plus"></i> 다른 파일 분석</div>
       </div>

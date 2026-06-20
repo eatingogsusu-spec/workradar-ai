@@ -109,19 +109,7 @@ function CalendarScreen() {
           </div>
         </div>
         <div className="cal-side">
-          <div style={{ flex: 1, overflowY: 'auto', padding: '14px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text)', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}><i className="ti ti-alert-triangle" style={{ fontSize: '13px', color: 'var(--text2)' }}></i> 리스크 구간</div>
-            <div style={{ padding: '7px 0', borderBottom: '1px solid var(--border)', fontSize: '11px' }}><div style={{ fontSize: '10px', color: 'var(--text3)', fontFamily: 'var(--mono)', marginBottom: '2px' }}>5/21~22 (목~금)</div><div style={{ color: 'var(--text)' }}>마감 4건 + 부재 겹침</div><span className="badge b-danger" style={{ marginTop: '4px', display: 'inline-block' }}>최고 위험</span></div>
-            <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text)', margin: '14px 0 8px', display: 'flex', alignItems: 'center', gap: '5px' }}><i className="ti ti-user-off" style={{ fontSize: '13px', color: 'var(--text2)' }}></i> 부재 현황</div>
-            <div id="calAbsenceList">
-              <div style={{ padding: '6px 0', borderBottom: '1px solid var(--border)', fontSize: '11px' }}><div style={{ fontSize: '10px', color: 'var(--text3)', fontFamily: 'var(--mono)' }}>5/19 이성우</div><div style={{ color: 'var(--text)' }}>외부 일정 — 업무 공백</div></div>
-              <div style={{ padding: '6px 0', fontSize: '11px' }}><div style={{ fontSize: '10px', color: 'var(--text3)', fontFamily: 'var(--mono)' }}>5/21 관리자</div><div style={{ color: 'var(--text)' }}>외부 일정 — 업무 지연</div></div>
-            </div>
-            <div style={{ fontSize: '11px', fontWeight: 500, color: 'var(--text)', margin: '14px 0 8px', display: 'flex', alignItems: 'center', gap: '5px' }}><i className="ti ti-flag" style={{ fontSize: '13px', color: 'var(--text2)' }}></i> 마일스톤</div>
-            <div style={{ padding: '7px 0', borderBottom: '1px solid var(--border)', fontSize: '11px' }}><div style={{ fontSize: '10px', color: 'var(--text3)', fontFamily: 'var(--mono)' }}>5/29</div><div style={{ color: 'var(--text)' }}>4주차 시연</div><span className="badge b-accent" style={{ marginTop: '4px', display: 'inline-block' }}>—</span></div>
-            <div style={{ padding: '7px 0', fontSize: '11px' }}><div style={{ fontSize: '10px', color: 'var(--text3)', fontFamily: 'var(--mono)' }}>6/26</div><div style={{ color: 'var(--text)' }}>MVP 최종 시연</div><span className="badge b-accent" style={{ marginTop: '4px', display: 'inline-block' }}>—</span></div>
-          </div>
-          <div className="cal-mini-chat" style={{ borderTop: '1px solid var(--border)', background: 'var(--surface2)' }}>
+          <div className="cal-mini-chat" style={{ background: 'var(--surface2)', marginTop: 'auto' }}>
             <div className="mini-chat-hd"><i className="ti ti-sparkles" style={{ fontSize: '13px', color: 'var(--accent)' }}></i><span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--accent)' }}>일정 등록</span></div>
             <div className="mini-log" id="miniLog">
               <div style={{ fontSize: '10px', color: 'var(--text3)', lineHeight: 1.5 }}>일정을 입력하면 내용을 검토하고 수정한 뒤 등록합니다.</div>
