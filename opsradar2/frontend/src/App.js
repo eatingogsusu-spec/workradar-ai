@@ -30,6 +30,11 @@ function App() {
     window.localStorage.setItem("opsradar_user_role", data.user.role);
     window.localStorage.setItem("opsradar_user_name", data.user.name);
     setSession(sessionData);
+    // Static workflow data may have loaded before authentication. Refresh it once
+    // the session token exists so calendar, Todo, and member data use the new session.
+    Promise.resolve(window.opsRadarApi?.reload?.()).catch((error) => {
+      console.warn("Authenticated data reload failed", error);
+    });
   }
 
   function handleLogout() {

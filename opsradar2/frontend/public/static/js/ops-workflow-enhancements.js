@@ -122,16 +122,6 @@
             }),
           });
         }
-        if (item.dueDate) {
-          await api("/calendar/", {
-            method: "POST",
-            body: JSON.stringify({
-              title: `[Risk 마감] ${item.title}`,
-              event_date: item.dueDate,
-              event_type: "deadline",
-            }),
-          });
-        }
         item.type = "confirmed";
         item.approvalStatus = "approved";
       }));
@@ -141,7 +131,7 @@
       await window.opsRadarApi.reload();
       renderAnalysisRiskReview();
       renderDashboardLive();
-      showToast(`${selected.length}개 리스크를 확정 이슈로 이동하고 마감 일정을 등록했습니다.`, "success");
+      showToast(`${selected.length}개 리스크를 확정 이슈로 이동했습니다.`, "success");
       if (!G.analysisRiskReview.length) closeModal("analysisRiskModal");
     } catch (error) {
       console.warn("Risk confirmation failed", error);

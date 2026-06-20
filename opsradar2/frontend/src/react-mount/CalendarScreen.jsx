@@ -120,15 +120,15 @@ function CalendarScreen() {
           <div className="cal-mini-chat" style={{ borderTop: '1px solid var(--border)', background: 'var(--surface2)' }}>
             <div className="mini-chat-hd"><i className="ti ti-sparkles" style={{ fontSize: '13px', color: 'var(--accent)' }}></i><span style={{ fontSize: '11px', fontWeight: 500, color: 'var(--accent)' }}>일정 등록</span></div>
             <div className="mini-log" id="miniLog">
-              <div style={{ fontSize: '10px', color: 'var(--text3)', lineHeight: 1.5 }}>누락된 일정을 말로 알려주세요.</div>
+              <div style={{ fontSize: '10px', color: 'var(--text3)', lineHeight: 1.5 }}>일정을 입력하면 내용을 검토하고 수정한 뒤 등록합니다.</div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', marginTop: '4px' }}>
-                <div className="sq" style={{ fontSize: '9px', padding: '2px 6px' }} onClick={() => window.miniChat?.('이성우 5/26 부재')}>이성우 5/26 부재</div>
-                <div className="sq" style={{ fontSize: '9px', padding: '2px 6px' }} onClick={() => window.miniChat?.('6/3 팀 회의')}>6/3 팀 회의</div>
+                <div className="sq" style={{ fontSize: '9px', padding: '2px 6px' }} onClick={() => window.miniChat?.('김도윤 6/15-19 휴가')}>김도윤 6/15-19 휴가</div>
+                <div className="sq" style={{ fontSize: '9px', padding: '2px 6px' }} onClick={() => window.miniChat?.('6/25 10:00 주간 운영 회의')}>6/25 10:00 주간 운영 회의</div>
               </div>
             </div>
             <div className="mini-input-row">
-              <input className="mini-input" id="miniInput" placeholder="예: 이성우 5/28 부재" onKeyDown={(e) => { if (e.key === 'Enter') window.miniChat?.() }} />
-              <button className="mini-send" onClick={() => window.miniChat?.()}><i className="ti ti-send" style={{ fontSize: '12px' }}></i></button>
+              <input className="mini-input" id="miniInput" placeholder="예: 김도윤 6/15-19 휴가" onKeyDown={(e) => { if (e.key === 'Enter') window.miniChat?.() }} />
+              <button className="mini-send" title="일정 해석" onClick={() => window.miniChat?.()}><i className="ti ti-send" style={{ fontSize: '12px' }}></i></button>
             </div>
           </div>
         </div>

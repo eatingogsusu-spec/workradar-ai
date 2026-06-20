@@ -575,8 +575,11 @@
 
   function applyCalendarPreferences() {
     const preferences = read(STORAGE.calendar, {});
-    const allowedMembers = new Set(preferences.members?.length ? preferences.members : names());
-    const allowedStatuses = new Set(preferences.statuses?.length ? preferences.statuses : ["approved", "done"]);
+    const activeMembers = names();
+    if (!activeMembers.length) return;
+    const selectedMembers = (preferences.members || []).filter((name) => activeMembers.includes(name));
+    const allowedMembers = new Set(selectedMembers.length ? selectedMembers : activeMembers);
+    const allowedStatuses = new Set(["approved", "done"]);
     (G.calEvents || []).forEach((event) => {
       event.tags = (event.tags || []).filter((tag) => {
         if (!tag.todoId) return true;

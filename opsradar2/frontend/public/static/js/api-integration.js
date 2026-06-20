@@ -242,6 +242,7 @@
     applyTodoRecommendations();
     window.applyWorkflowRoleVisibility?.();
     window.renderTodos?.();
+    window.syncTodoCalendar?.();
     return members;
   }
 
@@ -341,10 +342,56 @@
       showToast("담당자를 비활성화했습니다.", "success");
     } catch (error) { console.warn("Member delete API failed", error); showToast("담당자 삭제에 실패했습니다.", "warn"); }
   };
-  function normalizeCalendarEvent(event) {
+  function isAbsenceRange(event) {
+    return String(event?.source_type || "").startsWith("absence:");
+  }
+
+  function shortCalendarDate(value) {
+    const [, month, day] = String(value || "").split("-");
+    return month && day ? `${Number(month)}/${Number(day)}` : "-";
+  }
+
+  function absenceRangeMeta(events) {
+    const groups = new Map();
+    events.filter(isAbsenceRange).forEach((event) => {
+      const key = String(event.source_type);
+      const group = groups.get(key) || [];
+      group.push(event);
+      groups.set(key, group);
+    });
+    const metaById = new Map();
+    groups.forEach((group, sourceType) => {
+      const sorted = [...group].sort((left, right) => String(left.event_date).localeCompare(String(right.event_date)));
+      const first = sorted[0];
+      const last = sorted[sorted.length - 1];
+      sorted.forEach((event, index) => {
+        const date = new Date(`${event.event_date}T12:00:00`);
+        metaById.set(event.id, {
+          sourceType,
+          startDate: first.event_date,
+          endDate: last.event_date,
+          isStart: index === 0,
+          isEnd: index === sorted.length - 1,
+          startsVisualSegment: index === 0 || date.getDay() === 1,
+          endsVisualSegment: index === sorted.length - 1 || date.getDay() === 0,
+        });
+      });
+    });
+    return metaById;
+  }
+
+  function normalizeCalendarEvent(event, rangeMeta) {
     const date = String(event.event_date || "");
     const [year, month, day] = date.split("-").map(Number);
     if (!year || !month || !day) return null;
+    const range = rangeMeta?.get(event.id) || null;
+    const eventTime = event.event_time && event.event_time !== "00:00" ? event.event_time : "";
+    const tagTitle = range && !range.isStart
+      ? [eventTime, event.title].filter(Boolean).join(" ")
+      : [event.person, eventTime, event.title].filter(Boolean).join(" ");
+    const rangeClass = range
+      ? ` absence-range absence-range-${range.startsVisualSegment ? "start" : range.endsVisualSegment ? "end" : "middle"}`
+      : "";
     return {
       apiId: event.id,
       d: day,
@@ -352,8 +399,13 @@
       m: month - 1,
       tags: [{
         apiId: event.id,
-        t: event.person ? `${event.person} ${event.title}` : event.title,
-        c: calendarClass(event.event_type),
+        t: tagTitle,
+        c: `${calendarClass(event.event_type)}${rangeClass}`,
+        eventType: event.event_type,
+        sourceType: event.source_type || "manual",
+        rangeLabel: range
+          ? `${[event.person, event.title].filter(Boolean).join(" ")} · ${shortCalendarDate(range.startDate)}~${shortCalendarDate(range.endDate)}`
+          : "",
       }],
     };
   }
@@ -361,7 +413,8 @@
   function mergeCalendarEvents(events) {
     if (!window.G) return;
     const byDay = new Map();
-    events.map(normalizeCalendarEvent).filter(Boolean).forEach((event) => {
+    const rangeMeta = absenceRangeMeta(events);
+    events.map((event) => normalizeCalendarEvent(event, rangeMeta)).filter(Boolean).forEach((event) => {
       const key = `${event.y}-${event.m}-${event.d}`;
       const existing = byDay.get(key);
       if (existing) existing.tags.push(...event.tags);
@@ -658,12 +711,30 @@
     return { documentId, chunks: chunkData.chunks || [], todos: docTodos, issues: docIssues };
   }
 
-  window.opsRadarCreateCalendarEvent = async function ({ title, day, month, year, color }) {
+  window.opsRadarCreateCalendarEvent = async function ({
+    title,
+    day,
+    month,
+    year,
+    color,
+    eventType,
+    memberId,
+    eventTime,
+    endDate,
+  }) {
     const target = new Date(
       year ?? window.G?.currentCalYear ?? new Date().getFullYear(),
       month ?? window.G?.currentCalMonth ?? new Date().getMonth(),
       day,
     );
+    if(
+      !Number.isInteger(target.getTime())
+      || target.getFullYear() !== Number(year ?? window.G?.currentCalYear ?? target.getFullYear())
+      || target.getMonth() !== Number(month ?? window.G?.currentCalMonth ?? target.getMonth())
+      || target.getDate() !== Number(day)
+    ){
+      throw new Error("올바른 날짜를 지정하세요.");
+    }
     const created = await request("/calendar/", {
       method: "POST",
       body: JSON.stringify({
@@ -673,7 +744,10 @@
           String(target.getMonth() + 1).padStart(2, "0"),
           String(target.getDate()).padStart(2, "0"),
         ].join("-"),
-        event_type: calendarTypeFromColor(color),
+        event_type: eventType || calendarTypeFromColor(color),
+        member_id: memberId || null,
+        event_time: eventTime || null,
+        end_date: endDate || null,
       }),
     });
     return created.event;

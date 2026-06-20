@@ -317,9 +317,10 @@
           year, month: month - 1, day,
           tag: {
             t: `${todo.status === "approved" ? "[진행]" : "[완료]"} ${cleanTodoTitle(todo.title)}`,
-            c: todo.status === "approved" ? "ct-info" : "ct-success",
+            c: todo.status === "approved" ? "ct-info" : "ct-done",
             todoId: todo.id,
             todoStatus: todo.status,
+            hideOnCalendar: todo.status === "done",
           },
         };
       });
@@ -337,7 +338,10 @@
         G.calEvents.push(event);
       }
       event.tags.push(tag);
-      event.tags.sort((a, b) => (a.todoStatus === "approved" ? -1 : 0) - (b.todoStatus === "approved" ? -1 : 0));
+      event.tags.sort((a, b) => {
+        const rank = (tag) => tag.todoStatus === "approved" ? 0 : tag.todoStatus === "done" ? 1 : 2;
+        return rank(a) - rank(b);
+      });
     });
     if (G.currentScreen === "calendar") renderCalendar(G.currentCalYear, G.currentCalMonth);
   };
@@ -348,7 +352,11 @@
     const event = (G.calEvents || []).find((item) => item.y === G.currentCalYear && item.m === G.currentCalMonth && item.d === day);
     const list = document.getElementById("calModalList");
     if (!event || !list) return;
-    list.innerHTML = (event.tags || []).map((tag, index) => `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border-radius:var(--radius-sm)">
+    const tags = (event.tags || []).map((tag, index) => ({ tag, index })).sort((a, b) => {
+      const rank = (tag) => tag.todoStatus === "approved" ? 0 : tag.todoStatus === "done" ? 1 : 2;
+      return rank(a.tag) - rank(b.tag);
+    });
+    list.innerHTML = tags.map(({ tag, index }) => `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border-radius:var(--radius-sm)">
       <span class="cal-tag ${tag.c}" style="flex:1">${escapeHtml(tag.t)}</span>
       ${tag.todoId ? `<div class="tbtn" onclick="goToCalendarTodo(${tag.todoId})"><i class="ti ti-arrow-right"></i> 해당 Todo로 이동</div>` : `<div onclick="deleteCalTag(${day},${index})" style="cursor:pointer;color:var(--text3);font-size:14px;padding:2px 6px;border-radius:4px;border:1px solid var(--border)" title="삭제">×</div>`}
     </div>`).join("") || '<div style="font-size:11px;color:var(--text3);text-align:center;padding:16px 0">등록된 일정이 없습니다.</div>';

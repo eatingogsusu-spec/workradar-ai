@@ -9,9 +9,9 @@
 
 <link rel="stylesheet" href="/static/css/theme.css?v=20260619">
 <link rel="stylesheet" href="/static/css/layout.css?v=20260619">
-<link rel="stylesheet" href="/static/css/components.css?v=20260619">
+<link rel="stylesheet" href="/static/css/components.css?v=20260620-absence-range">
 <link rel="stylesheet" href="/static/css/role-workflow-enhancements.css?v=20260619">
-<link rel="stylesheet" href="/static/css/workflow-v2.css?v=20260620-member-issue-actions">
+<link rel="stylesheet" href="/static/css/workflow-v2.css?v=20260620-calendar-todos">
 </head>
 
 <body><script>
@@ -486,15 +486,15 @@ window.OPSRADAR_API_BASE = window.location.port === "8002"
       <div class="cal-mini-chat" style="border-top:1px solid var(--border);background:var(--surface2)">
         <div class="mini-chat-hd"><i class="ti ti-sparkles" style="font-size:13px;color:var(--accent)"></i><span style="font-size:11px;font-weight:500;color:var(--accent)">일정 등록</span></div>
         <div class="mini-log" id="miniLog">
-          <div style="font-size:10px;color:var(--text3);line-height:1.5">누락된 일정을 말로 알려주세요.</div>
+        <div style="font-size:10px;color:var(--text3);line-height:1.5">일정을 입력하면 내용을 검토하고 수정한 뒤 등록합니다.</div>
           <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px">
-            <div class="sq" style="font-size:9px;padding:2px 6px" onclick="miniChat('이성우 5/26 부재')">이성우 5/26 부재</div>
-            <div class="sq" style="font-size:9px;padding:2px 6px" onclick="miniChat('6/3 팀 회의')">6/3 팀 회의</div>
+            <div class="sq" style="font-size:9px;padding:2px 6px" onclick="miniChat('김도윤 6/15-19 휴가')">김도윤 6/15-19 휴가</div>
+            <div class="sq" style="font-size:9px;padding:2px 6px" onclick="miniChat('6/25 10:00 주간 운영 회의')">6/25 10:00 주간 운영 회의</div>
           </div>
         </div>
         <div class="mini-input-row">
-          <input class="mini-input" id="miniInput" placeholder="예: 이성우 5/28 부재" onkeydown="if(event.key==='Enter')miniChat()">
-          <button class="mini-send" onclick="miniChat()"><i class="ti ti-send" style="font-size:12px"></i></button>
+          <input class="mini-input" id="miniInput" placeholder="예: 김도윤 6/15-19 휴가" onkeydown="if(event.key==='Enter')miniChat()">
+          <button class="mini-send" title="일정 해석" onclick="miniChat()"><i class="ti ti-send" style="font-size:12px"></i></button>
         </div>
       </div>
     </div>
@@ -1024,8 +1024,8 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
   </button>
 </div>
 </div>
-<script src="/static/js/app.js?v=20260620-team-filter"></script>
-<script src="/static/js/api-integration.js?v=20260620-member-issue-actions"></script>
+<script src="/static/js/app.js?v=20260620-absence-range"></script>
+<script src="/static/js/api-integration.js?v=20260620-absence-range"></script>
 <script src="/static/js/storage.js?v=20260619"></script>
 <script src="/static/js/dashboard.js?v=20260619"></script>
 <script src="/static/js/todo.js?v=20260619"></script>
@@ -1035,12 +1035,12 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
 <script src="/static/js/report.js?v=20260619"></script>
 <script src="/static/js/assistant.js?v=20260619"></script>
 <script src="/static/js/settings.js?v=20260619"></script>
-<script src="/static/js/ops-workflow-enhancements.js?v=20260620-risk-no-assignee"></script>
+<script src="/static/js/ops-workflow-enhancements.js?v=20260620-calendar-todos"></script>
 <script src="/static/js/todo-calendar-enhancements.js?v=20260619"></script>
-<script src="/static/js/role-workflow-enhancements.js?v=20260620-member-issue-actions"></script>
+<script src="/static/js/role-workflow-enhancements.js?v=20260620-calendar-sync"></script>
 <script src="/static/js/workflow-v2.js?v=20260620-member-issue-actions"></script>
 <!-- React strangler-fig mount: Todo 탭/목록/카드/상세는 React 렌더링, 기존 Todo 전역 함수는 compatibility wrapper 유지. -->
 <div id="react-mount"></div>
-<script type="module" src="/static/react/main.js?v=20260620-team-filter"></script>
+<script type="module" src="/static/react/main.js?v=20260620-absence-range"></script>
 <div id="root"></div></body>
 </html>

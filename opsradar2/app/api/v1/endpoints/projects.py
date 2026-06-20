@@ -10,6 +10,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.deps import get_current_user
+from app.api.v1.endpoints.calendar import create_calendar_events
 from app.core.database import get_db
 from app.repositories.calendar_repository import CalendarRepository
 from app.repositories.issue_repository import IssueRepository
@@ -32,6 +34,11 @@ async def ensure_project(db: AsyncSession, project_id: str) -> None:
     )
     if result.scalar_one_or_none() is None:
         raise HTTPException(404, "project not found")
+
+
+def ensure_project_access(actor: dict, project_id: str) -> None:
+    if actor.get("project_id") != project_id:
+        raise HTTPException(403, "project access denied")
 
 
 @router.get("/{project_id}/dashboard/summary")
@@ -91,19 +98,28 @@ async def create_project_issue(project_id: str, body: IssueCreate, db: AsyncSess
 
 
 @router.get("/{project_id}/calendar")
-async def project_calendar(project_id: str, db: AsyncSession = Depends(get_db)):
+async def project_calendar(
+    project_id: str,
+    actor: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    ensure_project_access(actor, project_id)
     await ensure_project(db, project_id)
     events = await CalendarService(CalendarRepository(db)).list_events(project_id=project_id)
     return {"events": events}
 
 
 @router.post("/{project_id}/calendar/")
-async def create_project_calendar_event(project_id: str, body: dict, db: AsyncSession = Depends(get_db)):
+async def create_project_calendar_event(
+    project_id: str,
+    body: dict,
+    actor: dict = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    ensure_project_access(actor, project_id)
     await ensure_project(db, project_id)
-    if not body.get("title") or not body.get("event_date"):
-        raise HTTPException(400, "title and event_date are required")
-    event = await CalendarService(CalendarRepository(db)).create_event({**body, "project_id": project_id})
-    return {"event": event}
+    events = await create_calendar_events(body, project_id=project_id, db=db)
+    return {"event": events[0], "events": events}
 
 
 @router.get("/{project_id}/documents")

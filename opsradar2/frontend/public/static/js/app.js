@@ -1460,30 +1460,285 @@ function renderKnowledgeAbsence(){
   G.newCalEvents.filter(e=>e.type!=='회의').forEach(e=>{const div=document.createElement('div');div.style.cssText='background:var(--surface2);border-radius:var(--radius-sm);padding:8px 10px;font-size:11px';div.innerHTML=`<div style="font-weight:500;color:var(--text);margin-bottom:2px">${e.person} <span style="font-size:9px;color:var(--success)">✦ 신규</span></div><div style="color:var(--text3);font-size:10px;font-family:var(--mono)">${e.date} ${e.type}</div><span class="badge b-warn" style="margin-top:4px;display:inline-block">${e.impact}</span>`;list.appendChild(div);});
 }
 
-function miniChat(text){
-  const input=document.getElementById('miniInput');const msg=text||input.value.trim();if(!msg)return;input.value='';
-  const log=document.getElementById('miniLog');
-  const u=document.createElement('div');u.className='mini-bubble mini-bubble-user';u.textContent=msg;log.appendChild(u);log.scrollTop=log.scrollHeight;
-  setTimeout(async ()=>{
-    const parsed=parseScheduleMsg(msg);
-    const reply=(msg.includes('부재')||msg.includes('외부 일정'))?`✅ ${parsed.person} ${parsed.date} ${parsed.type}을 캘린더에 등록했습니다.`:'✅ 일정을 캘린더에 추가했습니다.';
-    const dateMatch=msg.match(/(\d+)\/(\d+)/);
-    try{
-      if(!dateMatch || !window.opsRadarCreateCalendarEvent || !window.opsRadarApi) throw new Error('Calendar API is not ready');
-      const month=Number(dateMatch[1])-1;
-      const day=Number(dateMatch[2]);
-      await window.opsRadarCreateCalendarEvent({title:`${parsed.person} ${parsed.type}`,day,month,year:G.currentCalYear,color:parsed.type==='부재'?'ct-gray':'ct-info'});
-      await window.opsRadarApi.loadCalendar();
-      G.newCalEvents.push({...parsed,calDate:day,y:G.currentCalYear,m:month});
-      renderCalendar(G.currentCalYear,G.currentCalMonth);
-      const a=document.createElement('div');a.className='mini-bubble mini-bubble-ai';a.textContent=reply;log.appendChild(a);log.scrollTop=log.scrollHeight;
-      showToast(reply);
-    }catch(error){
-      console.warn('Mini calendar create API failed',error);
-      const a=document.createElement('div');a.className='mini-bubble mini-bubble-ai';a.textContent='일정 등록에 실패했습니다. DB 연결을 확인해주세요.';log.appendChild(a);log.scrollTop=log.scrollHeight;
-      showToast('캘린더 등록에 실패했습니다.','warn');
+const MINI_SCHEDULE_TYPES = {
+  meeting: { label: '회의', color: 'ct-success' },
+  absence: { label: '부재/휴가', color: 'ct-gray' },
+  deadline: { label: '마감', color: 'ct-danger' },
+  milestone: { label: '마일스톤', color: 'ct-info' },
+};
+let miniScheduleSubmitting = false;
+
+function activeCalendarMembers(){
+  return (window.opsRadarMembers || []).filter((member) => (member.status || 'active') === 'active' && member.name && member.member_id);
+}
+function localDateFromParts(year, month, day){
+  const value = new Date(year, month - 1, day, 12, 0, 0, 0);
+  return value.getFullYear() === year && value.getMonth() === month - 1 && value.getDate() === day ? value : null;
+}
+function isoLocalDate(value){
+  return [value.getFullYear(), String(value.getMonth() + 1).padStart(2, '0'), String(value.getDate()).padStart(2, '0')].join('-');
+}
+function formatScheduleDate(value){
+  return `${value.getFullYear()}년 ${value.getMonth() + 1}월 ${value.getDate()}일`;
+}
+function scheduleWeekdayOffset(label){
+  return ({월:0, 화:1, 수:2, 목:3, 금:4, 토:5, 일:6})[label];
+}
+function parseMiniScheduleRange(message){
+  const raw = String(message || '');
+  const displayedYear = Number(window.G?.currentCalYear) || new Date().getFullYear();
+  let match = raw.match(/\b(20\d{2})[./-](\d{1,2})[./-](\d{1,2})\s*(?:~|–|-)\s*(?:(20\d{2})[./-])?(\d{1,2})[./-](\d{1,2})\b/);
+  if(match){
+    const start = localDateFromParts(Number(match[1]), Number(match[2]), Number(match[3]));
+    const end = localDateFromParts(Number(match[4] || match[1]), Number(match[5]), Number(match[6]));
+    if(!start || !end) return { value: null, endValue: null, error: '입력한 기간에 실제 달력에 없는 날짜가 있습니다.' };
+    if(end < start) return { value: null, endValue: null, error: '종료일은 시작일보다 빠를 수 없습니다.' };
+    return { value: start, endValue: end, source: match[0] };
+  }
+  match = raw.match(/\b(\d{1,2})[./](\d{1,2})\s*(?:~|–|-)\s*(?:(\d{1,2})[./])?(\d{1,2})\b/) || raw.match(/\b(\d{1,2})월\s*(\d{1,2})일?\s*(?:~|–|-)\s*(?:(\d{1,2})월\s*)?(\d{1,2})일?/);
+  if(match){
+    const start = localDateFromParts(displayedYear, Number(match[1]), Number(match[2]));
+    const end = localDateFromParts(displayedYear, Number(match[3] || match[1]), Number(match[4]));
+    if(!start || !end) return { value: null, endValue: null, error: '입력한 기간에 실제 달력에 없는 날짜가 있습니다.' };
+    if(end < start) return { value: null, endValue: null, error: '종료일은 시작일보다 빠를 수 없습니다.' };
+    return { value: start, endValue: end, source: match[0] };
+  }
+  const single = parseMiniScheduleDate(message);
+  return { ...single, endValue: single.value || null };
+}
+function parseMiniScheduleDate(message){
+  const raw = String(message || '');
+  const today = new Date();
+  today.setHours(12, 0, 0, 0);
+  let match = raw.match(/\b(20\d{2})[./-](\d{1,2})[./-](\d{1,2})\b/) || raw.match(/\b(20\d{2})년\s*(\d{1,2})월\s*(\d{1,2})일?/);
+  if(match){
+    const value = localDateFromParts(Number(match[1]), Number(match[2]), Number(match[3]));
+    return value ? { value, source: match[0] } : { value: null, error: '입력한 날짜가 실제 달력에 없습니다.' };
+  }
+  match = raw.match(/\b(\d{1,2})\/(\d{1,2})\b/) || raw.match(/\b(\d{1,2})월\s*(\d{1,2})일?/);
+  if(match){
+    const displayedYear = Number(window.G?.currentCalYear) || today.getFullYear();
+    const value = localDateFromParts(displayedYear, Number(match[1]), Number(match[2]));
+    return value ? { value, source: match[0] } : { value: null, error: '입력한 날짜가 실제 달력에 없습니다.' };
+  }
+  if(/오늘/.test(raw)) return { value: today, source: '오늘' };
+  if(/모레/.test(raw)) { const value = new Date(today); value.setDate(value.getDate() + 2); return { value, source: '모레' }; }
+  if(/내일/.test(raw)) { const value = new Date(today); value.setDate(value.getDate() + 1); return { value, source: '내일' }; }
+  match = raw.match(/(이번|금주|다음)\s*주\s*(월|화|수|목|금|토|일)(?:요일)?/);
+  if(match){
+    const mondayOffset = (today.getDay() + 6) % 7;
+    const value = new Date(today);
+    value.setDate(today.getDate() - mondayOffset + scheduleWeekdayOffset(match[2]) + (match[1] === '다음' ? 7 : 0));
+    return { value, source: match[0] };
+  }
+  return { value: null, error: '날짜를 찾지 못했습니다. 예: 2026-06-24, 6/24, 다음 주 화요일' };
+}
+function parseMiniScheduleTime(message){
+  const raw = String(message || '');
+  const direct = raw.match(/\b([01]?\d|2[0-3])\s*:\s*([0-5]\d)\b/);
+  if(direct) return `${String(Number(direct[1])).padStart(2, '0')}:${direct[2]}`;
+  const korean = raw.match(/(오전|오후)?\s*(1[0-2]|[1-9])\s*시(?:\s*([0-5]?\d)\s*분?)?/);
+  if(!korean) return '';
+  let hour = Number(korean[2]);
+  if(korean[1] === '오후' && hour < 12) hour += 12;
+  if(korean[1] === '오전' && hour === 12) hour = 0;
+  return `${String(hour).padStart(2, '0')}:${String(Number(korean[3] || 0)).padStart(2, '0')}`;
+}
+function scheduleTypeFromMessage(message){
+  const raw = String(message || '');
+  if(/휴가|부재|외근|외부\s*일정|연차|반차/.test(raw)) return 'absence';
+  if(/마감|데드라인|기한/.test(raw)) return 'deadline';
+  if(/릴리스|배포|시연|마일스톤|출시/.test(raw)) return 'milestone';
+  return 'meeting';
+}
+function escapeRegExp(value){ return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function scheduleTitleFromMessage(message, memberName, dateSource){
+  let title = String(message || '');
+  if(memberName) title = title.replace(new RegExp(escapeRegExp(memberName), 'g'), ' ');
+  if(dateSource) title = title.replace(dateSource, ' ');
+  title = title
+    .replace(/\b20\d{2}[./-]\d{1,2}[./-]\d{1,2}\s*(?:~|–|-)\s*(?:(?:20\d{2}[./-])?\d{1,2}[./-])?\d{1,2}\b|\b\d{1,2}[./]\d{1,2}\s*(?:~|–|-)\s*(?:(?:\d{1,2}[./])?\d{1,2})\b|\d{1,2}월\s*\d{1,2}일?\s*(?:~|–|-)\s*(?:(?:\d{1,2}월\s*)?\d{1,2}일?)?/g, ' ')
+    .replace(/\b20\d{2}[./-]\d{1,2}[./-]\d{1,2}\b|\b\d{1,2}[./]\d{1,2}\b|\d{1,2}월\s*\d{1,2}일?/g, ' ')
+    .replace(/(오늘|내일|모레|(이번|금주|다음)\s*주\s*[월화수목금토일](요일)?)/g, ' ')
+    .replace(/\b([01]?\d|2[0-3])\s*:\s*[0-5]\d\b|(오전|오후)?\s*(1[0-2]|[1-9])\s*시(?:\s*[0-5]?\d\s*분?)?/g, ' ')
+    .replace(/일정\s*(등록|추가|생성)|등록(해|해\s*줘|해주세요)?|추가(해|해\s*줘|해주세요)?|생성(해|해\s*줘|해주세요)?|잡아\s*줘/g, ' ')
+    .replace(/[,:;|]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return title;
+}
+function parseMiniSchedule(message){
+  const members = activeCalendarMembers();
+  const orderedMembers = [...members].sort((a, b) => String(b.name).length - String(a.name).length);
+  const member = orderedMembers.find((item) => String(message).includes(item.name)) || null;
+  const date = parseMiniScheduleRange(message);
+  const type = scheduleTypeFromMessage(message);
+  const title = scheduleTitleFromMessage(message, member?.name, date.source) || MINI_SCHEDULE_TYPES[type].label;
+  return {
+    raw: String(message || '').trim(),
+    title,
+    eventDate: date.value ? isoLocalDate(date.value) : '',
+    endDate: date.endValue ? isoLocalDate(date.endValue) : '',
+    eventTime: parseMiniScheduleTime(message),
+    type,
+    memberId: member?.member_id || '',
+    dateError: date.error || '',
+  };
+}
+function miniScheduleOptionHtml(selected){
+  const options = ['<option value="">담당자 미지정</option>'];
+  activeCalendarMembers().forEach((member) => {
+    options.push(`<option value="${escapeHtml(member.member_id)}" ${member.member_id === selected ? 'selected' : ''}>${escapeHtml(member.name)}</option>`);
+  });
+  return options.join('');
+}
+function miniScheduleTypeOptions(selected){
+  return Object.entries(MINI_SCHEDULE_TYPES).map(([value, type]) => `<option value="${value}" ${value === selected ? 'selected' : ''}>${type.label}</option>`).join('');
+}
+function appendMiniScheduleMessage(message, kind = 'ai'){
+  const log = document.getElementById('miniLog');
+  if(!log) return;
+  const bubble = document.createElement('div');
+  bubble.className = `mini-bubble mini-bubble-${kind}`;
+  bubble.textContent = message;
+  log.appendChild(bubble);
+  log.scrollTop = log.scrollHeight;
+}
+function readMiniScheduleReview(){
+  const title = document.getElementById('miniScheduleTitle')?.value.trim() || '';
+  const eventDate = document.getElementById('miniScheduleDate')?.value || '';
+  const endDate = document.getElementById('miniScheduleEndDate')?.value || eventDate;
+  const eventTime = document.getElementById('miniScheduleTime')?.value || '';
+  const type = document.getElementById('miniScheduleType')?.value || 'meeting';
+  const memberId = document.getElementById('miniScheduleMember')?.value || '';
+  const member = activeCalendarMembers().find((item) => item.member_id === memberId) || null;
+  return { title, eventDate, endDate, eventTime, type, memberId, memberName: member?.name || '' };
+}
+function miniScheduleValidation(draft){
+  const errors = [];
+  if(!draft.title) errors.push('일정 제목을 입력하세요.');
+  if(draft.title.length > 120) errors.push('일정 제목은 120자 이하여야 합니다.');
+  const parsedDate = /^\d{4}-\d{2}-\d{2}$/.test(draft.eventDate) && localDateFromParts(...draft.eventDate.split('-').map(Number));
+  if(!parsedDate) errors.push('올바른 날짜를 지정하세요.');
+  const parsedEndDate = /^\d{4}-\d{2}-\d{2}$/.test(draft.endDate) && localDateFromParts(...draft.endDate.split('-').map(Number));
+  if(!parsedEndDate) errors.push('올바른 종료일을 지정하세요.');
+  if(parsedDate && parsedEndDate && parsedEndDate < parsedDate) errors.push('종료일은 시작일보다 빠를 수 없습니다.');
+  if(parsedDate && parsedEndDate && (parsedEndDate - parsedDate) / 86400000 > 31) errors.push('부재 기간은 32일 이내로 지정하세요.');
+  if(draft.type !== 'absence' && draft.endDate !== draft.eventDate) errors.push('기간 일정은 부재/휴가 유형으로 등록하세요.');
+  if(draft.eventTime && !/^([01]\d|2[0-3]):[0-5]\d$/.test(draft.eventTime)) errors.push('시간은 HH:MM 형식이어야 합니다.');
+  if(draft.type === 'absence' && !draft.memberId) errors.push('부재/휴가 일정은 담당자를 지정해야 합니다.');
+  return errors;
+}
+function miniScheduleDuplicate(draft){
+  if(!draft.eventDate || !window.G?.calEvents) return false;
+  const [year, month, day] = draft.eventDate.split('-').map(Number);
+  const event = G.calEvents.find((item) => item.y === year && item.m === month - 1 && item.d === day);
+  if(!event) return false;
+  const expected = `${draft.memberName ? `${draft.memberName} ` : ''}${draft.eventTime ? `${draft.eventTime} ` : ''}${draft.title}`.replace(/\s+/g, ' ').trim().toLowerCase();
+  return (event.tags || []).some((tag) => String(tag.t || '').replace(/\s+/g, ' ').trim().toLowerCase() === expected);
+}
+function updateMiniScheduleReview(){
+  const card = document.getElementById('miniScheduleReview');
+  if(!card) return;
+  const draft = readMiniScheduleReview();
+  const endDate = document.getElementById('miniScheduleEndDate');
+  if(endDate){
+    const isAbsence = draft.type === 'absence';
+    endDate.disabled = !isAbsence;
+    if(!isAbsence && endDate.value !== draft.eventDate){
+      endDate.value = draft.eventDate;
+      draft.endDate = draft.eventDate;
     }
-  },300);
+  }
+  const errors = miniScheduleValidation(draft);
+  const duplicate = miniScheduleDuplicate(draft);
+  const feedback = card.querySelector('[data-mini-schedule-feedback]');
+  const register = card.querySelector('[data-mini-schedule-register]');
+  if(feedback){
+    const note = duplicate ? '동일한 일정이 이미 캘린더에 있습니다.' : errors[0] || '등록 내용을 확인한 뒤 저장하세요.';
+    feedback.textContent = note;
+    feedback.className = `mini-schedule-feedback${duplicate || errors.length ? ' is-warning' : ''}`;
+  }
+  if(register) register.disabled = miniScheduleSubmitting || duplicate || errors.length > 0;
+}
+function renderMiniScheduleReview(draft){
+  const log = document.getElementById('miniLog');
+  if(!log) return;
+  log.querySelectorAll('.mini-schedule-review').forEach((node) => node.remove());
+  const card = document.createElement('section');
+  card.id = 'miniScheduleReview';
+  card.className = 'mini-schedule-review';
+  card.innerHTML = `<div class="mini-schedule-review-head"><i class="ti ti-sparkles"></i><strong>등록 전 확인</strong></div>
+    <label>일정 제목<input id="miniScheduleTitle" class="mini-schedule-field" maxlength="120" value="${escapeHtml(draft.title)}"></label>
+    <div class="mini-schedule-grid"><label>시작일<input id="miniScheduleDate" class="mini-schedule-field" type="date" value="${escapeHtml(draft.eventDate)}"></label><label>종료일<input id="miniScheduleEndDate" class="mini-schedule-field" type="date" value="${escapeHtml(draft.endDate || draft.eventDate)}"></label></div>
+    <label>시간<input id="miniScheduleTime" class="mini-schedule-field" type="time" value="${escapeHtml(draft.eventTime)}"></label>
+    <div class="mini-schedule-grid"><label>유형<select id="miniScheduleType" class="mini-schedule-field">${miniScheduleTypeOptions(draft.type)}</select></label><label>담당자<select id="miniScheduleMember" class="mini-schedule-field">${miniScheduleOptionHtml(draft.memberId)}</select></label></div>
+    <div class="mini-schedule-feedback" data-mini-schedule-feedback></div>
+    <div class="mini-schedule-actions"><button type="button" class="tbtn" data-mini-schedule-cancel>취소</button><button type="button" class="tbtn primary" data-mini-schedule-register><i class="ti ti-calendar-plus"></i> 등록</button></div>`;
+  log.appendChild(card);
+  card.querySelectorAll('input, select').forEach((field) => {
+    field.addEventListener('input', updateMiniScheduleReview);
+    field.addEventListener('change', updateMiniScheduleReview);
+  });
+  card.querySelector('[data-mini-schedule-cancel]').addEventListener('click', () => { card.remove(); });
+  card.querySelector('[data-mini-schedule-register]').addEventListener('click', registerMiniScheduleReview);
+  updateMiniScheduleReview();
+  log.scrollTop = log.scrollHeight;
+}
+async function registerMiniScheduleReview(){
+  if(miniScheduleSubmitting) return;
+  const draft = readMiniScheduleReview();
+  if(miniScheduleValidation(draft).length || miniScheduleDuplicate(draft)) return updateMiniScheduleReview();
+  const [year, month, day] = draft.eventDate.split('-').map(Number);
+  const card = document.getElementById('miniScheduleReview');
+  const register = card?.querySelector('[data-mini-schedule-register]');
+  miniScheduleSubmitting = true;
+  updateMiniScheduleReview();
+  if(register) register.innerHTML = '<i class="ti ti-loader-2"></i> 등록 중';
+  try{
+    if(!window.opsRadarCreateCalendarEvent || !window.opsRadarApi) throw new Error('일정 서비스 연결을 준비 중입니다. 잠시 후 다시 시도하세요.');
+    await window.opsRadarCreateCalendarEvent({
+      title: draft.title,
+      day,
+      month: month - 1,
+      year,
+      color: MINI_SCHEDULE_TYPES[draft.type].color,
+      eventType: draft.type,
+      memberId: draft.memberId || null,
+      eventTime: draft.eventTime || null,
+      endDate: draft.endDate,
+    });
+    await window.opsRadarApi.loadCalendar();
+    G.newCalEvents = G.newCalEvents || [];
+    const [, endMonth, endDay] = draft.endDate.split('-').map(Number);
+    const dateLabel = draft.endDate !== draft.eventDate ? `${month}/${day}~${endMonth}/${endDay}` : `${month}/${day}`;
+    G.newCalEvents.push({ person: draft.memberName || '팀', date: dateLabel, type: MINI_SCHEDULE_TYPES[draft.type].label, impact: '수동 등록' });
+    renderCalendar(G.currentCalYear, G.currentCalMonth);
+    card?.remove();
+    appendMiniScheduleMessage(`${draft.endDate !== draft.eventDate ? `${draft.eventDate}~${draft.endDate}` : draft.eventDate}${draft.eventTime ? ` ${draft.eventTime}` : ''} 일정이 캘린더에 등록되었습니다.`);
+    showToast('캘린더에 일정이 등록되었습니다.');
+  }catch(error){
+    console.warn('Mini calendar create API failed', error);
+    const message = String(error?.message || '일정 등록에 실패했습니다.');
+    const feedback = card?.querySelector('[data-mini-schedule-feedback]');
+    if(feedback){ feedback.textContent = message; feedback.className = 'mini-schedule-feedback is-warning'; }
+    showToast(message, 'warn');
+  }finally{
+    miniScheduleSubmitting = false;
+    if(register) register.innerHTML = '<i class="ti ti-calendar-plus"></i> 등록';
+    updateMiniScheduleReview();
+  }
+}
+function miniChat(text){
+  const input = document.getElementById('miniInput');
+  const msg = String(text || input?.value || '').trim();
+  if(!msg) return;
+  if(msg.length > 240){ appendMiniScheduleMessage('입력은 240자 이내로 작성해주세요.'); return; }
+  if(input) input.value = '';
+  appendMiniScheduleMessage(msg, 'user');
+  const draft = parseMiniSchedule(msg);
+  if(draft.dateError){ appendMiniScheduleMessage(draft.dateError); return; }
+  renderMiniScheduleReview(draft);
 }
 
 function openCalModal(d) {
@@ -1548,8 +1803,8 @@ function deleteCalTag(d, idx) {
 }
 
 function parseScheduleMsg(msg){
-  const people=['이성우','박주원','김희진','김성호','관리자'];
-  const person=people.find(p=>msg.includes(p))||'미확인';
+  const people=activeCalendarMembers().map((member)=>member.name);
+  const person=people.find(p=>msg.includes(p))||'미지정';
   const dm=msg.match(/(\d+\/\d+|\d+월\s*\d+일)/);const date=dm?dm[0]:'날짜 미확인';
   const type=msg.includes('외부 일정')?'외부 일정':msg.includes('휴가')?'휴가':msg.includes('회의')||msg.includes('미팅')?'회의':'부재';
   return{person,date,type,impact:type==='회의'?'팀 진행상황 점검':`${person} 담당 업무 공백 예상`};
@@ -1561,7 +1816,7 @@ function isScheduleCreateRequest(msg){
 
 function assistantScheduleTodos(prompt){
   const member=(window.opsRadarMembers||[]).map(m=>m.name).find(name=>prompt.includes(name))
-    || ['이성우','박주원','김희진','김성호'].find(name=>prompt.includes(name));
+    || null;
   if(!member || !/일정|스케줄|마감|업무/.test(prompt)) return [];
   return todos.filter(todo=>todo.status==='approved' && todo.assignee===member);
 }
@@ -1828,11 +2083,22 @@ function showScheduleConfirm(msg,res){
 function showScheduleConfirmRaw(msg,parsed){showScheduleConfirm(msg,{parsed,calDate:null});}
 async function doRegisterCalEvent(btn,person,date,type,impact,calDate){
   const dateMatch=String(date||'').match(/(\d+)\/(\d+)/);
-  const month=dateMatch?Number(dateMatch[1])-1:G.currentCalMonth;
-  const day=calDate||(dateMatch?Number(dateMatch[2]):null);
+  const parsedDate=parseMiniScheduleDate(date);
+  const month=dateMatch?Number(dateMatch[1])-1:(parsedDate.value?parsedDate.value.getMonth():G.currentCalMonth);
+  const year=parsedDate.value?parsedDate.value.getFullYear():G.currentCalYear;
+  const day=calDate||(dateMatch?Number(dateMatch[2]):(parsedDate.value?parsedDate.value.getDate():null));
+  const member=activeCalendarMembers().find((item)=>item.name===person);
   try{
     if(!day || !window.opsRadarCreateCalendarEvent || !window.opsRadarApi) throw new Error('Calendar API is not ready');
-    await window.opsRadarCreateCalendarEvent({title:`${person} ${type}`,day,month,year:G.currentCalYear,color:type==='부재'?'ct-gray':'ct-info'});
+    await window.opsRadarCreateCalendarEvent({
+      title:person==='미지정'?type:`${person} ${type}`,
+      day,
+      month,
+      year,
+      color:type==='부재'||type==='휴가'?'ct-gray':'ct-info',
+      eventType:type==='부재'||type==='휴가'?'absence':type==='회의'?'meeting':'milestone',
+      memberId:member?.member_id || null,
+    });
     await window.opsRadarApi.loadCalendar();
     G.newCalEvents.push({person,date,type,impact,calDate:day,y:G.currentCalYear,m:month});
     renderCalendar(G.currentCalYear,G.currentCalMonth);
@@ -2746,7 +3012,13 @@ function renderCalendar(year, month){
     const isToday = today.getFullYear() === yearValue && today.getMonth() === monthValue && today.getDate() === d;
     const div = document.createElement('div');
     div.className = `cal-cell${(ev && ev.today) || isToday ? ' today' : ''}${ev && ev.risk ? ' risk' : ''}${isNew ? ' new-event' : ''}${isSelected ? ' cal-selected' : ''}`;
-    div.innerHTML = `<div class="cal-date">${d}</div><div class="cal-tags">${ev && ev.tags ? ev.tags.map(t => `<span class="cal-tag ${t.c}">${t.t}</span>`).join('') : ''}</div>${ev && ev.risk ? '<div class="risk-dot"></div>' : ''}`;
+    const visibleTags = (ev?.tags || [])
+      .filter((tag) => !tag.hideOnCalendar)
+      .sort((left, right) => {
+        const rank = (tag) => tag.eventType === 'absence' || String(tag.sourceType || '').startsWith('absence:') ? 0 : tag.todoStatus === 'approved' ? 1 : tag.todoStatus === 'done' ? 2 : 3;
+        return rank(left) - rank(right);
+      });
+    div.innerHTML = `<div class="cal-date">${d}</div><div class="cal-tags">${visibleTags.map(t => `<span class="cal-tag ${t.c}">${t.t}</span>`).join('')}</div>${ev && ev.risk ? '<div class="risk-dot"></div>' : ''}`;
     div.addEventListener('click', () => openCalModal(d));
     grid.appendChild(div);
   }
@@ -2780,7 +3052,7 @@ function openCalModal(d) {
   if(modalDate) modalDate.textContent = `${G.currentCalYear}년 ${G.currentCalMonth + 1}월 ${d}일`;
   const list = document.getElementById('calModalList');
   if(list){
-    list.innerHTML = tags.length ? tags.map((t, i) => `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border-radius:var(--radius-sm)"><span class="cal-tag ${t.c}" style="flex:1">${t.t}</span><div onclick="deleteCalTag(${d},${i})" style="cursor:pointer;color:var(--text3);font-size:14px;padding:2px 6px;border-radius:4px;border:1px solid var(--border)" title="삭제">×</div></div>`).join('') : `<div style="font-size:11px;color:var(--text3);text-align:center;padding:16px 0">등록된 일정이 없습니다.</div>`;
+    list.innerHTML = tags.length ? tags.map((t, i) => `<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface2);border-radius:var(--radius-sm)"><span class="cal-tag ${t.c}" style="flex:1">${t.rangeLabel || t.t}</span><div onclick="deleteCalTag(${d},${i})" style="cursor:pointer;color:var(--text3);font-size:14px;padding:2px 6px;border-radius:4px;border:1px solid var(--border)" title="${String(t.sourceType || '').startsWith('absence:') ? '기간 부재 일정 전체 삭제' : '삭제'}">×</div></div>`).join('') : `<div style="font-size:11px;color:var(--text3);text-align:center;padding:16px 0">등록된 일정이 없습니다.</div>`;
   }
   const input = document.getElementById('calModalInput'); if(input) input.value = '';
   calSelectedColor = 'ct-info';
@@ -2832,7 +3104,9 @@ async function deleteCalTag(d, idx) {
         return;
       }
 
-      await window.opsRadarApi.request(`/calendar/${eventId}`,{method:'DELETE'});
+      const isAbsenceRange = String(tag?.sourceType || '').startsWith('absence:');
+      if(isAbsenceRange && !window.confirm('이 기간의 부재 일정을 모두 삭제할까요?')) return;
+      await window.opsRadarApi.request(`/calendar/${eventId}${isAbsenceRange ? '?series=true' : ''}`,{method:'DELETE'});
       await window.opsRadarApi.loadCalendar();
     }else{
       ev.tags.splice(idx,1);
@@ -2843,7 +3117,7 @@ async function deleteCalTag(d, idx) {
 
     renderCalendar(G.currentCalYear,G.currentCalMonth);
     openCalModal(d);
-    showToast('일정이 삭제되었습니다.','info');
+    showToast(String(tag?.sourceType || '').startsWith('absence:') ? '기간 부재 일정이 삭제되었습니다.' : '일정이 삭제되었습니다.','info');
   }catch(error){
     console.warn('Calendar delete API failed',error);
     showToast('캘린더 삭제에 실패했습니다.','warn');
