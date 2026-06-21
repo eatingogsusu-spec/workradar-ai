@@ -1,5 +1,8 @@
 (function () {
-  const today = () => new Date().toISOString().slice(0, 10);
+  const today = () => {
+    const value = new Date();
+    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+  };
   const todoKey = (todo) => String(todo?.apiId || todo?.id || "");
   const selectedTodos = (status) => {
     const checked = Object.keys(G.todoChecked || {}).filter((id) => G.todoChecked[id]).map(Number);
@@ -10,13 +13,42 @@
     ? String(value)
     : `'${String(value).replace(/\\/g, "\\\\").replace(/'/g, "\\'")}'`;
 
+  function ymd(year, month, day) {
+    const date = new Date(year, month - 1, day);
+    if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
+    return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  }
+
+  function sourceDueRecommendation(todo) {
+    const stored = todo?.due_at || todo?.dueDate;
+    if (stored && /^\d{4}-\d{2}-\d{2}/.test(String(stored))) {
+      return { value: String(stored).slice(0, 10), grounded: true, reason: "기존 업무 마감일" };
+    }
+    const text = `${todo?.title || ""} ${todo?.description || ""} ${todo?.desc || ""} ${todo?.reason || ""}`;
+    const full = text.match(/\b(20\d{2})[./-](\d{1,2})[./-](\d{1,2})\b/);
+    if (full) {
+      const value = ymd(Number(full[1]), Number(full[2]), Number(full[3]));
+      if (value) return { value, grounded: true, reason: "원문에 명시된 날짜" };
+    }
+    const korean = text.match(/\b(\d{1,2})\s*월\s*(\d{1,2})\s*일/);
+    const slash = text.match(/\b(\d{1,2})\s*[./]\s*(\d{1,2})\b/);
+    const monthDay = korean || slash;
+    if (monthDay) {
+      const value = ymd(new Date().getFullYear(), Number(monthDay[1]), Number(monthDay[2]));
+      if (value) return { value, grounded: true, reason: "원문에 명시된 월·일" };
+    }
+    if (/오늘|금일/.test(text)) return { value: today(), grounded: true, reason: "원문의 오늘 기한" };
+    const offset = text.match(/(\d+)\s*일\s*(?:내|후)/);
+    if (/내일/.test(text) || offset) {
+      const date = new Date();
+      date.setDate(date.getDate() + (offset ? Number(offset[1]) : 1));
+      return { value: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`, grounded: true, reason: "원문에 명시된 상대 기한" };
+    }
+    return { value: today(), grounded: false, reason: "마감일 근거 없음" };
+  }
+
   function recommendedDueDate(todo) {
-    const date = new Date();
-    const text = `${todo?.title || ""} ${todo?.description || ""}`.toLowerCase();
-    const days = todo?.priority === "high" || /긴급|장애|오류|실패|risk|리스크/.test(text) ? 2
-      : todo?.priority === "low" ? 14 : 7;
-    date.setDate(date.getDate() + days);
-    return date.toISOString().slice(0, 10);
+    return sourceDueRecommendation(todo).value;
   }
 
   function formatDate(value) {
@@ -104,9 +136,11 @@
     if (input) input.value = dueDateForEdit(todo);
     enableDateHitbox(input);
     if (hint) {
-      const recommendation = recommendedDueDate(todo);
+      const recommendation = sourceDueRecommendation(todo);
       hint.textContent = todo?.status === "pending"
-        ? `AI 추천 마감일: ${formatDate(recommendation)} · 업무 우선순위와 위험 키워드 기준`
+        ? recommendation.grounded
+          ? `추천 마감일: ${formatDate(recommendation.value)} · ${recommendation.reason}`
+          : "마감일 근거 없음 · 오늘로 설정했습니다. 날짜를 확인하세요."
         : `마감일: ${formatDate(input?.value || todo?.dueDate)}`;
     }
   };
@@ -464,14 +498,19 @@
     document.getElementById("tcModalFrom").textContent = `이 Todo는 "${issue.title.slice(0, 30)}..." 이슈와 연결됩니다.`;
     document.getElementById("tcTitle").value = issue.suggestTodo || `${issue.title} 대응 Todo`;
     document.getElementById("tcDescription").value = `${issue.title} 대응을 위한 원인 확인 및 조치 결과 공유`;
+    // 기존 이슈 담당자 또는 원문에 실제 이름이 있을 때만 담당자를 선택한다.
     document.getElementById("tcAssignee").value = issue.suggestAssignee || issue.assignee || "";
     document.getElementById("tcPriority").value = issue.suggestPriority || issue.severity || "medium";
-    const recommendation = recommendedDueDate({ ...issue, priority: issue.suggestPriority || issue.severity });
-    document.getElementById("tcDue").value = recommendation;
+    const dueInput = document.getElementById("tcDue");
+    const recommendation = sourceDueRecommendation(issue);
+    dueInput.value = recommendation.value;
     const hint = document.getElementById("tcDueHint");
-    if (hint) hint.textContent = `추천 마감일: ${formatDate(recommendation)} · 이슈 위험도 기준`;
-    enableDateHitbox(document.getElementById("tcDue"));
+    if (hint) hint.textContent = recommendation.grounded
+      ? `추천 마감일: ${formatDate(recommendation.value)} · ${recommendation.reason}`
+      : "마감일 근거 없음 · 오늘로 입력했습니다. 날짜를 확인하세요.";
+    enableDateHitbox(dueInput);
     openModal("todoCreateModal");
+    if (!recommendation.grounded) setTimeout(() => dueInput?.focus({ preventScroll: true }), 60);
   };
   window.openDashboardTodoCreate = window.openTodoCreate;
   window.createTodoFromIssue = function (issueId) {

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from datetime import date, timedelta
 from typing import Any
 
 from app.ai.llm_client import AzureOpenAIConfigError, chat_completion
@@ -80,6 +81,8 @@ title과 description에도 그 대상을 명확히 포함하세요. 정확한 �
 정확한 제품/품목을 확인할 수 없으면 subject는 null로 두고, title 또는 description에 "대상 품목 확인 필요"를 표시하세요. 원문에 없는 품번이나 제품명을 만들지 마세요.
 이미 완료되었거나 해결되었다고 명확히 표현된 문장은 Todo 또는 Issue 후보로 추출하지 마세요.
 이미 완료/해결/반영된 과거 작업은 todos 또는 issues에 포함하지 마세요. 완료 여부를 확인해야 하는 후속 작업만 포함하세요.
+담당자(assignee)는 문서 원문에 사람 이름이 명시된 경우에만 그 이름을 그대로 입력하고, 부서·역할·키워드만으로 사람을 추정하지 마세요. 근거가 없으면 null입니다.
+마감일(due_date)은 원문에 YYYY-MM-DD, M/D, M월 D일, 오늘, 내일, N일 내/후처럼 명시된 기한이 있을 때만 YYYY-MM-DD로 입력하세요. 우선순위나 심각도만으로 날짜를 만들지 말고 근거가 없으면 null입니다.
 
 형식:
 {{
@@ -94,7 +97,7 @@ title과 description에도 그 대상을 명확히 포함하세요. 정확한 �
     try:
         raw = await chat_completion(prompt, system_prompt="Return only valid JSON.", temperature=0.1)
         parsed = _parse_json(raw, _heuristic_extract(text))
-        return _normalize_extraction(parsed)
+        return _normalize_extraction(parsed, text)
     except Exception:
         return _heuristic_extract(text)
 
@@ -111,7 +114,42 @@ def _parse_json(raw: str, fallback: dict) -> dict:
     return parsed if isinstance(parsed, dict) else fallback
 
 
-def _normalize_extraction(data: dict[str, Any]) -> dict:
+def _grounded_assignee(value: Any, source_text: str) -> str | None:
+    candidate = str(value or "").strip()
+    return candidate if candidate and candidate in source_text else None
+
+
+def _grounded_due_date(value: Any, source_text: str) -> str | None:
+    raw = str(value or "").strip()
+    matched = re.fullmatch(r"(20\d{2})[-/.](\d{1,2})[-/.](\d{1,2})", raw)
+    if not matched:
+        return None
+    try:
+        parsed = date(int(matched.group(1)), int(matched.group(2)), int(matched.group(3)))
+    except ValueError:
+        return None
+
+    year, month, day = parsed.year, parsed.month, parsed.day
+    absolute_patterns = (
+        rf"{year}[./-]0?{month}[./-]0?{day}",
+        rf"\b0?{month}[./]0?{day}\b",
+        rf"0?{month}\s*월\s*0?{day}\s*일",
+    )
+    if any(re.search(pattern, source_text) for pattern in absolute_patterns):
+        return parsed.isoformat()
+
+    today = date.today()
+    if re.search(r"오늘|금일", source_text) and parsed == today:
+        return parsed.isoformat()
+    if re.search(r"내일", source_text) and parsed == today + timedelta(days=1):
+        return parsed.isoformat()
+    relative = re.search(r"(\d+)\s*일\s*(?:내|후)", source_text)
+    if relative and parsed == today + timedelta(days=int(relative.group(1))):
+        return parsed.isoformat()
+    return None
+
+
+def _normalize_extraction(data: dict[str, Any], source_text: str = "") -> dict:
     todos = data.get("todos") if isinstance(data.get("todos"), list) else []
     decisions = data.get("decisions") if isinstance(data.get("decisions"), list) else []
     issues = data.get("issues") if isinstance(data.get("issues"), list) else []
@@ -141,8 +179,8 @@ def _normalize_extraction(data: dict[str, Any]) -> dict:
                         "title": concise_title,
                         "description": _with_subject_description(_detailed_todo_description(concise_title, str(description)), subject),
                         "subject": subject,
-                        "assignee": item.get("assignee"),
-                        "due_date": item.get("due_date") or item.get("due_at"),
+                        "assignee": _grounded_assignee(item.get("assignee"), source_text),
+                        "due_date": _grounded_due_date(item.get("due_date") or item.get("due_at"), source_text),
                     }
                 )
 

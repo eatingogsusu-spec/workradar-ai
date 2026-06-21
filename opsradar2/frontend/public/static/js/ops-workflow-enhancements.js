@@ -12,23 +12,16 @@
     if (selected && !names.includes(selected)) options.push(`<option value="${escapeHtml(selected)}" selected>${escapeHtml(selected)}</option>`);
     return options.join("");
   };
-  const defaultDueDate = () => new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+  const defaultDueDate = () => {
+    const value = new Date();
+    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+  };
   const recommendRiskAssignee = (item) => {
     const members = (window.opsRadarMembers || []).filter((member) => (member.status || "active") === "active");
     const text = `${item?.title || ""} ${item?.desc || item?.description || ""}`.toLowerCase();
     const named = members.find((member) => text.includes(String(member.name || "").toLowerCase()));
     if (named) return named.name;
-    const rules = [
-      { roles: ["ai"], keywords: ["ai", "azure", "openai", "rag", "faiss", "임베딩", "모델"] },
-      { roles: ["frontend"], keywords: ["frontend", "프론트", "ui", "화면", "vite", "react"] },
-      { roles: ["backend"], keywords: ["backend", "백엔드", "api", "db", "postgres", "sql", "서버"] },
-      { roles: ["pm", "admin"], keywords: ["일정", "회의", "승인", "기획", "정책", "마감"] },
-    ];
-    for (const rule of rules) {
-      if (!rule.keywords.some((keyword) => text.includes(keyword))) continue;
-      const member = members.find((candidate) => rule.roles.includes(String(candidate.user_role || "").toLowerCase()) || rule.roles.includes(String(candidate.project_role || "").toLowerCase()));
-      if (member) return member.name;
-    }
+    // 역할 키워드만으로 특정 팀원을 선택하지 않는다. 원문에 이름 근거가 없으면 미지정이다.
     return "";
   };
 

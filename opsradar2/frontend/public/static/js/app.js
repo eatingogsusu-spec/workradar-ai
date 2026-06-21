@@ -1228,7 +1228,8 @@ function openTodoCreate(issueId){
   document.getElementById('tcDescription').value=`${issue.title} 대응을 위한 원인 확인 및 조치 결과 공유`;
   document.getElementById('tcAssignee').value=issue.suggestAssignee||issue.assignee||'';
   document.getElementById('tcPriority').value=issue.suggestPriority||'high';
-  document.getElementById('tcDue').value=new Date(Date.now()+7*86400000).toISOString().slice(0,10);
+  const today=new Date();
+  document.getElementById('tcDue').value=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
   document.getElementById('todoCreateModal').classList.add('show');
 }
 

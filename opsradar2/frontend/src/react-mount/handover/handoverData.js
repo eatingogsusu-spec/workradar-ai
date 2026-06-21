@@ -11,7 +11,7 @@ export const HANDOFF_INCLUDES = ["진행 중 Todo", "미해결 이슈", "최근 
 export const ONBOARDING_INCLUDES = ["주요 고객사", "주요 품목", "반복 이슈", "미해결 Todo", "최근 보고서", "추천 질문"];
 
 export const DEFAULT_HANDOFF_CONDITIONS = { owner: "", receiver: "", department: "영업관리팀", reason: "담당자 변경", scope: "이전 담당 업무 전체", customer: "전체", supplier: "전체", filterDepartment: "전체", period: "최근 6개월", includes: [...HANDOFF_INCLUDES] };
-export const DEFAULT_ONBOARDING_CONDITIONS = { target: "", department: "영업관리팀", period: "최근 6개월", includes: [...ONBOARDING_INCLUDES] };
+export const DEFAULT_ONBOARDING_CONDITIONS = { target: "신입", mentor: "", department: "영업관리팀", period: "최근 6개월", includes: [...ONBOARDING_INCLUDES] };
 
 const item = (id, group, title, meta, priority = "Medium") => ({ id, group, title, meta, priority });
 export const HANDOFF_CANDIDATES = [
@@ -39,19 +39,24 @@ export const ONBOARDING_CANDIDATES = [
 const titles = (candidates, ids, group) => candidates.filter((v) => ids.includes(v.id) && (!group || v.group === group)).map((v) => v.title);
 const lines = (values) => values.length ? values : ["선택된 항목이 없습니다."];
 export function buildPreviewData(type, conditions, candidates, selectedIds) {
-  if (type === "onboarding") return {
-    type, title: `신입 온보딩 가이드 - ${conditions.target}`,
-    sections: [
-      ["팀/업무 요약", [`${conditions.target} 담당자는 ${conditions.department} 업무를 ${conditions.period} 기록을 기준으로 확인합니다.`]],
-      ["먼저 파악해야 할 고객사", lines(titles(candidates, selectedIds, "먼저 파악할 고객사"))],
-      ["먼저 파악해야 할 구매처", lines(titles(candidates, selectedIds, "먼저 파악할 구매처"))],
-      ["최근 반복 이슈", lines(titles(candidates, selectedIds, "최근 반복 이슈"))],
-      ["우선 확인할 Todo", lines(titles(candidates, selectedIds, "우선 확인할 Todo"))],
-      ["첫날 / 첫주 / 첫달 가이드", ["첫날: 고객별 주문 패턴과 주요 문서 위치를 확인합니다.", "첫주: 긴급 발주 대응을 사수와 함께 처리합니다.", "첫달: 반복 이슈와 미완료 Todo의 다음 액션을 정리합니다."]],
-      ["추천 질문", lines(titles(candidates, selectedIds, "추천 질문"))]
-      ,["사수/팀장 확인 항목", ["고객별 업무 차이를 이해했는지 확인", "High Risk 업무의 단독 처리 금지 기준 확인", "첫달 독립 처리 범위를 합의"]]
-    ]
-  };
+  if (type === "onboarding") {
+    const selected = candidates.filter((candidate) => selectedIds.includes(candidate.id));
+    const todos = selected.filter((candidate) => candidate.id.startsWith("todo_"));
+    const issues = selected.filter((candidate) => candidate.id.startsWith("issue_"));
+    const issueTitles = issues.map((candidate) => candidate.title);
+    const todoTitles = todos.map((candidate) => candidate.title);
+    return {
+      type,
+      title: "3 Step으로 배우는 업무 적응 플랜 - 신입",
+      sections: [
+        ["1. 업무 지도", [`선택한 ${conditions.department} 운영 자료에서 진행 Todo ${todos.length}건과 미해결 이슈 ${issues.length}건을 우선 학습 범위로 구성했습니다. 실제 업무 흐름과 역할 분담은 사수와 함께 확인이 필요합니다.`]],
+        ["2. 1 Step: 흐름과 자료 익히기", lines([...issueTitles, ...todoTitles].slice(0, 5).map((title) => `선택 자료의 제목·현재 상태·출처를 사수와 함께 확인: ${title}`))],
+        ["3. 2 Step: 사수와 함께 하는 실전 연습", lines(todoTitles.length ? todoTitles.map((title) => `사수와 함께 처리 흐름과 완료 기준을 확인: ${title}`) : ["실전 연습 후보 없음"] )],
+        ["4. 3 Step: 독립 처리 범위와 리스크 기준", lines(issueTitles.length ? issueTitles.map((title) => `이슈 상태와 사수에게 공유해야 할 판단 기준을 합의: ${title}`) : ["선택된 이슈가 없어 사수와 독립 처리 범위 합의 필요"] )],
+        ["5. 사수 확인 및 참고 자료", ["선택 자료의 처리 우선순위와 완료 기준을 함께 확인", "단독 처리 가능한 범위와 즉시 공유할 조건을 합의", "연결된 참고 문서를 읽고 모르는 용어와 절차를 질문"]]
+      ]
+    };
+  }
   if (conditions.scope === "특정 이슈") return {
     type, title: `이슈 인수인계서 - ${conditions.owner} → ${conditions.receiver}`,
     sections: [
@@ -83,7 +88,17 @@ export function buildPreviewData(type, conditions, candidates, selectedIds) {
 const API_BASE = "/api/v1";
 
 function getAuthToken() {
-  return localStorage.getItem("access_token") || localStorage.getItem("token") || "";
+  const direct = localStorage.getItem("access_token") || localStorage.getItem("token");
+  if (direct) return direct;
+  try {
+    const session = JSON.parse(localStorage.getItem("opsradar_session") || "null");
+    if (session?.access_token || session?.token) return session.access_token || session.token;
+  } catch (_) {}
+  try {
+    return JSON.parse(localStorage.getItem("auth") || "null")?.token || "";
+  } catch (_) {
+    return "";
+  }
 }
 
 function normalizePriority(value) {
@@ -94,9 +109,11 @@ function normalizePriority(value) {
 }
 
 export async function fetchHandoffCandidates() {
+  const token = getAuthToken();
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
   const [todosRes, issuesRes] = await Promise.all([
-    fetch(`${API_BASE}/todos?status=in_progress&limit=50`),
-    fetch(`${API_BASE}/issues?status=open&limit=50`),
+    fetch(`${API_BASE}/todos?status=in_progress&limit=50`, { headers }),
+    fetch(`${API_BASE}/issues?status=open&limit=50`, { headers }),
   ]);
   if (!todosRes.ok || !issuesRes.ok) throw new Error("API fetch failed");
   const [todosData, issuesData] = await Promise.all([todosRes.json(), issuesRes.json()]);
@@ -107,6 +124,9 @@ export async function fetchHandoffCandidates() {
     title: t.title,
     meta: t.assignee || "",
     priority: normalizePriority(t.priority),
+    description: t.description || t.content || "",
+    dueAt: t.due_at || t.due_date || "",
+    team: t.team_name || t.department || "",
   }));
 
   const issueItems = (issuesData.issues || []).map((i) => ({
@@ -115,6 +135,8 @@ export async function fetchHandoffCandidates() {
     title: i.title,
     meta: i.assignee || "",
     priority: normalizePriority(i.risk_level),
+    description: i.description || i.risk_reason || "",
+    team: i.team_name || i.department || "",
   }));
 
   const staticItems = HANDOFF_CANDIDATES.filter(
@@ -122,6 +144,17 @@ export async function fetchHandoffCandidates() {
   );
 
   return [...todoItems, ...issueItems, ...staticItems];
+}
+
+// 온보딩은 예시 고객사 목록이 아니라 현재 실제로 진행 중인 업무와 리스크를 학습 재료로 삼는다.
+export function buildOnboardingCandidates(candidates) {
+  const operational = candidates
+    .filter((candidate) => candidate.id.startsWith("todo_") || candidate.id.startsWith("issue_"))
+    .map((candidate) => ({
+      ...candidate,
+      group: candidate.id.startsWith("todo_") ? "첫주 실전 연습 Todo" : "업무 지도: 현재 리스크",
+    }));
+  return operational.length ? operational : ONBOARDING_CANDIDATES;
 }
 
 export async function fetchMembers() {
@@ -142,14 +175,17 @@ export async function fetchMembers() {
 }
 
 // AI 인수인계서 생성: 백엔드 LLM 호출. 실패/미설정 시 fallback 신호 반환.
-export async function fetchHandoverPreview({ owner, receiver, type, todoIds, issueIds, department, period }) {
+export async function fetchHandoverPreview({ owner, receiver, target, mentor, type, todoIds, issueIds, department, period }) {
   try {
+    const token = getAuthToken();
     const res = await fetch(`${API_BASE}/knowledge/generate-handover`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify({
         owner,
         receiver,
+        target,
+        mentor,
         type,
         todo_ids: todoIds,
         issue_ids: issueIds,
@@ -166,7 +202,7 @@ export async function fetchHandoverPreview({ owner, receiver, type, todoIds, iss
 }
 
 // LLM markdown(## 1.~## 4.)을 HandoffPreview가 쓰는 { title, sections, documents } 구조로 변환.
-export function parseHandoverMarkdown(md, title, documents = []) {
+export function parseHandoverMarkdown(md, title, documents = [], type = "handoff") {
   const sections = [];
   let current = null;
   for (const raw of (md || "").split("\n")) {
@@ -182,7 +218,7 @@ export function parseHandoverMarkdown(md, title, documents = []) {
     }
   }
   if (current) sections.push(current);
-  return { type: "handoff", title: title || "업무 인수인계서", sections, documents };
+  return { type, title: title || (type === "onboarding" ? "3 Step으로 배우는 업무 적응 플랜 - 신입" : "업무 인수인계서"), sections, documents };
 }
 
 export async function fetchWorkflowReview() {

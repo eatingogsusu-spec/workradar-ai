@@ -173,6 +173,7 @@
       src: issue.document_id || null,
       sourceFileName: issue.source_file_name || null,
       assignee: issue.assignee || null,
+      dueDate: issue.due_at ? String(issue.due_at).slice(0, 10) : null,
       days: 0,
       desc: stripIssueTargetDate(issue.description || issue.title),
       chunk: "",
@@ -207,6 +208,11 @@
 
   let members = [];
 
+  const localToday = () => {
+    const value = new Date();
+    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+  };
+
 
   function recommendTodoAssignee(todo) {
     if (todo.assignee || !members.length) return null;
@@ -214,17 +220,7 @@
     const named = members.find((member) => text.includes(String(member.name || "").toLowerCase()));
     if (named) return { name: named.name, reason: "제목에 담당자 이름이 언급됨" };
 
-    const rules = [
-      { roles: ["ai"], keywords: ["ai", "azure", "openai", "rag", "faiss", "임베딩", "청크", "요약", "assistant", "모델", "재시도"] },
-      { roles: ["frontend"], keywords: ["frontend", "front-end", "프론트", "ui", "ux", "화면", "버튼", "모달", "vite", "react", "상태 표시", "폴링"] },
-      { roles: ["backend"], keywords: ["backend", "백엔드", "api", "엔드포인트", "fastapi", "db", "postgres", "sql", "쿼리", "서버", "repository"] },
-      { roles: ["pm", "admin"], keywords: ["회의", "일정", "팀 공유", "보고서", "승인", "정책", "기획", "요구사항", "점검", "마감"] },
-    ];
-    for (const rule of rules) {
-      if (!rule.keywords.some((keyword) => text.includes(keyword))) continue;
-      const member = members.find((candidate) => rule.roles.includes(String(candidate.user_role || "").toLowerCase()) || rule.roles.includes(String(candidate.project_role || "").toLowerCase()));
-      if (member) return { name: member.name, reason: `${rule.keywords.find((keyword) => text.includes(keyword))} 키워드와 ${member.user_role || member.project_role} 역할 일치` };
-    }
+    // 역할/키워드만으로 특정 개인을 정하면 오배정이 된다. 이름이 원문에 있을 때만 추천한다.
     return null;
   }
 
@@ -667,7 +663,7 @@
     window.G.analysisRiskChecked = {};
     window.G.analysisRiskReview = (docIssues || []).map((issue) => {
       const item = normalizeIssue(issue);
-      item.dueDate = new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10);
+      item.dueDate = item.dueDate || localToday();
       window.G.analysisRiskChecked[String(item.apiId || item.id)] = true;
       return item;
     });

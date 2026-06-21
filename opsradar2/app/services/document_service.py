@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import asyncio
 import uuid
+from datetime import datetime, time
 from pathlib import Path
 from typing import BinaryIO
 
@@ -18,7 +19,7 @@ from app.ai.file_parser import infer_doc_type, parse_file
 from app.ai.summarizer import extract_todos, summarize_document
 from app.core.config import PROJECT_ROOT, settings
 from app.core.database import AsyncSessionLocal
-from app.models import Document, DocumentChunk, Issue, Project, Todo
+from app.models import Document, DocumentChunk, Issue, Project, ProjectMember, Todo, User
 from app.repositories.embedding_repository import EmbeddingRepository
 
 
@@ -206,7 +207,7 @@ async def run_document_pipeline(document_id: str) -> None:
             await _update_document(db, document, analysis_status="analyzing", progress=85)
             summary = await summarize_document(text)
             extracted = await extract_todos(text)
-            await _create_extracted_items(db, document, extracted, chunk_rows)
+            await _create_extracted_items(db, document, extracted, chunk_rows, text)
             await _create_ai_summary(db, document, summary, extracted)
 
             await _update_document(
@@ -231,13 +232,29 @@ async def _create_extracted_items(
     document: Document,
     extracted: dict,
     chunk_rows: list[DocumentChunk] | None = None,
+    source_text: str = "",
 ) -> None:
     source_chunk_id = chunk_rows[0].id if chunk_rows else None
+    member_rows = await db.execute(
+        select(ProjectMember.id, User.name)
+        .join(User, User.id == ProjectMember.user_id)
+        .where(ProjectMember.project_id == document.project_id, ProjectMember.status == "active")
+    )
+    member_ids = {str(name): member_id for member_id, name in member_rows.all() if name}
+
+    def grounded_due_at(value: object) -> datetime | None:
+        raw = str(value or "")[:10]
+        try:
+            return datetime.combine(datetime.strptime(raw, "%Y-%m-%d").date(), time.min)
+        except ValueError:
+            return None
 
     for item in extracted.get("todos", [])[:20]:
         title = item.get("title") or item.get("content")
         if title:
             description = item.get("description") or item.get("content") or str(title)
+            assignee_name = str(item.get("assignee") or "").strip()
+            assignee_member_id = member_ids.get(assignee_name) if assignee_name and assignee_name in source_text else None
             db.add(
                 Todo(
                     id=uuid.uuid4(),
@@ -245,6 +262,7 @@ async def _create_extracted_items(
                     created_by_member_id=document.uploaded_by_member_id,
                     source_document_id=document.id,
                     source_chunk_id=source_chunk_id,
+                    assignee_member_id=assignee_member_id,
                     title=str(title)[:500],
                     description=str(description),
                     status="pending",
@@ -252,6 +270,7 @@ async def _create_extracted_items(
                     source_type="ai",
                     approval_status="pending",
                     confidence_score=80,
+                    due_at=grounded_due_at(item.get("due_date")),
                 )
             )
 

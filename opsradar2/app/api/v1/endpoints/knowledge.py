@@ -19,6 +19,8 @@ router = APIRouter()
 class GenerateHandoverRequest(BaseModel):
     owner: str = ""
     receiver: str = ""
+    target: str = ""
+    mentor: str = ""
     type: str = "handoff"
     todo_ids: list[str] = []
     issue_ids: list[str] = []
@@ -75,9 +77,23 @@ async def generate_handover(
         todo_ids=body.todo_ids,
         issue_ids=body.issue_ids,
     )
+    # The same grounded dataset powers both documents. Onboarding adds the
+    # learner and mentor context without introducing a new persistence model.
+    handover_input.update(
+        {
+            "target": body.target,
+            "mentor": body.mentor,
+            "department": body.department,
+            "period": body.period,
+        }
+    )
 
     # Step 2: LLM generation
-    content = await HandoverDraftService().generate(handover_input)
+    document_type = "onboarding" if body.type == "onboarding" else "handoff"
+    content = await HandoverDraftService().generate(
+        handover_input,
+        document_type=document_type,
+    )
 
     if not content:
         return {"content": None, "generation_mode": "fallback"}

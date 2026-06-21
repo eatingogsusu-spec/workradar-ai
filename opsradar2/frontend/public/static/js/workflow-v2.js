@@ -84,9 +84,7 @@
 
   function recommendedDue(item) {
     const date = new Date();
-    const level = item?.priority || item?.severity || item?.level || "medium";
-    date.setDate(date.getDate() + ({ critical: 1, high: 3, medium: 7, low: 14 }[level] || 7));
-    return date.toISOString().slice(0, 10);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
   }
 
   function hasAuthToken() {
@@ -119,7 +117,15 @@
   window.downloadSource = async function (documentId, fileName) {
     if (!documentId) return showToast("다운로드할 출처 파일이 없습니다.", "warn");
     try {
-      const response = await fetch(`/api/v1/documents/${encodeURIComponent(documentId)}/download`);
+      if (window.opsRadarApi?.downloadDocument) {
+        await window.opsRadarApi.downloadDocument(documentId, fileName || "source");
+        return;
+      }
+      const session = JSON.parse(localStorage.getItem("opsradar_session") || "null");
+      const token = localStorage.getItem("access_token") || localStorage.getItem("token") || session?.access_token || session?.token || JSON.parse(localStorage.getItem("auth") || "null")?.token || "";
+      const response = await fetch(`/api/v1/documents/${encodeURIComponent(documentId)}/download`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
       if (!response.ok) throw new Error("source unavailable");
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
