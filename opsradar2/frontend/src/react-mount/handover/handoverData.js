@@ -129,10 +129,15 @@ export async function fetchMembers() {
     const res = await fetch(`${API_BASE}/members?active_only=true`);
     if (!res.ok) throw new Error("Members fetch failed");
     const data = await res.json();
-    const names = (data.members || []).map((m) => m.name).filter(Boolean);
-    return [...new Set(names)];
+    const members = data.members || [];
+    const names = [...new Set(members.map((m) => m.name).filter(Boolean))];
+    const teamMap = {};
+    for (const m of members) {
+      if (m.name && m.team_name) teamMap[m.name] = m.team_name;
+    }
+    return { names, teamMap };
   } catch {
-    return PEOPLE;
+    return { names: PEOPLE, teamMap: {} };
   }
 }
 
@@ -152,16 +157,16 @@ export async function fetchHandoverPreview({ owner, receiver, type, todoIds, iss
         period,
       }),
     });
-    if (!res.ok) return { content: null, mode: "fallback" };
+    if (!res.ok) return { content: null, mode: "fallback", documents: [] };
     const data = await res.json();
-    return { content: data.content, mode: data.generation_mode };
+    return { content: data.content, mode: data.generation_mode, documents: data.documents || [] };
   } catch {
-    return { content: null, mode: "fallback" };
+    return { content: null, mode: "fallback", documents: [] };
   }
 }
 
-// LLM markdown(## 1.~## 4.)을 HandoffPreview가 쓰는 { title, sections } 구조로 변환.
-export function parseHandoverMarkdown(md, title) {
+// LLM markdown(## 1.~## 4.)을 HandoffPreview가 쓰는 { title, sections, documents } 구조로 변환.
+export function parseHandoverMarkdown(md, title, documents = []) {
   const sections = [];
   let current = null;
   for (const raw of (md || "").split("\n")) {
@@ -177,7 +182,7 @@ export function parseHandoverMarkdown(md, title) {
     }
   }
   if (current) sections.push(current);
-  return { type: "handoff", title: title || "업무 인수인계서", sections };
+  return { type: "handoff", title: title || "업무 인수인계서", sections, documents };
 }
 
 export async function fetchWorkflowReview() {
@@ -190,3 +195,4 @@ export async function fetchWorkflowReview() {
 
 export function readArchives() { try { const data = JSON.parse(localStorage.getItem(ARCHIVE_KEY) || "[]"); return Array.isArray(data) ? data : []; } catch { return []; } }
 export function writeArchives(value) { localStorage.setItem(ARCHIVE_KEY, JSON.stringify(value)); }
+export function deleteArchive(id) { const list = readArchives().filter((a) => a.id !== id); writeArchives(list); return list; }

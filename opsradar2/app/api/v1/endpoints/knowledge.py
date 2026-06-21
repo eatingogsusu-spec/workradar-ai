@@ -97,4 +97,8 @@ async def generate_handover(
     )
     await db.commit()
 
-    return {"content": content, "generation_mode": "ai"}
+    docs = [
+        {"doc_id": d["doc_id"], "title": d["title"]}
+        for d in handover_input.get("documents", [])
+    ]
+    return {"content": content, "generation_mode": "ai", "documents": docs}
