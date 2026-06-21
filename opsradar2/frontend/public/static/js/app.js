@@ -851,7 +851,7 @@ function updateAnalysisTodoCheckedCount(){const el=document.getElementById('anal
 async function moveCheckedAnalysisTodosToProgress(){
   const selected=selectedAnalysisTodos();if(!selected.length){showToast('선택된 Todo가 없습니다.','info');return;}
   try{
-    await Promise.all(selected.filter(item=>item.apiId).map(item=>window.opsRadarApi.request(`/todos/${item.apiId}`,{method:'PATCH',body:JSON.stringify({title:cleanTodoTitle(item.title),description:briefTodoText(item),assignee:item.assignee||item.recommendedAssignee||null,status:'in_progress',approval_status:'approved'})})));
+    await Promise.all(selected.filter(item=>item.apiId).map(item=>window.opsRadarApi.request(`/todos/${item.apiId}`,{method:'PATCH',body:JSON.stringify({title:cleanTodoTitle(item.title),description:item.description||briefTodoText(item),assignee:item.assignee||item.recommendedAssignee||null,status:'in_progress',approval_status:'approved'})})));
     const selectedKeys=new Set(selected.map(analysisTodoKey));
     G.analysisTodoReview=getAnalysisTodoItems().filter(item=>!selectedKeys.has(analysisTodoKey(item)));
     selectedKeys.forEach(key=>delete G.analysisTodoChecked[key]);
@@ -1018,7 +1018,7 @@ function renderTodoPager(total){
 }
 
 function cleanTodoTitle(title){return normalizeText(title||'').replace(/^\s*\[[^\]]+\]\s*/,'').trim()||'Untitled';}
-function briefTodoText(t){const raw=normalizeText(t.description||'').replace(/\s+/g,' ').trim();const base=raw||`${cleanTodoTitle(t.title)} 관련 업무 진행 및 결과 확인`;return base.length>72?base.slice(0,69)+'...':base;}
+function briefTodoText(t){if(t.descriptionPreview!=null)return t.descriptionPreview;const raw=normalizeText(t.description||'').replace(/\s+/g,' ').trim();const base=raw||`${cleanTodoTitle(t.title)} 관련 업무 진행 및 결과 확인`;return base.length>72?base.slice(0,69)+'...':base;}
 function renderTodos() {
   const list = getFilteredTodos();
   const pageList = todoPageItems(list);
@@ -1124,7 +1124,7 @@ function updateTodoCounts(){
   ['t-ai-cnt','t-in-cnt','t-done-cnt','t-rej-cnt'].forEach((id)=>{const el=document.getElementById(id);if(!el)return;el.className=(id==='t-ai-cnt'&&ai>0)?'badge b-warn':'badge b-gray';});
 }
 function switchTodoTab(tab){G.currentTodoTab=tab;G.todoPage[tab]=1;G.selectedTodoId=null;document.getElementById('todoDetailEmpty').style.display='flex';document.getElementById('todoDetailContent').style.display='none';document.querySelectorAll('#s-todo .tab').forEach((el,i)=>{el.classList.toggle('active',['inprogress','ai','done','rejected'][i]===tab);});const notice=document.getElementById('todoAINotice');const isAi=tab==='ai';const isProgress=tab==='inprogress';notice.style.display=(isAi||isProgress)?'flex':'none';document.getElementById('todoNoticeIcon').className=isAi?'ti ti-sparkles':'ti ti-rotate-2';document.getElementById('todoNoticeText').textContent=isAi?'AI가 추출한 Todo 제안입니다. 검토 후 승인 또는 반려해주세요.':'체크한 진행 Todo를 AI 제안으로 되돌릴 수 있습니다.';document.getElementById('todoBulkApproveBtn').style.display=isAi?'flex':'none';document.getElementById('todoBulkRejectBtn').style.display=isAi?'flex':'none';document.getElementById('todoBulkUndoBtn').style.display=isProgress?'flex':'none';renderTodos();}
-function openEditModal(id){G.editTargetId=id;const t=todos.find(x=>x.id===id);document.getElementById('editTitle').value=cleanTodoTitle(t.title);document.getElementById('editDescription').value=briefTodoText(t);document.getElementById('editAssignee').value=t.assignee||t.recommendedAssignee||'';document.getElementById('editModal').classList.add('show');}
+function openEditModal(id){G.editTargetId=id;const t=todos.find(x=>x.id===id);document.getElementById('editTitle').value=cleanTodoTitle(t.title);document.getElementById('editDescription').value=t.description||'';document.getElementById('editAssignee').value=t.assignee||t.recommendedAssignee||'';document.getElementById('editModal').classList.add('show');}
 function saveEdit(){const t=todos.find(x=>x.id===G.editTargetId);t.title=document.getElementById('editTitle').value.trim();t.description=document.getElementById('editDescription').value.trim();t.assignee=document.getElementById('editAssignee').value;closeModal('editModal');renderTodos();if(G.selectedTodoId===G.editTargetId)renderTodoDetail(G.editTargetId);showToast('수정되었습니다.','info');}
 function openManualModal(){document.getElementById('manualModal').classList.add('show');}
 async function saveManual(){

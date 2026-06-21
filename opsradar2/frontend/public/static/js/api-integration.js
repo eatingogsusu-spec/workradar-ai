@@ -130,11 +130,13 @@
 
   function normalizeTodo(todo) {
     const title = cleanTodoApiTitle(todo.title);
+    const rawDesc = String(todo.description || "").replace(/\s+/g, " ").trim();
     return {
       id: uiId("todo", todo.id),
       apiId: todo.id,
       title,
-      description: briefTodoApiDescription(todo.description, title),
+      description: rawDesc,
+      descriptionPreview: briefTodoApiDescription(todo.description, title),
       src: todo.document_id || null,
       sourceFileName: todo.source_file_name || null,
       srcChunk: todo.source_chunk_id || null,

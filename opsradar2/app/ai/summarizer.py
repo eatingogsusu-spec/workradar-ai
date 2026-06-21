@@ -284,10 +284,10 @@ def _with_subject_title(title: str, subject: str | None) -> str:
 def _with_subject_description(description: str, subject: str | None) -> str:
     cleaned = re.sub(r"\s+", " ", str(description or "")).strip()
     if subject and subject.lower() not in cleaned.lower():
-        return f"대상 품목: {subject}. {cleaned}"[:500]
+        return f"대상 품목: {subject}. {cleaned}"[:2000]
     if not subject and re.search(r"(?:물품|재고|제품|품목|부품|자재)", cleaned) and "대상 품목 확인 필요" not in cleaned:
-        return f"{cleaned} 대상 품목 확인 필요."[:500]
-    return cleaned[:500]
+        return f"{cleaned} 대상 품목 확인 필요."[:2000]
+    return cleaned[:2000]
 
 
 def _concise_todo_title(title: str, description: str = "") -> str:
@@ -314,7 +314,7 @@ def _detailed_todo_description(title: str, description: str) -> str:
         return f"{title} 업무의 수행 범위와 필요한 산출물을 확인하고, 완료 기준에 따라 결과를 공유합니다."
     if len(cleaned) < 45:
         return f"{cleaned} 관련 작업 범위와 완료 기준을 확인하고 결과를 공유합니다."
-    return cleaned[:500]
+    return cleaned[:2000]
 
 
 def _simple_summary(text: str) -> str:
