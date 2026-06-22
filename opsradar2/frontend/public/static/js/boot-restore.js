@@ -106,20 +106,29 @@
 
   function boot() {
     wrapNavPersist();
-    // role 캐시(localStorage)만 먼저 확정한 뒤, 경로 복원과 가드 해제를 진행한다.
-    // ⚠️ [C] 경로 복원을 [A6] renderDashboardLive 에 await 로 묶지 않는다.
-    //   renderDashboardLive 는 4중 몽키패치(ops/todo-calendar/role/workflow-v2)를 거치며 내부
-    //   await 체인이 boot 시점에 resolve 되지 않는 경우가 있어, 묶으면 restoreScreen 이 영영
-    //   실행되지 않아 F5 때 항상 dashboard 로 떨어졌다(실측 버그). 그래서 분리한다.
+    // role 캐시(localStorage)를 먼저 확정한 뒤 경로 복원·역할 렌더·가드 해제를 진행한다.
     refreshRole()
       .catch(function () {})
       .then(function () {
-        // [A6] 역할 UI 재렌더는 백그라운드(await 안 함). role 캐시는 위에서 이미 갱신됨.
-        try { applyRoleAndRender(); } catch (e) {}
-        // [C] 저장된 경로 복원 → 복원 화면이 갱신된 role 로 렌더된다.
+        // [C] 경로 복원은 동기로 **먼저** 실행한다. 아래 applyRoleAndRender await 에 묶지 않는 이유:
+        //   renderDashboardLive 는 4중 몽키패치(ops/todo-calendar/role/workflow-v2)를 거치며 내부
+        //   await 체인이 boot 시점에 resolve 되지 않는 경우가 있어, 묶으면 restoreScreen 이 영영
+        //   실행되지 않아 F5 때 항상 dashboard 로 떨어졌다(실측 버그). 그래서 복원은 먼저 끝낸다.
         restoreScreen();
-        // [A5] 가드 해제.
-        removeGuard();
+        // [A5/A6] ★가드 해제는 역할 반영 렌더(applyRoleVisibility→switchDbRole)가 끝난 뒤로 미룬다.
+        //   예전엔 여기서 곧장 removeGuard() 를 호출해, /dashboard/summary 응답 후 일어나는
+        //   관리자↔팀원 뷰 전환이 오버레이가 걷힌 뒤 노출돼 깜빡임이 남았다. 이제 렌더를 await 한다.
+        //   (renderDashboardLive 가 끝내 resolve 되지 않아도 아래 안전 타임아웃이 가드를 푼다.)
+        return applyRoleAndRender();
+      })
+      .catch(function () {})
+      .then(function () {
+        // 새 역할 뷰가 실제로 페인트된 다음 프레임에 오버레이를 제거(전환을 끝까지 가림).
+        if (typeof requestAnimationFrame === "function") {
+          requestAnimationFrame(function () { requestAnimationFrame(removeGuard); });
+        } else {
+          removeGuard();
+        }
       });
   }
 
