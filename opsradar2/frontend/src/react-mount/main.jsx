@@ -20,6 +20,7 @@ import DashboardScreen from './DashboardScreen.jsx'
 import HandoverCenterPage from './handover/HandoverCenterPage.jsx'
 import { installHandoffCompatibility } from './handover/handoffStateAdapter.js'
 import AnalysisScreen from './AnalysisScreen.jsx'
+import LoginGate from './LoginGate.jsx'
 
 // handoff.js가 sync script로 먼저 실행되므로, 모듈 최상위에서 즉시 호출해
 // window.__HANDOFF_REACT_ENABLED__ = true 를 최대한 일찍 설정.
@@ -243,7 +244,20 @@ function mountReactTodo() {
   )
 }
 
+// 로그인 게이트(s2단계) — 9개 화면의 "1회 렌더" 셸과 분리된 별도 React 트리로 #root 에 마운트.
+// 자체 useState 로 세션을 관리하므로 다른 화면의 memo/re-render 0 설계에 영향 0.
+function mountLoginGate() {
+  const el = document.getElementById('root')
+  if (!el) return
+  createRoot(el).render(
+    <StrictMode>
+      <LoginGate />
+    </StrictMode>,
+  )
+}
+
 function bootstrap() {
+  mountLoginGate()
   if (USE_REACT_SETTINGS) mountReactSettings()
   if (USE_REACT_REPORTS) mountReactReports()
   if (USE_REACT_CALENDAR) mountReactCalendar()

@@ -1,0 +1,178 @@
+/* 로그인 게이트 스타일 — src/index.css(CRA 전용, 서빙 안 됨)에서 로그인 관련 규칙만 추출.
+   LoginGate.jsx 가 import 하므로 Vite 가 서빙되는 /static/react/assets/main.css 에 번들한다.
+   body.opsradar-login-required 규칙이 핵심: 로그인 전 정적 셸(#root 제외 모든 top-level div)을 가린다. */
+
+body.opsradar-login-required {
+  overflow: hidden;
+}
+
+body.opsradar-login-required > div:not(#root) {
+  display: none !important;
+}
+
+.opsradar-login {
+  min-height: 100vh;
+  display: flex;
+  background: #f8fafc;
+}
+
+.opsradar-login-copy {
+  flex: 1 1 50%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 60px 56px;
+  background: #0f172a;
+  color: white;
+}
+
+.opsradar-login-mark {
+  align-self: flex-start;
+  background: #6366f1;
+  color: white;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.opsradar-login-tagline {
+  color: #6366f1;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 16px 0 8px;
+}
+
+.opsradar-login h1 {
+  font-size: 3rem;
+  font-weight: 800;
+  color: white;
+  margin: 16px 0 12px;
+  line-height: 1.08;
+}
+
+.opsradar-login-subtitle {
+  color: #94a3b8;
+  line-height: 1.7;
+  font-size: 0.95rem;
+  word-break: keep-all;
+}
+
+.opsradar-login-cards {
+  flex: 1 1 50%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 48px;
+  background: #f8fafc;
+}
+
+.opsradar-login-form {
+  width: 100%;
+  max-width: 400px;
+  box-sizing: border-box;
+  margin: auto;
+  padding: 48px;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+.opsradar-login-form h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: #111827;
+}
+
+.opsradar-login-form-desc {
+  color: #64748b;
+  font-size: 0.875rem;
+  margin: 0 0 28px;
+  line-height: 1.6;
+}
+
+.opsradar-login-form label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+  margin-top: 16px;
+}
+
+.opsradar-login-form input[type="text"],
+.opsradar-login-form input[type="password"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  outline: none;
+}
+
+.opsradar-login-form input[type="text"]:focus,
+.opsradar-login-form input[type="password"]:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.opsradar-login-form button[type="submit"] {
+  width: 100%;
+  margin-top: 28px;
+  padding: 12px;
+  background: #6366f1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.opsradar-login-form button[type="submit"]:hover {
+  background: #4f46e5;
+}
+
+.opsradar-login-form button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.opsradar-login-error {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  background: #fef2f2;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+}
+
+@media (max-width: 768px) {
+  .opsradar-login {
+    flex-direction: column;
+    overflow: auto;
+  }
+
+  .opsradar-login-copy {
+    flex: 0 0 auto;
+    padding: 40px 24px;
+  }
+
+  .opsradar-login-cards {
+    flex: 1 1 auto;
+    padding: 32px 16px;
+  }
+
+  .opsradar-login-form {
+    padding: 32px 24px;
+  }
+}
