@@ -12,6 +12,15 @@
 <link rel="stylesheet" href="/static/css/components.css?v=20260621-calendar-agenda">
 <link rel="stylesheet" href="/static/css/role-workflow-enhancements.css?v=20260619">
 <link rel="stylesheet" href="/static/css/workflow-v2.css?v=20260620-calendar-todos">
+
+<!-- [A5] 부팅 로딩가드: role 확정 전 화면(팀원↔관리자) 깜빡임을 오버레이로 가린다. -->
+<style>
+  html.app-booting #appLoadingOverlay { display: flex; }
+  #appLoadingOverlay { display: none; position: fixed; inset: 0; z-index: 99999; background: var(--bg, #f4f5f7); align-items: center; justify-content: center; }
+  #appLoadingOverlay .albs { width: 28px; height: 28px; border: 3px solid rgba(127,127,127,.3); border-top-color: var(--accent, #4263eb); border-radius: 50%; animation: albspin .7s linear infinite; }
+  @keyframes albspin { to { transform: rotate(360deg); } }
+</style>
+<script>document.documentElement.classList.add('app-booting');</script>
 </head>
 
 <body><script>
@@ -21,6 +30,9 @@ window.OPSRADAR_API_BASE = ["8002", "3001"].includes(window.location.port)
     ? "http://127.0.0.1:8002/api/v1"
     : `${window.location.protocol}//${window.location.hostname}:8002/api/v1`);
 </script>
+
+<!-- [A5] 부팅 로딩가드 오버레이 (boot-restore.js 가 role 확정 후 html.app-booting 해제) -->
+<div id="appLoadingOverlay"><div class="albs"></div></div>
 
 <div style="display:flex;flex:1;overflow:hidden">
 <!-- ══ 사이드바 ══ -->
@@ -1028,6 +1040,7 @@ Content: API 연결 일정과 담당자 확인이 필요합니다.</pre></div>
 <script src="/static/js/role-workflow-enhancements.js?v=20260620-calendar-sync"></script>
 <script src="/static/js/calendar-team-filter.js?v=20260620-calendar-filter-fix"></script>
 <script src="/static/js/workflow-v2.js?v=20260622-fix-todo-description"></script>
+<script src="/static/js/boot-restore.js?v=20260619-int"></script>
 <!-- React strangler-fig mount: Todo 탭/목록/카드/상세는 React 렌더링, 기존 Todo 전역 함수는 compatibility wrapper 유지. -->
 <div id="react-mount"></div>
 <link rel="stylesheet" href="/static/react/assets/main.css?v=20260621-onboarding-steps">

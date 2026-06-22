@@ -178,6 +178,7 @@
       dueDate: issue.due_at ? String(issue.due_at).slice(0, 10) : null,
       days: 0,
       desc: stripIssueTargetDate(issue.description || issue.title),
+      reason: issue.risk_reason || "",
       chunk: "",
       history: [],
       domino: [],
@@ -672,7 +673,29 @@
     if (typeof renderAnalysisRiskReview === "function") renderAnalysisRiskReview();
   }
 
-  function renderRealDocumentResult({ file, documentId, chunks, todos: docTodos, issues: docIssues }) {
+  function showAnalysisTruncationBanner(truncation) {
+    const host = document.getElementById("resultSection");
+    let banner = document.getElementById("analysisTruncationBanner");
+    if (!truncation || !truncation.truncated) {
+      if (banner) banner.style.display = "none";
+      return;
+    }
+    if (!banner && host) {
+      banner = document.createElement("div");
+      banner.id = "analysisTruncationBanner";
+      banner.style.cssText = "margin:0 0 12px;padding:10px 14px;border:1px solid var(--warning,#c47c00);background:var(--warn-soft,rgba(196,124,0,.1));border-radius:8px;font-size:12px;line-height:1.5;color:var(--text);display:flex;gap:8px;align-items:flex-start";
+      host.insertBefore(banner, host.firstChild);
+    }
+    if (!banner) return;
+    const cap = truncation.cap || 20;
+    const parts = [];
+    if ((truncation.todos_total || 0) > cap) parts.push(`Todo 전체 ${truncation.todos_total}건 중 ${cap}건`);
+    if ((truncation.issues_total || 0) > cap) parts.push(`Issue 전체 ${truncation.issues_total}건 중 ${cap}건`);
+    banner.innerHTML = `<i class="ti ti-alert-triangle" style="color:var(--warning,#c47c00);flex-shrink:0;margin-top:1px"></i><span><b>항목이 많아 상한을 적용했습니다.</b> ${parts.join(", ")}만 등록되었고 나머지는 등록되지 않았습니다(대시보드 보호).</span>`;
+    banner.style.display = "flex";
+  }
+
+  function renderRealDocumentResult({ file, documentId, chunks, todos: docTodos, issues: docIssues, truncation }) {
     const chunk = (chunks || [])[0];
     const chunkCount = chunks?.length || 0;
     const issueCount = docIssues?.length || 0;
@@ -692,7 +715,26 @@
     if (resultFname) resultFname.textContent = file.name;
     if (rChunkMeta) rChunkMeta.textContent = `${file.name} · ${chunkCount} chunks · document ${documentId.slice(0, 8)}`;
     if (rChunkContent) rChunkContent.textContent = firstChunkText(chunks);
-    if (rSrcDoc) rSrcDoc.textContent = file.name;
+    if (rSrcDoc) {
+      // [B4] 출처 문서를 다운로드 링크로 노출. documentId 가 있으면 클릭 시 원본 파일 다운로드
+      // (downloadSource → GET /documents/{id}/download). 안전하게 DOM 으로 구성(파일명 인젝션 방지).
+      rSrcDoc.textContent = "";
+      if (documentId) {
+        const dlBtn = document.createElement("button");
+        dlBtn.type = "button";
+        dlBtn.className = "wr-source-link";
+        dlBtn.title = "원본 파일 다운로드";
+        dlBtn.style.cssText = "background:none;border:none;padding:0;cursor:pointer;color:var(--accent);display:inline-flex;align-items:center;gap:4px;font:inherit;text-align:left";
+        dlBtn.innerHTML = '<i class="ti ti-download"></i>';
+        dlBtn.appendChild(document.createTextNode(" " + file.name));
+        dlBtn.addEventListener("click", () => {
+          if (typeof window.downloadSource === "function") window.downloadSource(documentId, file.name);
+        });
+        rSrcDoc.appendChild(dlBtn);
+      } else {
+        rSrcDoc.textContent = file.name;
+      }
+    }
     if (rSrcRange) rSrcRange.textContent = chunk ? `chunk #${chunk.chunk_index ?? 0}` : "-";
     if (rSrcReason) {
       rSrcReason.textContent = issueCount || todoCount
@@ -714,6 +756,7 @@
     }
 
     if (resultSection) resultSection.style.display = "block";
+    showAnalysisTruncationBanner(truncation);
     if (window.G?.analysisHistory) {
       window.G.analysisHistory.unshift({
         name: file.name,
@@ -734,7 +777,7 @@
     const documentId = upload.document_id;
     if (!documentId) throw new Error("백엔드에서 document_id를 받지 못했습니다.");
 
-    await waitForDocumentAnalysis(documentId, (status) => {
+    const finalStatus = await waitForDocumentAnalysis(documentId, (status) => {
       const progress = Number(status.progress || 0);
       if (typeof setFlow === "function") {
         if (progress < 40) setFlow(1, "active", "파일 저장 및 텍스트 추출 중", `진행률 ${progress}%`, "s-active");
@@ -765,6 +808,7 @@
       chunks: chunkData.chunks || [],
       todos: docTodos,
       issues: docIssues,
+      truncation: finalStatus?.truncation || null,
     });
 
     await window.opsRadarApi.reload();

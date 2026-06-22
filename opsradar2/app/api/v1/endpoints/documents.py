@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import uuid
 from pathlib import Path
 
@@ -65,6 +66,26 @@ async def get_document_status(document_id: str, db: AsyncSession = Depends(get_d
     if not document:
         raise HTTPException(status_code=404, detail="document not found")
 
+    # 추출 상한 적용으로 일부 항목이 누락됐는지(전체 N건 중 cap건만 등록) 알린다.
+    truncation = None
+    summary_row = (
+        await db.execute(
+            text(
+                "SELECT extracted_json FROM ai_summaries "
+                "WHERE document_id = :doc_id ORDER BY created_at DESC LIMIT 1"
+            ),
+            {"doc_id": str(doc_uuid)},
+        )
+    ).scalar_one_or_none()
+    if summary_row is not None:
+        try:
+            data = summary_row if isinstance(summary_row, dict) else json.loads(summary_row)
+            candidate = data.get("truncation") if isinstance(data, dict) else None
+            if candidate and candidate.get("truncated"):
+                truncation = candidate
+        except (ValueError, TypeError):
+            truncation = None
+
     return {
         "document_id": str(document.id),
         "file_name": document.file_name,
@@ -73,6 +94,7 @@ async def get_document_status(document_id: str, db: AsyncSession = Depends(get_d
         "status": document.analysis_status,
         "progress": document.progress,
         "error": document.error_message,
+        "truncation": truncation,
     }
 
 

@@ -227,6 +227,45 @@ async def run_document_pipeline(document_id: str) -> None:
             )
 
 
+async def _resolve_assignee_member_ids(
+    db: AsyncSession, project_id, names: list,
+) -> dict[str, str]:
+    """추출된 담당자 '이름' → project_members.id 매핑.
+
+    안전 규칙:
+    - 해당 프로젝트의 *활성* 멤버 중 그 이름이 **정확히 한 명**일 때만 매핑한다.
+    - 이름이 없거나(0명) 동명이인(2명 이상)이면 매핑에서 제외 → 호출부에서 None 폴백.
+    """
+    wanted = {str(n).strip() for n in names if n and str(n).strip()}
+    if not wanted:
+        return {}
+    rows = (
+        await db.execute(
+            text(
+                """
+                SELECT u.name AS name, pm.id::text AS member_id
+                FROM project_members pm
+                JOIN users u ON u.id = pm.user_id
+                WHERE pm.project_id = :project_id
+                  AND pm.status = 'active'
+                  AND u.deleted_at IS NULL
+                  AND u.name IS NOT NULL
+                """
+            ),
+            {"project_id": project_id},
+        )
+    ).mappings().all()
+    counts: dict[str, int] = {}
+    first: dict[str, str] = {}
+    for row in rows:
+        name = str(row["name"]).strip()
+        if name not in wanted:
+            continue
+        counts[name] = counts.get(name, 0) + 1
+        first.setdefault(name, row["member_id"])
+    return {name: member_id for name, member_id in first.items() if counts[name] == 1}
+
+
 async def _create_extracted_items(
     db: AsyncSession,
     document: Document,
@@ -235,12 +274,6 @@ async def _create_extracted_items(
     source_text: str = "",
 ) -> None:
     source_chunk_id = chunk_rows[0].id if chunk_rows else None
-    member_rows = await db.execute(
-        select(ProjectMember.id, User.name)
-        .join(User, User.id == ProjectMember.user_id)
-        .where(ProjectMember.project_id == document.project_id, ProjectMember.status == "active")
-    )
-    member_ids = {str(name): member_id for member_id, name in member_rows.all() if name}
 
     def grounded_due_at(value: object) -> datetime | None:
         raw = str(value or "")[:10]
@@ -249,12 +282,22 @@ async def _create_extracted_items(
         except ValueError:
             return None
 
-    for item in extracted.get("todos", [])[:20]:
+    todo_items = extracted.get("todos", [])[:20]
+    assignee_member_map = await _resolve_assignee_member_ids(
+        db, document.project_id, [item.get("assignee") for item in todo_items]
+    )
+    for item in todo_items:
         title = item.get("title") or item.get("content")
         if title:
             description = item.get("description") or item.get("content") or str(title)
             assignee_name = str(item.get("assignee") or "").strip()
-            assignee_member_id = member_ids.get(assignee_name) if assignee_name and assignee_name in source_text else None
+            # [작업1 + main 근거] resolver(_resolve_assignee_member_ids)로 이름→member_id 매핑(동명이인 모호 시 제외)
+            # 하되, 원문(source_text)에 이름이 실제로 등장할 때만 배정(main 근거 기반 정책 유지).
+            assignee_member_id = (
+                assignee_member_map.get(assignee_name)
+                if assignee_name and assignee_name in source_text
+                else None
+            )
             db.add(
                 Todo(
                     id=uuid.uuid4(),
@@ -286,6 +329,7 @@ async def _create_extracted_items(
                     title=str(title)[:500],
                     description=item.get("description") or str(title),
                     severity=item.get("severity", "medium"),
+                    risk_reason=item.get("reason") or None,
                     status="open",
                     source_type="ai",
                     approval_status="pending",
@@ -300,6 +344,17 @@ async def _create_ai_summary(db: AsyncSession, document: Document, summary: str 
     summary_text = summary.get("summary") if isinstance(summary, dict) else summary
     if not summary_text:
         summary_text = ""
+    truncation = extracted.get("truncation") if isinstance(extracted, dict) else None
+    if truncation and truncation.get("truncated"):
+        cap = truncation.get("cap", 20)
+        parts = []
+        if (truncation.get("todos_total") or 0) > cap:
+            parts.append(f"Todo 전체 {truncation['todos_total']}건 중 {cap}건")
+        if (truncation.get("issues_total") or 0) > cap:
+            parts.append(f"Issue 전체 {truncation['issues_total']}건 중 {cap}건")
+        if parts:
+            note = "⚠️ 항목이 많아 상한을 적용했습니다: " + ", ".join(parts) + "만 등록(나머지 미등록)."
+            summary_text = f"{note}\n{summary_text}" if summary_text else note
     todos = extracted.get("todos", [])
     issues = extracted.get("issues", [])
     blocked = [
