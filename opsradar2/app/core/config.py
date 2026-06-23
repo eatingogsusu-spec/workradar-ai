@@ -59,6 +59,8 @@ class Settings:
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "change-this-secret-in-production")
     JWT_ALGORITHM: str = "HS256"
     JWT_EXPIRE_HOURS: int = parse_int_env("JWT_EXPIRE_HOURS", 8)
+    # Telegram bot (프로토타입). 비어 있으면 폴링 스크립트가 비활성 처리한다.
+    TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
 
 
 settings = Settings()
