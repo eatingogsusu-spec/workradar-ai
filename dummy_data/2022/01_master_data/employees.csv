@@ -1,0 +1,15 @@
+﻿employee_id,name,team,role,permission_level,email
+EMP-2022-001,김도윤,운영총괄팀,운영총괄,admin,doyun.kim@example.invalid
+EMP-2022-002,박서연,영업관리팀,선임 매니저,manager,seoyeon.park@example.invalid
+EMP-2022-003,이민재,영업관리팀,매니저,user,minjae.lee@example.invalid
+EMP-2022-004,정하늘,영업관리팀,매니저,user,haneul.jung@example.invalid
+EMP-2022-005,최유진,구매팀,구매 리드,manager,yujin.choi@example.invalid
+EMP-2022-006,강민호,구매팀,구매 매니저,user,minho.kang@example.invalid
+EMP-2022-007,오지훈,구매팀,구매 담당,user,jihoon.oh@example.invalid
+EMP-2022-008,한지우,품질 클레임팀,품질 리드,manager,jiwoo.han@example.invalid
+EMP-2022-009,송태경,품질 클레임팀,품질 담당,user,taekyung.song@example.invalid
+EMP-2022-010,배수민,품질 클레임팀,클레임 담당,user,sumin.bae@example.invalid
+EMP-2022-011,윤예린,물류팀,물류 리드,manager,yerin.yoon@example.invalid
+EMP-2022-012,임가은,물류팀,출고 담당,user,gaeun.lim@example.invalid
+EMP-2022-013,문태오,물류팀,수출 담당,user,taeo.moon@example.invalid
+EMP-2022-014,시스템 관리자,시스템관리,시스템 관리자,admin,system.admin@example.invalid

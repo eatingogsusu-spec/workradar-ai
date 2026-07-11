@@ -453,7 +453,7 @@ class ReportRepository:
                 """
                 SELECT
                   t.id::text AS id, t.title, t.description, t.status, t.approval_status,
-                  t.priority, t.due_at, t.created_at, t.updated_at, t.dept,
+                  t.priority, t.due_at, t.created_at, t.updated_at,
                   assignee.name AS assignee_name, assignee_team.name AS assignee_team,
                   COALESCE(d.file_name, t.source_document_id::text, t.source_chunk_id::text, '확인 필요') AS source
                 FROM todos t
@@ -486,7 +486,7 @@ class ReportRepository:
                 """
                 SELECT
                   i.id::text AS id, i.title, i.description, i.status, i.approval_status,
-                  i.severity, i.risk_reason, i.due_at, i.created_at, i.updated_at, i.dept,
+                  i.severity, i.risk_reason, i.due_at, i.created_at, i.updated_at,
                   assignee.name AS assignee_name, assignee_team.name AS assignee_team,
                   COALESCE(d.file_name, i.source_document_id::text, i.source_chunk_id::text, '확인 필요') AS source
                 FROM issues i

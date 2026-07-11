@@ -1,0 +1,4 @@
+﻿id,project_id,title,period_start,period_end,summary,status,source,created_at,updated_at
+MR-0001,PROJ-001,월간 보고서 seed - Yazaki Parts Asia 리드타임 8주에서 12주 증가,2025-12-01,2025-12-31,Yazaki Parts Asia가 AP-RL-450 리드타임을 8주에서 12주로 변경 공지함,draft,dummy_seed,2025-12-02T09:00:00,2026-06-01T09:00:00
+MR-0002,PROJ-001,월간 보고서 seed - TE Connectivity Korea 단가 7% 인상 통보,2026-04-01,2026-05-01,TE Connectivity Korea가 주요 커넥터 단가 7% 인상을 통보하여 고객 단가 협상이 필요함,draft,dummy_seed,2026-04-03T09:00:00,2026-06-01T09:00:00
+MR-0003,PROJ-001,월간 보고서 seed - 박서연 담당 고객 인수인계 준비,2026-05-01,2026-05-31,박서연 담당 Hyundai Mobis Tier2와 Daesung Automotive 업무 일부를 이민재에게 인수인계해야 함,draft,dummy_seed,2026-05-12T09:00:00,2026-06-01T09:00:00

@@ -1,0 +1,1055 @@
+﻿id,project_id,source_type,source_id,business_entity_id,link_type,link_reason,confidence_score,created_at
+EL-00001,PROJ-001,document,DOC-0001,BE-ORDER-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00002,PROJ-001,document,DOC-0001,BE-ORDER-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00003,PROJ-001,document,DOC-0001,BE-ORDER-0034,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00004,PROJ-001,document,DOC-0001,BE-ORDER-0068,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00005,PROJ-001,document,DOC-0001,BE-ORDER-0084,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00006,PROJ-001,document,DOC-0001,BE-ORDER-0085,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00007,PROJ-001,document,DOC-0003,BE-ORDER-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00008,PROJ-001,document,DOC-0003,BE-ORDER-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00009,PROJ-001,document,DOC-0003,BE-ORDER-0034,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00010,PROJ-001,document,DOC-0003,BE-ORDER-0068,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00011,PROJ-001,document,DOC-0003,BE-ORDER-0084,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00012,PROJ-001,document,DOC-0003,BE-ORDER-0085,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00013,PROJ-001,document,DOC-0004,BE-ORDER-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00014,PROJ-001,document,DOC-0004,BE-ORDER-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00015,PROJ-001,document,DOC-0004,BE-ORDER-0034,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00016,PROJ-001,document,DOC-0004,BE-ORDER-0068,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00017,PROJ-001,document,DOC-0004,BE-ORDER-0084,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00018,PROJ-001,document,DOC-0004,BE-ORDER-0085,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00019,PROJ-001,document,DOC-0005,BE-ORDER-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00020,PROJ-001,document,DOC-0005,BE-ORDER-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00021,PROJ-001,document,DOC-0005,BE-ORDER-0034,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00022,PROJ-001,document,DOC-0005,BE-ORDER-0068,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00023,PROJ-001,document,DOC-0005,BE-ORDER-0084,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00024,PROJ-001,document,DOC-0005,BE-ORDER-0085,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00025,PROJ-001,document,DOC-0006,BE-ORDER-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00026,PROJ-001,document,DOC-0006,BE-ORDER-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00027,PROJ-001,document,DOC-0006,BE-ORDER-0034,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00028,PROJ-001,document,DOC-0006,BE-ORDER-0068,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00029,PROJ-001,document,DOC-0006,BE-ORDER-0084,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00030,PROJ-001,document,DOC-0006,BE-ORDER-0085,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00031,PROJ-001,document,DOC-0007,BE-ORDER-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00032,PROJ-001,document,DOC-0007,BE-ORDER-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00033,PROJ-001,document,DOC-0007,BE-ORDER-0034,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00034,PROJ-001,document,DOC-0007,BE-ORDER-0068,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00035,PROJ-001,document,DOC-0007,BE-ORDER-0084,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00036,PROJ-001,document,DOC-0007,BE-ORDER-0085,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00037,PROJ-001,document,DOC-0009,BE-ORDER-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00038,PROJ-001,document,DOC-0009,BE-ORDER-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00039,PROJ-001,document,DOC-0009,BE-ORDER-0034,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00040,PROJ-001,document,DOC-0009,BE-ORDER-0068,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00041,PROJ-001,document,DOC-0009,BE-ORDER-0084,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00042,PROJ-001,document,DOC-0009,BE-ORDER-0085,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00043,PROJ-001,document,DOC-0010,BE-ORDER-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00044,PROJ-001,document,DOC-0010,BE-ORDER-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00045,PROJ-001,document,DOC-0010,BE-ORDER-0034,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00046,PROJ-001,document,DOC-0010,BE-ORDER-0068,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00047,PROJ-001,document,DOC-0010,BE-ORDER-0084,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00048,PROJ-001,document,DOC-0010,BE-ORDER-0085,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00049,PROJ-001,document,DOC-0011,BE-ORDER-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00050,PROJ-001,document,DOC-0011,BE-ORDER-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00051,PROJ-001,document,DOC-0011,BE-ORDER-0034,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00052,PROJ-001,document,DOC-0011,BE-ORDER-0068,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00053,PROJ-001,document,DOC-0011,BE-ORDER-0084,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00054,PROJ-001,document,DOC-0011,BE-ORDER-0085,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00055,PROJ-001,document,DOC-0012,BE-ORDER-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00056,PROJ-001,document,DOC-0012,BE-ORDER-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00057,PROJ-001,document,DOC-0012,BE-ORDER-0034,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00058,PROJ-001,document,DOC-0012,BE-ORDER-0068,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00059,PROJ-001,document,DOC-0012,BE-ORDER-0084,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00060,PROJ-001,document,DOC-0012,BE-ORDER-0085,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00061,PROJ-001,document,DOC-0013,BE-ORDER-0027,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00062,PROJ-001,document,DOC-0013,BE-ORDER-0028,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00063,PROJ-001,document,DOC-0013,BE-ORDER-0033,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00064,PROJ-001,document,DOC-0013,BE-ORDER-0055,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00065,PROJ-001,document,DOC-0013,BE-ORDER-0096,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00066,PROJ-001,document,DOC-0013,BE-ORDER-0109,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00067,PROJ-001,document,DOC-0017,BE-ORDER-0027,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00068,PROJ-001,document,DOC-0017,BE-ORDER-0028,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00069,PROJ-001,document,DOC-0017,BE-ORDER-0033,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00070,PROJ-001,document,DOC-0017,BE-ORDER-0055,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00071,PROJ-001,document,DOC-0017,BE-ORDER-0096,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00072,PROJ-001,document,DOC-0017,BE-ORDER-0109,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00073,PROJ-001,document,DOC-0021,BE-ORDER-0027,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00074,PROJ-001,document,DOC-0021,BE-ORDER-0028,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00075,PROJ-001,document,DOC-0021,BE-ORDER-0033,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00076,PROJ-001,document,DOC-0021,BE-ORDER-0055,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00077,PROJ-001,document,DOC-0021,BE-ORDER-0096,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00078,PROJ-001,document,DOC-0021,BE-ORDER-0109,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00079,PROJ-001,document,DOC-0022,BE-ORDER-0027,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00080,PROJ-001,document,DOC-0022,BE-ORDER-0028,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00081,PROJ-001,document,DOC-0022,BE-ORDER-0033,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00082,PROJ-001,document,DOC-0022,BE-ORDER-0055,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00083,PROJ-001,document,DOC-0022,BE-ORDER-0096,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00084,PROJ-001,document,DOC-0022,BE-ORDER-0109,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00085,PROJ-001,document,DOC-0025,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00086,PROJ-001,document,DOC-0025,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00087,PROJ-001,document,DOC-0025,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00088,PROJ-001,document,DOC-0025,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00089,PROJ-001,document,DOC-0025,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00090,PROJ-001,document,DOC-0025,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00091,PROJ-001,document,DOC-0026,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00092,PROJ-001,document,DOC-0026,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00093,PROJ-001,document,DOC-0026,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00094,PROJ-001,document,DOC-0026,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00095,PROJ-001,document,DOC-0026,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00096,PROJ-001,document,DOC-0026,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00097,PROJ-001,document,DOC-0027,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00098,PROJ-001,document,DOC-0027,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00099,PROJ-001,document,DOC-0027,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00100,PROJ-001,document,DOC-0027,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00101,PROJ-001,document,DOC-0027,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00102,PROJ-001,document,DOC-0027,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00103,PROJ-001,document,DOC-0028,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00104,PROJ-001,document,DOC-0028,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00105,PROJ-001,document,DOC-0028,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00106,PROJ-001,document,DOC-0028,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00107,PROJ-001,document,DOC-0028,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00108,PROJ-001,document,DOC-0028,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00109,PROJ-001,document,DOC-0029,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00110,PROJ-001,document,DOC-0029,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00111,PROJ-001,document,DOC-0029,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00112,PROJ-001,document,DOC-0029,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00113,PROJ-001,document,DOC-0029,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00114,PROJ-001,document,DOC-0029,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00115,PROJ-001,document,DOC-0030,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00116,PROJ-001,document,DOC-0030,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00117,PROJ-001,document,DOC-0030,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00118,PROJ-001,document,DOC-0030,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00119,PROJ-001,document,DOC-0030,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00120,PROJ-001,document,DOC-0030,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00121,PROJ-001,document,DOC-0031,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00122,PROJ-001,document,DOC-0031,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00123,PROJ-001,document,DOC-0031,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00124,PROJ-001,document,DOC-0031,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00125,PROJ-001,document,DOC-0031,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00126,PROJ-001,document,DOC-0031,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00127,PROJ-001,document,DOC-0032,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00128,PROJ-001,document,DOC-0032,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00129,PROJ-001,document,DOC-0032,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00130,PROJ-001,document,DOC-0032,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00131,PROJ-001,document,DOC-0032,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00132,PROJ-001,document,DOC-0032,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00133,PROJ-001,document,DOC-0033,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00134,PROJ-001,document,DOC-0033,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00135,PROJ-001,document,DOC-0033,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00136,PROJ-001,document,DOC-0033,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00137,PROJ-001,document,DOC-0033,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00138,PROJ-001,document,DOC-0033,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00139,PROJ-001,document,DOC-0034,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00140,PROJ-001,document,DOC-0034,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00141,PROJ-001,document,DOC-0034,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00142,PROJ-001,document,DOC-0034,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00143,PROJ-001,document,DOC-0034,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00144,PROJ-001,document,DOC-0034,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00145,PROJ-001,document,DOC-0035,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00146,PROJ-001,document,DOC-0035,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00147,PROJ-001,document,DOC-0035,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00148,PROJ-001,document,DOC-0035,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00149,PROJ-001,document,DOC-0035,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00150,PROJ-001,document,DOC-0035,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00151,PROJ-001,document,DOC-0036,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00152,PROJ-001,document,DOC-0036,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00153,PROJ-001,document,DOC-0036,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00154,PROJ-001,document,DOC-0036,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00155,PROJ-001,document,DOC-0036,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00156,PROJ-001,document,DOC-0036,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00157,PROJ-001,document,DOC-0037,BE-ORDER-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00158,PROJ-001,document,DOC-0037,BE-ORDER-0023,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00159,PROJ-001,document,DOC-0037,BE-ORDER-0036,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00160,PROJ-001,document,DOC-0037,BE-ORDER-0038,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00161,PROJ-001,document,DOC-0037,BE-ORDER-0046,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00162,PROJ-001,document,DOC-0037,BE-ORDER-0051,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00163,PROJ-001,document,DOC-0038,BE-ORDER-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00164,PROJ-001,document,DOC-0038,BE-ORDER-0023,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00165,PROJ-001,document,DOC-0038,BE-ORDER-0036,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00166,PROJ-001,document,DOC-0038,BE-ORDER-0038,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00167,PROJ-001,document,DOC-0038,BE-ORDER-0046,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00168,PROJ-001,document,DOC-0038,BE-ORDER-0051,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00169,PROJ-001,document,DOC-0039,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00170,PROJ-001,document,DOC-0039,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00171,PROJ-001,document,DOC-0039,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00172,PROJ-001,document,DOC-0039,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00173,PROJ-001,document,DOC-0039,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00174,PROJ-001,document,DOC-0039,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00175,PROJ-001,document,DOC-0040,BE-ORDER-0008,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00176,PROJ-001,document,DOC-0040,BE-ORDER-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00177,PROJ-001,document,DOC-0040,BE-ORDER-0021,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00178,PROJ-001,document,DOC-0040,BE-ORDER-0060,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00179,PROJ-001,document,DOC-0040,BE-ORDER-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00180,PROJ-001,document,DOC-0040,BE-ORDER-0091,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00181,PROJ-001,document,DOC-0041,BE-ORDER-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00182,PROJ-001,document,DOC-0041,BE-ORDER-0023,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00183,PROJ-001,document,DOC-0041,BE-ORDER-0036,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00184,PROJ-001,document,DOC-0041,BE-ORDER-0038,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00185,PROJ-001,document,DOC-0041,BE-ORDER-0046,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00186,PROJ-001,document,DOC-0041,BE-ORDER-0051,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00187,PROJ-001,document,DOC-0043,BE-ORDER-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00188,PROJ-001,document,DOC-0043,BE-ORDER-0023,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00189,PROJ-001,document,DOC-0043,BE-ORDER-0036,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00190,PROJ-001,document,DOC-0043,BE-ORDER-0038,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00191,PROJ-001,document,DOC-0043,BE-ORDER-0046,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00192,PROJ-001,document,DOC-0043,BE-ORDER-0051,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00193,PROJ-001,document,DOC-0045,BE-ORDER-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00194,PROJ-001,document,DOC-0045,BE-ORDER-0023,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00195,PROJ-001,document,DOC-0045,BE-ORDER-0036,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00196,PROJ-001,document,DOC-0045,BE-ORDER-0038,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00197,PROJ-001,document,DOC-0045,BE-ORDER-0046,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00198,PROJ-001,document,DOC-0045,BE-ORDER-0051,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00199,PROJ-001,document,DOC-0046,BE-ORDER-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00200,PROJ-001,document,DOC-0046,BE-ORDER-0023,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00201,PROJ-001,document,DOC-0046,BE-ORDER-0036,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00202,PROJ-001,document,DOC-0046,BE-ORDER-0038,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00203,PROJ-001,document,DOC-0046,BE-ORDER-0046,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00204,PROJ-001,document,DOC-0046,BE-ORDER-0051,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00205,PROJ-001,document,DOC-0047,BE-ORDER-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00206,PROJ-001,document,DOC-0047,BE-ORDER-0023,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00207,PROJ-001,document,DOC-0047,BE-ORDER-0036,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00208,PROJ-001,document,DOC-0047,BE-ORDER-0038,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00209,PROJ-001,document,DOC-0047,BE-ORDER-0046,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00210,PROJ-001,document,DOC-0047,BE-ORDER-0051,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00211,PROJ-001,document,DOC-0048,BE-ORDER-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00212,PROJ-001,document,DOC-0048,BE-ORDER-0023,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00213,PROJ-001,document,DOC-0048,BE-ORDER-0036,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00214,PROJ-001,document,DOC-0048,BE-ORDER-0038,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00215,PROJ-001,document,DOC-0048,BE-ORDER-0046,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00216,PROJ-001,document,DOC-0048,BE-ORDER-0051,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00217,PROJ-001,document,DOC-0052,BE-ORDER-0024,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00218,PROJ-001,document,DOC-0052,BE-ORDER-0025,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00219,PROJ-001,document,DOC-0052,BE-ORDER-0048,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00220,PROJ-001,document,DOC-0052,BE-ORDER-0058,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00221,PROJ-001,document,DOC-0052,BE-ORDER-0059,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00222,PROJ-001,document,DOC-0052,BE-ORDER-0070,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00223,PROJ-001,document,DOC-0053,BE-ORDER-0024,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00224,PROJ-001,document,DOC-0053,BE-ORDER-0025,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00225,PROJ-001,document,DOC-0053,BE-ORDER-0048,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00226,PROJ-001,document,DOC-0053,BE-ORDER-0058,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00227,PROJ-001,document,DOC-0053,BE-ORDER-0059,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00228,PROJ-001,document,DOC-0053,BE-ORDER-0070,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00229,PROJ-001,document,DOC-0054,BE-ORDER-0024,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00230,PROJ-001,document,DOC-0054,BE-ORDER-0025,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00231,PROJ-001,document,DOC-0054,BE-ORDER-0048,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00232,PROJ-001,document,DOC-0054,BE-ORDER-0058,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00233,PROJ-001,document,DOC-0054,BE-ORDER-0059,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00234,PROJ-001,document,DOC-0054,BE-ORDER-0070,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00235,PROJ-001,document,DOC-0055,BE-ORDER-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00236,PROJ-001,document,DOC-0055,BE-ORDER-0013,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00237,PROJ-001,document,DOC-0055,BE-ORDER-0022,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00238,PROJ-001,document,DOC-0055,BE-ORDER-0053,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00239,PROJ-001,document,DOC-0055,BE-ORDER-0075,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00240,PROJ-001,document,DOC-0055,BE-ORDER-0077,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00241,PROJ-001,document,DOC-0056,BE-ORDER-0024,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00242,PROJ-001,document,DOC-0056,BE-ORDER-0025,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00243,PROJ-001,document,DOC-0056,BE-ORDER-0048,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00244,PROJ-001,document,DOC-0056,BE-ORDER-0058,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00245,PROJ-001,document,DOC-0056,BE-ORDER-0059,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00246,PROJ-001,document,DOC-0056,BE-ORDER-0070,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00247,PROJ-001,document,DOC-0057,BE-ORDER-0024,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00248,PROJ-001,document,DOC-0057,BE-ORDER-0025,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00249,PROJ-001,document,DOC-0057,BE-ORDER-0048,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00250,PROJ-001,document,DOC-0057,BE-ORDER-0058,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00251,PROJ-001,document,DOC-0057,BE-ORDER-0059,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00252,PROJ-001,document,DOC-0057,BE-ORDER-0070,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00253,PROJ-001,document,DOC-0058,BE-ORDER-0024,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00254,PROJ-001,document,DOC-0058,BE-ORDER-0025,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00255,PROJ-001,document,DOC-0058,BE-ORDER-0048,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00256,PROJ-001,document,DOC-0058,BE-ORDER-0058,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00257,PROJ-001,document,DOC-0058,BE-ORDER-0059,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00258,PROJ-001,document,DOC-0058,BE-ORDER-0070,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00259,PROJ-001,document,DOC-0059,BE-ORDER-0024,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00260,PROJ-001,document,DOC-0059,BE-ORDER-0025,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00261,PROJ-001,document,DOC-0059,BE-ORDER-0048,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00262,PROJ-001,document,DOC-0059,BE-ORDER-0058,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00263,PROJ-001,document,DOC-0059,BE-ORDER-0059,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00264,PROJ-001,document,DOC-0059,BE-ORDER-0070,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00265,PROJ-001,document,DOC-0060,BE-ORDER-0024,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00266,PROJ-001,document,DOC-0060,BE-ORDER-0025,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00267,PROJ-001,document,DOC-0060,BE-ORDER-0048,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00268,PROJ-001,document,DOC-0060,BE-ORDER-0058,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00269,PROJ-001,document,DOC-0060,BE-ORDER-0059,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00270,PROJ-001,document,DOC-0060,BE-ORDER-0070,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00271,PROJ-001,document,DOC-0061,BE-ORDER-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00272,PROJ-001,document,DOC-0061,BE-ORDER-0013,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00273,PROJ-001,document,DOC-0061,BE-ORDER-0022,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00274,PROJ-001,document,DOC-0061,BE-ORDER-0053,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00275,PROJ-001,document,DOC-0061,BE-ORDER-0075,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00276,PROJ-001,document,DOC-0061,BE-ORDER-0077,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00277,PROJ-001,document,DOC-0062,BE-ORDER-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00278,PROJ-001,document,DOC-0062,BE-ORDER-0013,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00279,PROJ-001,document,DOC-0062,BE-ORDER-0022,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00280,PROJ-001,document,DOC-0062,BE-ORDER-0053,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00281,PROJ-001,document,DOC-0062,BE-ORDER-0075,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00282,PROJ-001,document,DOC-0062,BE-ORDER-0077,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00283,PROJ-001,document,DOC-0063,BE-ORDER-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00284,PROJ-001,document,DOC-0063,BE-ORDER-0013,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00285,PROJ-001,document,DOC-0063,BE-ORDER-0022,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00286,PROJ-001,document,DOC-0063,BE-ORDER-0053,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00287,PROJ-001,document,DOC-0063,BE-ORDER-0075,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00288,PROJ-001,document,DOC-0063,BE-ORDER-0077,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00289,PROJ-001,document,DOC-0064,BE-ORDER-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00290,PROJ-001,document,DOC-0064,BE-ORDER-0013,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00291,PROJ-001,document,DOC-0064,BE-ORDER-0022,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00292,PROJ-001,document,DOC-0064,BE-ORDER-0053,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00293,PROJ-001,document,DOC-0064,BE-ORDER-0075,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00294,PROJ-001,document,DOC-0064,BE-ORDER-0077,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00295,PROJ-001,document,DOC-0065,BE-ORDER-0011,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00296,PROJ-001,document,DOC-0065,BE-ORDER-0012,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00297,PROJ-001,document,DOC-0065,BE-ORDER-0040,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00298,PROJ-001,document,DOC-0065,BE-ORDER-0045,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00299,PROJ-001,document,DOC-0065,BE-ORDER-0056,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00300,PROJ-001,document,DOC-0065,BE-ORDER-0067,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00301,PROJ-001,document,DOC-0066,BE-ORDER-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00302,PROJ-001,document,DOC-0066,BE-ORDER-0013,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00303,PROJ-001,document,DOC-0066,BE-ORDER-0022,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00304,PROJ-001,document,DOC-0066,BE-ORDER-0053,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00305,PROJ-001,document,DOC-0066,BE-ORDER-0075,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00306,PROJ-001,document,DOC-0066,BE-ORDER-0077,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00307,PROJ-001,document,DOC-0067,BE-ORDER-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00308,PROJ-001,document,DOC-0067,BE-ORDER-0013,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00309,PROJ-001,document,DOC-0067,BE-ORDER-0022,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00310,PROJ-001,document,DOC-0067,BE-ORDER-0053,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00311,PROJ-001,document,DOC-0067,BE-ORDER-0075,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00312,PROJ-001,document,DOC-0067,BE-ORDER-0077,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00313,PROJ-001,document,DOC-0068,BE-ORDER-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00314,PROJ-001,document,DOC-0068,BE-ORDER-0013,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00315,PROJ-001,document,DOC-0068,BE-ORDER-0022,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00316,PROJ-001,document,DOC-0068,BE-ORDER-0053,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00317,PROJ-001,document,DOC-0068,BE-ORDER-0075,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00318,PROJ-001,document,DOC-0068,BE-ORDER-0077,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00319,PROJ-001,document,DOC-0069,BE-ORDER-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00320,PROJ-001,document,DOC-0069,BE-ORDER-0013,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00321,PROJ-001,document,DOC-0069,BE-ORDER-0022,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00322,PROJ-001,document,DOC-0069,BE-ORDER-0053,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00323,PROJ-001,document,DOC-0069,BE-ORDER-0075,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00324,PROJ-001,document,DOC-0069,BE-ORDER-0077,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00325,PROJ-001,document,DOC-0070,BE-ORDER-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00326,PROJ-001,document,DOC-0070,BE-ORDER-0013,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00327,PROJ-001,document,DOC-0070,BE-ORDER-0022,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00328,PROJ-001,document,DOC-0070,BE-ORDER-0053,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00329,PROJ-001,document,DOC-0070,BE-ORDER-0075,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00330,PROJ-001,document,DOC-0070,BE-ORDER-0077,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00331,PROJ-001,document,DOC-0071,BE-ORDER-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00332,PROJ-001,document,DOC-0071,BE-ORDER-0013,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00333,PROJ-001,document,DOC-0071,BE-ORDER-0022,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00334,PROJ-001,document,DOC-0071,BE-ORDER-0053,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00335,PROJ-001,document,DOC-0071,BE-ORDER-0075,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00336,PROJ-001,document,DOC-0071,BE-ORDER-0077,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00337,PROJ-001,document,DOC-0072,BE-ORDER-0011,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00338,PROJ-001,document,DOC-0072,BE-ORDER-0012,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00339,PROJ-001,document,DOC-0072,BE-ORDER-0040,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00340,PROJ-001,document,DOC-0072,BE-ORDER-0045,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00341,PROJ-001,document,DOC-0072,BE-ORDER-0056,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00342,PROJ-001,document,DOC-0072,BE-ORDER-0067,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00343,PROJ-001,document,DOC-0073,BE-ORDER-0006,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00344,PROJ-001,document,DOC-0073,BE-ORDER-0026,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00345,PROJ-001,document,DOC-0073,BE-ORDER-0050,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00346,PROJ-001,document,DOC-0073,BE-ORDER-0066,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00347,PROJ-001,document,DOC-0073,BE-ORDER-0071,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00348,PROJ-001,document,DOC-0073,BE-PO-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00349,PROJ-001,document,DOC-0074,BE-ORDER-0088,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00350,PROJ-001,document,DOC-0074,BE-PO-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00351,PROJ-001,document,DOC-0074,BE-PO-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00352,PROJ-001,document,DOC-0074,BE-PO-0037,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00353,PROJ-001,document,DOC-0074,BE-PO-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00354,PROJ-001,document,DOC-0074,BE-PO-0107,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00355,PROJ-001,document,DOC-0075,BE-ORDER-0088,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00356,PROJ-001,document,DOC-0075,BE-PO-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00357,PROJ-001,document,DOC-0075,BE-PO-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00358,PROJ-001,document,DOC-0075,BE-PO-0037,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00359,PROJ-001,document,DOC-0075,BE-PO-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00360,PROJ-001,document,DOC-0075,BE-PO-0107,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00361,PROJ-001,document,DOC-0076,BE-ORDER-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00362,PROJ-001,document,DOC-0076,BE-ORDER-0013,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00363,PROJ-001,document,DOC-0076,BE-ORDER-0022,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00364,PROJ-001,document,DOC-0076,BE-ORDER-0053,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00365,PROJ-001,document,DOC-0076,BE-ORDER-0075,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00366,PROJ-001,document,DOC-0076,BE-ORDER-0077,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00367,PROJ-001,document,DOC-0077,BE-ORDER-0006,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00368,PROJ-001,document,DOC-0077,BE-ORDER-0026,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00369,PROJ-001,document,DOC-0077,BE-ORDER-0050,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00370,PROJ-001,document,DOC-0077,BE-ORDER-0066,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00371,PROJ-001,document,DOC-0077,BE-ORDER-0071,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00372,PROJ-001,document,DOC-0077,BE-PO-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00373,PROJ-001,document,DOC-0078,BE-ORDER-0088,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00374,PROJ-001,document,DOC-0078,BE-PO-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00375,PROJ-001,document,DOC-0078,BE-PO-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00376,PROJ-001,document,DOC-0078,BE-PO-0037,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00377,PROJ-001,document,DOC-0078,BE-PO-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00378,PROJ-001,document,DOC-0078,BE-PO-0107,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00379,PROJ-001,document,DOC-0079,BE-ORDER-0006,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00380,PROJ-001,document,DOC-0079,BE-ORDER-0026,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00381,PROJ-001,document,DOC-0079,BE-ORDER-0050,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00382,PROJ-001,document,DOC-0079,BE-ORDER-0066,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00383,PROJ-001,document,DOC-0079,BE-ORDER-0071,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00384,PROJ-001,document,DOC-0079,BE-PO-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00385,PROJ-001,document,DOC-0080,BE-ORDER-0006,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00386,PROJ-001,document,DOC-0080,BE-ORDER-0026,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00387,PROJ-001,document,DOC-0080,BE-ORDER-0050,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00388,PROJ-001,document,DOC-0080,BE-ORDER-0066,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00389,PROJ-001,document,DOC-0080,BE-ORDER-0071,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00390,PROJ-001,document,DOC-0080,BE-PO-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00391,PROJ-001,document,DOC-0081,BE-ORDER-0006,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00392,PROJ-001,document,DOC-0081,BE-ORDER-0026,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00393,PROJ-001,document,DOC-0081,BE-ORDER-0050,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00394,PROJ-001,document,DOC-0081,BE-ORDER-0066,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00395,PROJ-001,document,DOC-0081,BE-ORDER-0071,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00396,PROJ-001,document,DOC-0081,BE-PO-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00397,PROJ-001,document,DOC-0082,BE-ORDER-0006,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00398,PROJ-001,document,DOC-0082,BE-ORDER-0026,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00399,PROJ-001,document,DOC-0082,BE-ORDER-0050,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00400,PROJ-001,document,DOC-0082,BE-ORDER-0066,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00401,PROJ-001,document,DOC-0082,BE-ORDER-0071,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00402,PROJ-001,document,DOC-0082,BE-PO-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00403,PROJ-001,document,DOC-0083,BE-ORDER-0006,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00404,PROJ-001,document,DOC-0083,BE-ORDER-0026,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00405,PROJ-001,document,DOC-0083,BE-ORDER-0050,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00406,PROJ-001,document,DOC-0083,BE-ORDER-0066,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00407,PROJ-001,document,DOC-0083,BE-ORDER-0071,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00408,PROJ-001,document,DOC-0083,BE-PO-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00409,PROJ-001,document,DOC-0084,BE-ORDER-0088,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00410,PROJ-001,document,DOC-0084,BE-PO-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00411,PROJ-001,document,DOC-0084,BE-PO-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00412,PROJ-001,document,DOC-0084,BE-PO-0037,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00413,PROJ-001,document,DOC-0084,BE-PO-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00414,PROJ-001,document,DOC-0084,BE-PO-0107,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00415,PROJ-001,document,DOC-0085,BE-ORDER-0016,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00416,PROJ-001,document,DOC-0085,BE-ORDER-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00417,PROJ-001,document,DOC-0085,BE-ORDER-0110,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00418,PROJ-001,document,DOC-0085,BE-ORDER-0114,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00419,PROJ-001,document,DOC-0085,BE-ORDER-0123,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00420,PROJ-001,document,DOC-0085,BE-PO-0012,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00421,PROJ-001,document,DOC-0088,BE-ORDER-0088,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00422,PROJ-001,document,DOC-0088,BE-PO-0001,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00423,PROJ-001,document,DOC-0088,BE-PO-0017,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00424,PROJ-001,document,DOC-0088,BE-PO-0037,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00425,PROJ-001,document,DOC-0088,BE-PO-0076,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00426,PROJ-001,document,DOC-0088,BE-PO-0107,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00427,PROJ-001,document,DOC-0089,BE-ORDER-0016,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00428,PROJ-001,document,DOC-0089,BE-ORDER-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00429,PROJ-001,document,DOC-0089,BE-ORDER-0110,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00430,PROJ-001,document,DOC-0089,BE-ORDER-0114,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00431,PROJ-001,document,DOC-0089,BE-ORDER-0123,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00432,PROJ-001,document,DOC-0089,BE-PO-0012,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00433,PROJ-001,document,DOC-0090,BE-ORDER-0016,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00434,PROJ-001,document,DOC-0090,BE-ORDER-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00435,PROJ-001,document,DOC-0090,BE-ORDER-0110,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00436,PROJ-001,document,DOC-0090,BE-ORDER-0114,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00437,PROJ-001,document,DOC-0090,BE-ORDER-0123,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00438,PROJ-001,document,DOC-0090,BE-PO-0012,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00439,PROJ-001,document,DOC-0092,BE-ORDER-0006,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00440,PROJ-001,document,DOC-0092,BE-ORDER-0026,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00441,PROJ-001,document,DOC-0092,BE-ORDER-0050,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00442,PROJ-001,document,DOC-0092,BE-ORDER-0066,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00443,PROJ-001,document,DOC-0092,BE-ORDER-0071,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00444,PROJ-001,document,DOC-0092,BE-PO-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00445,PROJ-001,document,DOC-0093,BE-ORDER-0006,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00446,PROJ-001,document,DOC-0093,BE-ORDER-0026,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00447,PROJ-001,document,DOC-0093,BE-ORDER-0050,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00448,PROJ-001,document,DOC-0093,BE-ORDER-0066,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00449,PROJ-001,document,DOC-0093,BE-ORDER-0071,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00450,PROJ-001,document,DOC-0093,BE-PO-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00451,PROJ-001,document,DOC-0095,BE-ORDER-0016,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00452,PROJ-001,document,DOC-0095,BE-ORDER-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00453,PROJ-001,document,DOC-0095,BE-ORDER-0110,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00454,PROJ-001,document,DOC-0095,BE-ORDER-0114,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00455,PROJ-001,document,DOC-0095,BE-ORDER-0123,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00456,PROJ-001,document,DOC-0095,BE-PO-0012,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00457,PROJ-001,document,DOC-0096,BE-ORDER-0006,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00458,PROJ-001,document,DOC-0096,BE-ORDER-0026,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00459,PROJ-001,document,DOC-0096,BE-ORDER-0050,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00460,PROJ-001,document,DOC-0096,BE-ORDER-0066,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00461,PROJ-001,document,DOC-0096,BE-ORDER-0071,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00462,PROJ-001,document,DOC-0096,BE-PO-0003,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00463,PROJ-001,document,DOC-0098,BE-ORDER-0002,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00464,PROJ-001,document,DOC-0098,BE-ORDER-0010,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00465,PROJ-001,document,DOC-0098,BE-ORDER-0035,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00466,PROJ-001,document,DOC-0098,BE-ORDER-0065,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00467,PROJ-001,document,DOC-0098,BE-ORDER-0092,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00468,PROJ-001,document,DOC-0098,BE-PO-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00469,PROJ-001,document,DOC-0100,BE-ORDER-0002,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00470,PROJ-001,document,DOC-0100,BE-ORDER-0010,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00471,PROJ-001,document,DOC-0100,BE-ORDER-0035,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00472,PROJ-001,document,DOC-0100,BE-ORDER-0065,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00473,PROJ-001,document,DOC-0100,BE-ORDER-0092,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00474,PROJ-001,document,DOC-0100,BE-PO-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00475,PROJ-001,document,DOC-0101,BE-ORDER-0002,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00476,PROJ-001,document,DOC-0101,BE-ORDER-0010,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00477,PROJ-001,document,DOC-0101,BE-ORDER-0035,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00478,PROJ-001,document,DOC-0101,BE-ORDER-0065,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00479,PROJ-001,document,DOC-0101,BE-ORDER-0092,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00480,PROJ-001,document,DOC-0101,BE-PO-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00481,PROJ-001,document,DOC-0102,BE-ORDER-0002,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00482,PROJ-001,document,DOC-0102,BE-ORDER-0010,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00483,PROJ-001,document,DOC-0102,BE-ORDER-0035,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00484,PROJ-001,document,DOC-0102,BE-ORDER-0065,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00485,PROJ-001,document,DOC-0102,BE-ORDER-0092,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00486,PROJ-001,document,DOC-0102,BE-PO-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00487,PROJ-001,document,DOC-0103,BE-ORDER-0002,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00488,PROJ-001,document,DOC-0103,BE-ORDER-0010,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00489,PROJ-001,document,DOC-0103,BE-ORDER-0035,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00490,PROJ-001,document,DOC-0103,BE-ORDER-0065,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00491,PROJ-001,document,DOC-0103,BE-ORDER-0092,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00492,PROJ-001,document,DOC-0103,BE-PO-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00493,PROJ-001,document,DOC-0104,BE-ORDER-0002,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00494,PROJ-001,document,DOC-0104,BE-ORDER-0010,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00495,PROJ-001,document,DOC-0104,BE-ORDER-0035,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00496,PROJ-001,document,DOC-0104,BE-ORDER-0065,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00497,PROJ-001,document,DOC-0104,BE-ORDER-0092,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00498,PROJ-001,document,DOC-0104,BE-PO-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00499,PROJ-001,document,DOC-0105,BE-ORDER-0002,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00500,PROJ-001,document,DOC-0105,BE-ORDER-0010,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00501,PROJ-001,document,DOC-0105,BE-ORDER-0035,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00502,PROJ-001,document,DOC-0105,BE-ORDER-0065,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00503,PROJ-001,document,DOC-0105,BE-ORDER-0092,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00504,PROJ-001,document,DOC-0105,BE-PO-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00505,PROJ-001,document,DOC-0106,BE-ORDER-0002,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00506,PROJ-001,document,DOC-0106,BE-ORDER-0010,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00507,PROJ-001,document,DOC-0106,BE-ORDER-0035,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00508,PROJ-001,document,DOC-0106,BE-ORDER-0065,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00509,PROJ-001,document,DOC-0106,BE-ORDER-0092,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00510,PROJ-001,document,DOC-0106,BE-PO-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00511,PROJ-001,document,DOC-0107,BE-ORDER-0002,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00512,PROJ-001,document,DOC-0107,BE-ORDER-0010,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00513,PROJ-001,document,DOC-0107,BE-ORDER-0035,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00514,PROJ-001,document,DOC-0107,BE-ORDER-0065,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00515,PROJ-001,document,DOC-0107,BE-ORDER-0092,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00516,PROJ-001,document,DOC-0107,BE-PO-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00517,PROJ-001,document,DOC-0108,BE-ORDER-0002,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00518,PROJ-001,document,DOC-0108,BE-ORDER-0010,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00519,PROJ-001,document,DOC-0108,BE-ORDER-0035,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00520,PROJ-001,document,DOC-0108,BE-ORDER-0065,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00521,PROJ-001,document,DOC-0108,BE-ORDER-0092,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00522,PROJ-001,document,DOC-0108,BE-PO-0097,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00523,PROJ-001,document,DOC-0109,BE-ORDER-0004,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00524,PROJ-001,document,DOC-0109,BE-ORDER-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00525,PROJ-001,document,DOC-0109,BE-ORDER-0039,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00526,PROJ-001,document,DOC-0109,BE-ORDER-0041,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00527,PROJ-001,document,DOC-0109,BE-ORDER-0057,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00528,PROJ-001,document,DOC-0109,BE-ORDER-0061,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00529,PROJ-001,document,DOC-0110,BE-ORDER-0005,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00530,PROJ-001,document,DOC-0110,BE-ORDER-0014,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00531,PROJ-001,document,DOC-0110,BE-ORDER-0029,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00532,PROJ-001,document,DOC-0110,BE-ORDER-0047,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00533,PROJ-001,document,DOC-0110,BE-ORDER-0064,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00534,PROJ-001,document,DOC-0110,BE-ORDER-0069,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00535,PROJ-001,document,DOC-0111,BE-ORDER-0004,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00536,PROJ-001,document,DOC-0111,BE-ORDER-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00537,PROJ-001,document,DOC-0111,BE-ORDER-0039,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00538,PROJ-001,document,DOC-0111,BE-ORDER-0041,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00539,PROJ-001,document,DOC-0111,BE-ORDER-0057,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00540,PROJ-001,document,DOC-0111,BE-ORDER-0061,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00541,PROJ-001,document,DOC-0112,BE-ORDER-0005,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00542,PROJ-001,document,DOC-0112,BE-ORDER-0014,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00543,PROJ-001,document,DOC-0112,BE-ORDER-0029,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00544,PROJ-001,document,DOC-0112,BE-ORDER-0047,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00545,PROJ-001,document,DOC-0112,BE-ORDER-0064,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00546,PROJ-001,document,DOC-0112,BE-ORDER-0069,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00547,PROJ-001,document,DOC-0113,BE-ORDER-0005,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00548,PROJ-001,document,DOC-0113,BE-ORDER-0014,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00549,PROJ-001,document,DOC-0113,BE-ORDER-0029,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00550,PROJ-001,document,DOC-0113,BE-ORDER-0047,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00551,PROJ-001,document,DOC-0113,BE-ORDER-0064,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00552,PROJ-001,document,DOC-0113,BE-ORDER-0069,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00553,PROJ-001,document,DOC-0114,BE-ORDER-0005,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00554,PROJ-001,document,DOC-0114,BE-ORDER-0014,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00555,PROJ-001,document,DOC-0114,BE-ORDER-0029,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00556,PROJ-001,document,DOC-0114,BE-ORDER-0047,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00557,PROJ-001,document,DOC-0114,BE-ORDER-0064,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00558,PROJ-001,document,DOC-0114,BE-ORDER-0069,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00559,PROJ-001,document,DOC-0115,BE-ORDER-0004,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00560,PROJ-001,document,DOC-0115,BE-ORDER-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00561,PROJ-001,document,DOC-0115,BE-ORDER-0039,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00562,PROJ-001,document,DOC-0115,BE-ORDER-0041,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00563,PROJ-001,document,DOC-0115,BE-ORDER-0057,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00564,PROJ-001,document,DOC-0115,BE-ORDER-0061,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00565,PROJ-001,document,DOC-0116,BE-ORDER-0007,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00566,PROJ-001,document,DOC-0116,BE-ORDER-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00567,PROJ-001,document,DOC-0116,BE-ORDER-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00568,PROJ-001,document,DOC-0116,BE-ORDER-0103,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00569,PROJ-001,document,DOC-0116,BE-ORDER-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00570,PROJ-001,document,DOC-0116,BE-ORDER-0119,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00571,PROJ-001,document,DOC-0117,BE-ORDER-0004,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00572,PROJ-001,document,DOC-0117,BE-ORDER-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00573,PROJ-001,document,DOC-0117,BE-ORDER-0039,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00574,PROJ-001,document,DOC-0117,BE-ORDER-0041,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00575,PROJ-001,document,DOC-0117,BE-ORDER-0057,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00576,PROJ-001,document,DOC-0117,BE-ORDER-0061,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00577,PROJ-001,document,DOC-0118,BE-ORDER-0004,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00578,PROJ-001,document,DOC-0118,BE-ORDER-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00579,PROJ-001,document,DOC-0118,BE-ORDER-0039,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00580,PROJ-001,document,DOC-0118,BE-ORDER-0041,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00581,PROJ-001,document,DOC-0118,BE-ORDER-0057,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00582,PROJ-001,document,DOC-0118,BE-ORDER-0061,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00583,PROJ-001,document,DOC-0119,BE-ORDER-0004,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00584,PROJ-001,document,DOC-0119,BE-ORDER-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00585,PROJ-001,document,DOC-0119,BE-ORDER-0039,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00586,PROJ-001,document,DOC-0119,BE-ORDER-0041,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00587,PROJ-001,document,DOC-0119,BE-ORDER-0057,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00588,PROJ-001,document,DOC-0119,BE-ORDER-0061,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00589,PROJ-001,document,DOC-0120,BE-ORDER-0005,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00590,PROJ-001,document,DOC-0120,BE-ORDER-0014,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00591,PROJ-001,document,DOC-0120,BE-ORDER-0029,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00592,PROJ-001,document,DOC-0120,BE-ORDER-0047,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00593,PROJ-001,document,DOC-0120,BE-ORDER-0064,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00594,PROJ-001,document,DOC-0120,BE-ORDER-0069,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00595,PROJ-001,document,DOC-0121,BE-ORDER-0007,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00596,PROJ-001,document,DOC-0121,BE-ORDER-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00597,PROJ-001,document,DOC-0121,BE-ORDER-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00598,PROJ-001,document,DOC-0121,BE-ORDER-0103,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00599,PROJ-001,document,DOC-0121,BE-ORDER-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00600,PROJ-001,document,DOC-0121,BE-ORDER-0119,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00601,PROJ-001,document,DOC-0122,BE-ORDER-0004,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00602,PROJ-001,document,DOC-0122,BE-ORDER-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00603,PROJ-001,document,DOC-0122,BE-ORDER-0039,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00604,PROJ-001,document,DOC-0122,BE-ORDER-0041,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00605,PROJ-001,document,DOC-0122,BE-ORDER-0057,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00606,PROJ-001,document,DOC-0122,BE-ORDER-0061,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00607,PROJ-001,document,DOC-0123,BE-ORDER-0007,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00608,PROJ-001,document,DOC-0123,BE-ORDER-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00609,PROJ-001,document,DOC-0123,BE-ORDER-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00610,PROJ-001,document,DOC-0123,BE-ORDER-0103,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00611,PROJ-001,document,DOC-0123,BE-ORDER-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00612,PROJ-001,document,DOC-0123,BE-ORDER-0119,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00613,PROJ-001,document,DOC-0124,BE-ORDER-0042,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00614,PROJ-001,document,DOC-0124,BE-ORDER-0099,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00615,PROJ-001,document,DOC-0124,BE-ORDER-0122,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00616,PROJ-001,document,DOC-0124,BE-ORDER-0127,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00617,PROJ-001,document,DOC-0124,BE-PO-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00618,PROJ-001,document,DOC-0124,BE-PO-0028,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00619,PROJ-001,document,DOC-0125,BE-ORDER-0007,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00620,PROJ-001,document,DOC-0125,BE-ORDER-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00621,PROJ-001,document,DOC-0125,BE-ORDER-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00622,PROJ-001,document,DOC-0125,BE-ORDER-0103,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00623,PROJ-001,document,DOC-0125,BE-ORDER-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00624,PROJ-001,document,DOC-0125,BE-ORDER-0119,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00625,PROJ-001,document,DOC-0126,BE-ORDER-0007,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00626,PROJ-001,document,DOC-0126,BE-ORDER-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00627,PROJ-001,document,DOC-0126,BE-ORDER-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00628,PROJ-001,document,DOC-0126,BE-ORDER-0103,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00629,PROJ-001,document,DOC-0126,BE-ORDER-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00630,PROJ-001,document,DOC-0126,BE-ORDER-0119,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00631,PROJ-001,document,DOC-0127,BE-ORDER-0007,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00632,PROJ-001,document,DOC-0127,BE-ORDER-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00633,PROJ-001,document,DOC-0127,BE-ORDER-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00634,PROJ-001,document,DOC-0127,BE-ORDER-0103,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00635,PROJ-001,document,DOC-0127,BE-ORDER-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00636,PROJ-001,document,DOC-0127,BE-ORDER-0119,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00637,PROJ-001,document,DOC-0128,BE-ORDER-0007,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00638,PROJ-001,document,DOC-0128,BE-ORDER-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00639,PROJ-001,document,DOC-0128,BE-ORDER-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00640,PROJ-001,document,DOC-0128,BE-ORDER-0103,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00641,PROJ-001,document,DOC-0128,BE-ORDER-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00642,PROJ-001,document,DOC-0128,BE-ORDER-0119,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00643,PROJ-001,document,DOC-0129,BE-ORDER-0007,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00644,PROJ-001,document,DOC-0129,BE-ORDER-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00645,PROJ-001,document,DOC-0129,BE-ORDER-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00646,PROJ-001,document,DOC-0129,BE-ORDER-0103,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00647,PROJ-001,document,DOC-0129,BE-ORDER-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00648,PROJ-001,document,DOC-0129,BE-ORDER-0119,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00649,PROJ-001,document,DOC-0130,BE-ORDER-0007,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00650,PROJ-001,document,DOC-0130,BE-ORDER-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00651,PROJ-001,document,DOC-0130,BE-ORDER-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00652,PROJ-001,document,DOC-0130,BE-ORDER-0103,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00653,PROJ-001,document,DOC-0130,BE-ORDER-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00654,PROJ-001,document,DOC-0130,BE-ORDER-0119,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00655,PROJ-001,document,DOC-0131,BE-ORDER-0007,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00656,PROJ-001,document,DOC-0131,BE-ORDER-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00657,PROJ-001,document,DOC-0131,BE-ORDER-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00658,PROJ-001,document,DOC-0131,BE-ORDER-0103,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00659,PROJ-001,document,DOC-0131,BE-ORDER-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00660,PROJ-001,document,DOC-0131,BE-ORDER-0119,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00661,PROJ-001,document,DOC-0132,BE-ORDER-0007,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00662,PROJ-001,document,DOC-0132,BE-ORDER-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00663,PROJ-001,document,DOC-0132,BE-ORDER-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00664,PROJ-001,document,DOC-0132,BE-ORDER-0103,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00665,PROJ-001,document,DOC-0132,BE-ORDER-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00666,PROJ-001,document,DOC-0132,BE-ORDER-0119,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00667,PROJ-001,document,DOC-0133,BE-ORDER-0083,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00668,PROJ-001,document,DOC-0133,BE-ORDER-0120,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00669,PROJ-001,document,DOC-0133,BE-PO-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00670,PROJ-001,document,DOC-0133,BE-PO-0042,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00671,PROJ-001,document,DOC-0133,BE-PO-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00672,PROJ-001,document,DOC-0133,BE-PO-0045,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00673,PROJ-001,document,DOC-0134,BE-ORDER-0083,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00674,PROJ-001,document,DOC-0134,BE-ORDER-0120,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00675,PROJ-001,document,DOC-0134,BE-PO-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00676,PROJ-001,document,DOC-0134,BE-PO-0042,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00677,PROJ-001,document,DOC-0134,BE-PO-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00678,PROJ-001,document,DOC-0134,BE-PO-0045,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00679,PROJ-001,document,DOC-0135,BE-ORDER-0020,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00680,PROJ-001,document,DOC-0135,BE-ORDER-0080,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00681,PROJ-001,document,DOC-0135,BE-ORDER-0087,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00682,PROJ-001,document,DOC-0135,BE-ORDER-0101,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00683,PROJ-001,document,DOC-0135,BE-PO-0014,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00684,PROJ-001,document,DOC-0135,BE-PO-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00685,PROJ-001,document,DOC-0136,BE-ORDER-0018,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00686,PROJ-001,document,DOC-0136,BE-ORDER-0030,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00687,PROJ-001,document,DOC-0136,BE-ORDER-0054,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00688,PROJ-001,document,DOC-0136,BE-ORDER-0063,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00689,PROJ-001,document,DOC-0136,BE-ORDER-0074,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00690,PROJ-001,document,DOC-0136,BE-ORDER-0078,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00691,PROJ-001,document,DOC-0137,BE-ORDER-0083,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00692,PROJ-001,document,DOC-0137,BE-ORDER-0120,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00693,PROJ-001,document,DOC-0137,BE-PO-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00694,PROJ-001,document,DOC-0137,BE-PO-0042,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00695,PROJ-001,document,DOC-0137,BE-PO-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00696,PROJ-001,document,DOC-0137,BE-PO-0045,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00697,PROJ-001,document,DOC-0138,BE-ORDER-0018,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00698,PROJ-001,document,DOC-0138,BE-ORDER-0030,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00699,PROJ-001,document,DOC-0138,BE-ORDER-0054,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00700,PROJ-001,document,DOC-0138,BE-ORDER-0063,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00701,PROJ-001,document,DOC-0138,BE-ORDER-0074,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00702,PROJ-001,document,DOC-0138,BE-ORDER-0078,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00703,PROJ-001,document,DOC-0139,BE-ORDER-0020,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00704,PROJ-001,document,DOC-0139,BE-ORDER-0080,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00705,PROJ-001,document,DOC-0139,BE-ORDER-0087,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00706,PROJ-001,document,DOC-0139,BE-ORDER-0101,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00707,PROJ-001,document,DOC-0139,BE-PO-0014,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00708,PROJ-001,document,DOC-0139,BE-PO-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00709,PROJ-001,document,DOC-0140,BE-ORDER-0042,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00710,PROJ-001,document,DOC-0140,BE-ORDER-0099,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00711,PROJ-001,document,DOC-0140,BE-ORDER-0122,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00712,PROJ-001,document,DOC-0140,BE-ORDER-0127,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00713,PROJ-001,document,DOC-0140,BE-PO-0009,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00714,PROJ-001,document,DOC-0140,BE-PO-0028,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00715,PROJ-001,document,DOC-0141,BE-ORDER-0083,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00716,PROJ-001,document,DOC-0141,BE-ORDER-0120,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00717,PROJ-001,document,DOC-0141,BE-PO-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00718,PROJ-001,document,DOC-0141,BE-PO-0042,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00719,PROJ-001,document,DOC-0141,BE-PO-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00720,PROJ-001,document,DOC-0141,BE-PO-0045,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00721,PROJ-001,document,DOC-0142,BE-ORDER-0020,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00722,PROJ-001,document,DOC-0142,BE-ORDER-0080,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00723,PROJ-001,document,DOC-0142,BE-ORDER-0087,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00724,PROJ-001,document,DOC-0142,BE-ORDER-0101,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00725,PROJ-001,document,DOC-0142,BE-PO-0014,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00726,PROJ-001,document,DOC-0142,BE-PO-0015,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00727,PROJ-001,document,DOC-0143,BE-ORDER-0083,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00728,PROJ-001,document,DOC-0143,BE-ORDER-0120,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00729,PROJ-001,document,DOC-0143,BE-PO-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00730,PROJ-001,document,DOC-0143,BE-PO-0042,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00731,PROJ-001,document,DOC-0143,BE-PO-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00732,PROJ-001,document,DOC-0143,BE-PO-0045,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00733,PROJ-001,document,DOC-0144,BE-ORDER-0083,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00734,PROJ-001,document,DOC-0144,BE-ORDER-0120,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00735,PROJ-001,document,DOC-0144,BE-PO-0032,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00736,PROJ-001,document,DOC-0144,BE-PO-0042,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00737,PROJ-001,document,DOC-0144,BE-PO-0044,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00738,PROJ-001,document,DOC-0144,BE-PO-0045,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00739,PROJ-001,document,DOC-2026-0513-SALES-009-001,BE-ORDER-0131,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00740,PROJ-001,document,DOC-2026-0513-SALES-009-001,BE-SHIP-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00741,PROJ-001,document,DOC-2026-0513-SALES-009-001,BE-CLAIM-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00742,PROJ-001,document,DOC-2026-0513-LOG-009-002,BE-ORDER-0131,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00743,PROJ-001,document,DOC-2026-0513-LOG-009-002,BE-SHIP-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00744,PROJ-001,document,DOC-2026-0513-LOG-009-002,BE-CLAIM-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00745,PROJ-001,document,DOC-2026-0514-CHAT-009-003,BE-ORDER-0131,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00746,PROJ-001,document,DOC-2026-0514-CHAT-009-003,BE-SHIP-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00747,PROJ-001,document,DOC-2026-0514-CHAT-009-003,BE-CLAIM-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00748,PROJ-001,document,DOC-2026-0516-CLAIM-009-004,BE-ORDER-0131,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00749,PROJ-001,document,DOC-2026-0516-CLAIM-009-004,BE-SHIP-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00750,PROJ-001,document,DOC-2026-0516-CLAIM-009-004,BE-CLAIM-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00751,PROJ-001,document,DOC-2026-0517-MEET-009-005,BE-ORDER-0131,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00752,PROJ-001,document,DOC-2026-0517-MEET-009-005,BE-SHIP-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00753,PROJ-001,document,DOC-2026-0517-MEET-009-005,BE-CLAIM-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00754,PROJ-001,document,DOC-2026-0520-SALES-009-006,BE-ORDER-0131,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00755,PROJ-001,document,DOC-2026-0520-SALES-009-006,BE-SHIP-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00756,PROJ-001,document,DOC-2026-0520-SALES-009-006,BE-CLAIM-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00757,PROJ-001,document,DOC-2026-0521-PURCHASE-009-007,BE-ORDER-0131,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00758,PROJ-001,document,DOC-2026-0521-PURCHASE-009-007,BE-SHIP-0111,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00759,PROJ-001,document,DOC-2026-0521-PURCHASE-009-007,BE-CLAIM-0031,source,source_document_index.related_issue_id 기반 연결,0.88,2026-06-01T09:00:00
+EL-00760,PROJ-001,issue,AI-ISS-2025-006,BE-ORDER-0003,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00761,PROJ-001,issue,AI-ISS-2025-006,BE-ORDER-0031,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00762,PROJ-001,issue,AI-ISS-2025-006,BE-ORDER-0034,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00763,PROJ-001,issue,AI-ISS-2025-006,BE-ORDER-0068,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00764,PROJ-001,issue,AI-ISS-2025-006,BE-ORDER-0084,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00765,PROJ-001,issue,AI-ISS-2025-006,BE-ORDER-0085,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00766,PROJ-001,issue,AI-ISS-2025-006,BE-ORDER-0116,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00767,PROJ-001,issue,AI-ISS-2025-006,BE-ORDER-0121,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00768,PROJ-001,issue,AI-ISS-2025-008,BE-ORDER-0008,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00769,PROJ-001,issue,AI-ISS-2025-008,BE-ORDER-0017,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00770,PROJ-001,issue,AI-ISS-2025-008,BE-ORDER-0021,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00771,PROJ-001,issue,AI-ISS-2025-008,BE-ORDER-0060,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00772,PROJ-001,issue,AI-ISS-2025-008,BE-ORDER-0076,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00773,PROJ-001,issue,AI-ISS-2025-008,BE-ORDER-0091,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00774,PROJ-001,issue,AI-ISS-2025-008,BE-ORDER-0106,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00775,PROJ-001,issue,AI-ISS-2025-008,BE-PO-0008,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00776,PROJ-001,issue,AI-ISS-2025-009,BE-ORDER-0001,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00777,PROJ-001,issue,AI-ISS-2025-009,BE-ORDER-0023,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00778,PROJ-001,issue,AI-ISS-2025-009,BE-ORDER-0036,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00779,PROJ-001,issue,AI-ISS-2025-009,BE-ORDER-0038,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00780,PROJ-001,issue,AI-ISS-2025-009,BE-ORDER-0046,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00781,PROJ-001,issue,AI-ISS-2025-009,BE-ORDER-0051,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00782,PROJ-001,issue,AI-ISS-2025-009,BE-ORDER-0079,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00783,PROJ-001,issue,AI-ISS-2025-009,BE-ORDER-0124,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00784,PROJ-001,issue,AI-ISS-2025-011,BE-ORDER-0009,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00785,PROJ-001,issue,AI-ISS-2025-011,BE-ORDER-0013,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00786,PROJ-001,issue,AI-ISS-2025-011,BE-ORDER-0022,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00787,PROJ-001,issue,AI-ISS-2025-011,BE-ORDER-0053,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00788,PROJ-001,issue,AI-ISS-2025-011,BE-ORDER-0075,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00789,PROJ-001,issue,AI-ISS-2025-011,BE-ORDER-0077,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00790,PROJ-001,issue,AI-ISS-2025-011,BE-ORDER-0081,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00791,PROJ-001,issue,AI-ISS-2025-011,BE-ORDER-0089,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00792,PROJ-001,issue,AI-ISS-2025-012,BE-ORDER-0006,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00793,PROJ-001,issue,AI-ISS-2025-012,BE-ORDER-0026,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00794,PROJ-001,issue,AI-ISS-2025-012,BE-ORDER-0050,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00795,PROJ-001,issue,AI-ISS-2025-012,BE-ORDER-0066,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00796,PROJ-001,issue,AI-ISS-2025-012,BE-ORDER-0071,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00797,PROJ-001,issue,AI-ISS-2025-012,BE-PO-0003,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00798,PROJ-001,issue,AI-ISS-2025-012,BE-PO-0016,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00799,PROJ-001,issue,AI-ISS-2025-012,BE-PO-0018,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00800,PROJ-001,issue,AI-ISS-2026-002,BE-ORDER-0002,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00801,PROJ-001,issue,AI-ISS-2026-002,BE-ORDER-0010,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00802,PROJ-001,issue,AI-ISS-2026-002,BE-ORDER-0035,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00803,PROJ-001,issue,AI-ISS-2026-002,BE-ORDER-0065,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00804,PROJ-001,issue,AI-ISS-2026-002,BE-ORDER-0092,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00805,PROJ-001,issue,AI-ISS-2026-002,BE-PO-0097,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00806,PROJ-001,issue,AI-ISS-2026-002,BE-PO-0101,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00807,PROJ-001,issue,AI-ISS-2026-002,BE-SHIP-0012,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00808,PROJ-001,issue,AI-ISS-2026-004,BE-ORDER-0007,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00809,PROJ-001,issue,AI-ISS-2026-004,BE-ORDER-0015,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00810,PROJ-001,issue,AI-ISS-2026-004,BE-ORDER-0044,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00811,PROJ-001,issue,AI-ISS-2026-004,BE-ORDER-0103,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00812,PROJ-001,issue,AI-ISS-2026-004,BE-ORDER-0111,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00813,PROJ-001,issue,AI-ISS-2026-004,BE-ORDER-0119,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00814,PROJ-001,issue,AI-ISS-2026-004,BE-PO-0007,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00815,PROJ-001,issue,AI-ISS-2026-004,BE-PO-0057,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00816,PROJ-001,issue,AI-ISS-2026-005,BE-ORDER-0083,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00817,PROJ-001,issue,AI-ISS-2026-005,BE-ORDER-0120,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00818,PROJ-001,issue,AI-ISS-2026-005,BE-PO-0032,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00819,PROJ-001,issue,AI-ISS-2026-005,BE-PO-0042,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00820,PROJ-001,issue,AI-ISS-2026-005,BE-PO-0044,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00821,PROJ-001,issue,AI-ISS-2026-005,BE-PO-0045,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00822,PROJ-001,issue,AI-ISS-2026-005,BE-PO-0062,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00823,PROJ-001,issue,AI-ISS-2026-005,BE-PO-0063,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00824,PROJ-001,issue,AI-ISS-2025-007,BE-ORDER-0027,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00825,PROJ-001,issue,AI-ISS-2025-007,BE-ORDER-0028,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00826,PROJ-001,issue,AI-ISS-2025-007,BE-ORDER-0033,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00827,PROJ-001,issue,AI-ISS-2025-007,BE-ORDER-0055,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00828,PROJ-001,issue,AI-ISS-2025-007,BE-ORDER-0096,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00829,PROJ-001,issue,AI-ISS-2025-007,BE-ORDER-0109,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00830,PROJ-001,issue,AI-ISS-2025-007,BE-ORDER-0118,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00831,PROJ-001,issue,AI-ISS-2025-007,BE-PO-0004,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00832,PROJ-001,issue,AI-ISS-2025-010,BE-ORDER-0024,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00833,PROJ-001,issue,AI-ISS-2025-010,BE-ORDER-0025,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00834,PROJ-001,issue,AI-ISS-2025-010,BE-ORDER-0048,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00835,PROJ-001,issue,AI-ISS-2025-010,BE-ORDER-0058,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00836,PROJ-001,issue,AI-ISS-2025-010,BE-ORDER-0059,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00837,PROJ-001,issue,AI-ISS-2025-010,BE-ORDER-0070,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00838,PROJ-001,issue,AI-ISS-2025-010,BE-ORDER-0090,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00839,PROJ-001,issue,AI-ISS-2025-010,BE-ORDER-0108,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00840,PROJ-001,issue,AI-ISS-2026-001,BE-ORDER-0016,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00841,PROJ-001,issue,AI-ISS-2026-001,BE-ORDER-0097,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00842,PROJ-001,issue,AI-ISS-2026-001,BE-ORDER-0110,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00843,PROJ-001,issue,AI-ISS-2026-001,BE-ORDER-0114,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00844,PROJ-001,issue,AI-ISS-2026-001,BE-ORDER-0123,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00845,PROJ-001,issue,AI-ISS-2026-001,BE-PO-0012,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00846,PROJ-001,issue,AI-ISS-2026-001,BE-PO-0021,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00847,PROJ-001,issue,AI-ISS-2026-001,BE-PO-0029,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00848,PROJ-001,issue,AI-ISS-2026-003,BE-ORDER-0005,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00849,PROJ-001,issue,AI-ISS-2026-003,BE-ORDER-0014,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00850,PROJ-001,issue,AI-ISS-2026-003,BE-ORDER-0029,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00851,PROJ-001,issue,AI-ISS-2026-003,BE-ORDER-0047,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00852,PROJ-001,issue,AI-ISS-2026-003,BE-ORDER-0064,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00853,PROJ-001,issue,AI-ISS-2026-003,BE-ORDER-0069,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00854,PROJ-001,issue,AI-ISS-2026-003,BE-ORDER-0104,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00855,PROJ-001,issue,AI-ISS-2026-003,BE-ORDER-0112,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00856,PROJ-001,issue,AI-ISS-2026-006,BE-ORDER-0018,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00857,PROJ-001,issue,AI-ISS-2026-006,BE-ORDER-0030,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00858,PROJ-001,issue,AI-ISS-2026-006,BE-ORDER-0054,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00859,PROJ-001,issue,AI-ISS-2026-006,BE-ORDER-0063,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00860,PROJ-001,issue,AI-ISS-2026-006,BE-ORDER-0074,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00861,PROJ-001,issue,AI-ISS-2026-006,BE-ORDER-0078,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00862,PROJ-001,issue,AI-ISS-2026-006,BE-ORDER-0094,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00863,PROJ-001,issue,AI-ISS-2026-006,BE-ORDER-0100,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00864,PROJ-001,issue,AI-ISS-2025-013,BE-ORDER-0088,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00865,PROJ-001,issue,AI-ISS-2025-013,BE-PO-0001,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00866,PROJ-001,issue,AI-ISS-2025-013,BE-PO-0017,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00867,PROJ-001,issue,AI-ISS-2025-013,BE-PO-0037,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00868,PROJ-001,issue,AI-ISS-2025-013,BE-PO-0076,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00869,PROJ-001,issue,AI-ISS-2025-013,BE-PO-0107,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00870,PROJ-001,issue,AI-ISS-2025-013,BE-SHIP-0008,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00871,PROJ-001,issue,AI-ISS-2025-013,BE-SHIP-0027,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00872,PROJ-001,issue,AI-ISS-2026-007,BE-ORDER-0020,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00873,PROJ-001,issue,AI-ISS-2026-007,BE-ORDER-0080,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00874,PROJ-001,issue,AI-ISS-2026-007,BE-ORDER-0087,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00875,PROJ-001,issue,AI-ISS-2026-007,BE-ORDER-0101,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00876,PROJ-001,issue,AI-ISS-2026-007,BE-PO-0014,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00877,PROJ-001,issue,AI-ISS-2026-007,BE-PO-0015,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00878,PROJ-001,issue,AI-ISS-2026-007,BE-PO-0072,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00879,PROJ-001,issue,AI-ISS-2026-007,BE-PO-0083,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00880,PROJ-001,issue,AI-ISS-2025-014,BE-ORDER-0011,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00881,PROJ-001,issue,AI-ISS-2025-014,BE-ORDER-0012,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00882,PROJ-001,issue,AI-ISS-2025-014,BE-ORDER-0040,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00883,PROJ-001,issue,AI-ISS-2025-014,BE-ORDER-0045,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00884,PROJ-001,issue,AI-ISS-2025-014,BE-ORDER-0056,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00885,PROJ-001,issue,AI-ISS-2025-014,BE-ORDER-0067,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00886,PROJ-001,issue,AI-ISS-2025-014,BE-ORDER-0086,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00887,PROJ-001,issue,AI-ISS-2025-014,BE-ORDER-0105,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00888,PROJ-001,issue,AI-ISS-2026-008,BE-ORDER-0004,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00889,PROJ-001,issue,AI-ISS-2026-008,BE-ORDER-0032,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00890,PROJ-001,issue,AI-ISS-2026-008,BE-ORDER-0039,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00891,PROJ-001,issue,AI-ISS-2026-008,BE-ORDER-0041,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00892,PROJ-001,issue,AI-ISS-2026-008,BE-ORDER-0057,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00893,PROJ-001,issue,AI-ISS-2026-008,BE-ORDER-0061,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00894,PROJ-001,issue,AI-ISS-2026-008,BE-ORDER-0072,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00895,PROJ-001,issue,AI-ISS-2026-008,BE-ORDER-0113,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00896,PROJ-001,issue,AI-ISS-2026-009,BE-ORDER-0042,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00897,PROJ-001,issue,AI-ISS-2026-009,BE-ORDER-0099,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00898,PROJ-001,issue,AI-ISS-2026-009,BE-ORDER-0122,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00899,PROJ-001,issue,AI-ISS-2026-009,BE-ORDER-0127,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00900,PROJ-001,issue,AI-ISS-2026-009,BE-PO-0009,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00901,PROJ-001,issue,AI-ISS-2026-009,BE-PO-0028,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00902,PROJ-001,issue,AI-ISS-2026-009,BE-PO-0030,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00903,PROJ-001,issue,AI-ISS-2026-009,BE-PO-0071,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00904,PROJ-001,issue,AI-ISSUE-2026-009,BE-ORDER-0131,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00905,PROJ-001,issue,AI-ISSUE-2026-009,BE-SHIP-0111,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00906,PROJ-001,issue,AI-ISSUE-2026-009,BE-CLAIM-0031,related,issue_events.related_issue_id 기반 연결,0.90,2026-06-01T09:00:00
+EL-00907,PROJ-001,todo,TODO-0001,BE-ORDER-0003,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00908,PROJ-001,todo,TODO-0001,BE-ORDER-0031,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00909,PROJ-001,todo,TODO-0001,BE-ORDER-0034,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00910,PROJ-001,todo,TODO-0002,BE-ORDER-0003,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00911,PROJ-001,todo,TODO-0002,BE-ORDER-0031,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00912,PROJ-001,todo,TODO-0002,BE-ORDER-0034,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00913,PROJ-001,todo,TODO-0003,BE-ORDER-0008,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00914,PROJ-001,todo,TODO-0003,BE-ORDER-0017,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00915,PROJ-001,todo,TODO-0003,BE-ORDER-0021,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00916,PROJ-001,todo,TODO-0004,BE-ORDER-0008,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00917,PROJ-001,todo,TODO-0004,BE-ORDER-0017,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00918,PROJ-001,todo,TODO-0004,BE-ORDER-0021,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00919,PROJ-001,todo,TODO-0005,BE-ORDER-0001,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00920,PROJ-001,todo,TODO-0005,BE-ORDER-0023,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00921,PROJ-001,todo,TODO-0005,BE-ORDER-0036,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00922,PROJ-001,todo,TODO-0006,BE-ORDER-0001,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00923,PROJ-001,todo,TODO-0006,BE-ORDER-0023,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00924,PROJ-001,todo,TODO-0006,BE-ORDER-0036,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00925,PROJ-001,todo,TODO-0007,BE-ORDER-0009,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00926,PROJ-001,todo,TODO-0007,BE-ORDER-0013,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00927,PROJ-001,todo,TODO-0007,BE-ORDER-0022,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00928,PROJ-001,todo,TODO-0008,BE-ORDER-0009,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00929,PROJ-001,todo,TODO-0008,BE-ORDER-0013,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00930,PROJ-001,todo,TODO-0008,BE-ORDER-0022,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00931,PROJ-001,todo,TODO-0009,BE-ORDER-0006,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00932,PROJ-001,todo,TODO-0009,BE-ORDER-0026,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00933,PROJ-001,todo,TODO-0009,BE-ORDER-0050,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00934,PROJ-001,todo,TODO-0010,BE-ORDER-0006,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00935,PROJ-001,todo,TODO-0010,BE-ORDER-0026,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00936,PROJ-001,todo,TODO-0010,BE-ORDER-0050,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00937,PROJ-001,todo,TODO-0011,BE-ORDER-0002,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00938,PROJ-001,todo,TODO-0011,BE-ORDER-0010,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00939,PROJ-001,todo,TODO-0011,BE-ORDER-0035,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00940,PROJ-001,todo,TODO-0012,BE-ORDER-0002,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00941,PROJ-001,todo,TODO-0012,BE-ORDER-0010,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00942,PROJ-001,todo,TODO-0012,BE-ORDER-0035,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00943,PROJ-001,todo,TODO-0013,BE-ORDER-0007,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00944,PROJ-001,todo,TODO-0013,BE-ORDER-0015,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00945,PROJ-001,todo,TODO-0013,BE-ORDER-0044,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00946,PROJ-001,todo,TODO-0014,BE-ORDER-0007,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00947,PROJ-001,todo,TODO-0014,BE-ORDER-0015,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00948,PROJ-001,todo,TODO-0014,BE-ORDER-0044,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00949,PROJ-001,todo,TODO-0015,BE-ORDER-0083,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00950,PROJ-001,todo,TODO-0015,BE-ORDER-0120,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00951,PROJ-001,todo,TODO-0015,BE-PO-0032,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00952,PROJ-001,todo,TODO-0016,BE-ORDER-0083,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00953,PROJ-001,todo,TODO-0016,BE-ORDER-0120,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00954,PROJ-001,todo,TODO-0016,BE-PO-0032,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00955,PROJ-001,todo,TODO-0017,BE-ORDER-0027,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00956,PROJ-001,todo,TODO-0017,BE-ORDER-0028,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00957,PROJ-001,todo,TODO-0017,BE-ORDER-0033,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00958,PROJ-001,todo,TODO-0018,BE-ORDER-0027,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00959,PROJ-001,todo,TODO-0018,BE-ORDER-0028,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00960,PROJ-001,todo,TODO-0018,BE-ORDER-0033,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00961,PROJ-001,todo,TODO-0019,BE-ORDER-0024,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00962,PROJ-001,todo,TODO-0019,BE-ORDER-0025,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00963,PROJ-001,todo,TODO-0019,BE-ORDER-0048,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00964,PROJ-001,todo,TODO-0020,BE-ORDER-0024,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00965,PROJ-001,todo,TODO-0020,BE-ORDER-0025,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00966,PROJ-001,todo,TODO-0020,BE-ORDER-0048,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00967,PROJ-001,todo,TODO-0021,BE-ORDER-0016,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00968,PROJ-001,todo,TODO-0021,BE-ORDER-0097,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00969,PROJ-001,todo,TODO-0021,BE-ORDER-0110,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00970,PROJ-001,todo,TODO-0022,BE-ORDER-0016,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00971,PROJ-001,todo,TODO-0022,BE-ORDER-0097,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00972,PROJ-001,todo,TODO-0022,BE-ORDER-0110,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00973,PROJ-001,todo,TODO-0023,BE-ORDER-0005,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00974,PROJ-001,todo,TODO-0023,BE-ORDER-0014,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00975,PROJ-001,todo,TODO-0023,BE-ORDER-0029,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00976,PROJ-001,todo,TODO-0024,BE-ORDER-0005,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00977,PROJ-001,todo,TODO-0024,BE-ORDER-0014,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00978,PROJ-001,todo,TODO-0024,BE-ORDER-0029,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00979,PROJ-001,todo,TODO-0025,BE-ORDER-0018,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00980,PROJ-001,todo,TODO-0025,BE-ORDER-0030,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00981,PROJ-001,todo,TODO-0025,BE-ORDER-0054,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00982,PROJ-001,todo,TODO-0026,BE-ORDER-0018,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00983,PROJ-001,todo,TODO-0026,BE-ORDER-0030,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00984,PROJ-001,todo,TODO-0026,BE-ORDER-0054,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00985,PROJ-001,todo,TODO-0027,BE-ORDER-0088,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00986,PROJ-001,todo,TODO-0027,BE-PO-0001,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00987,PROJ-001,todo,TODO-0027,BE-PO-0017,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00988,PROJ-001,todo,TODO-0028,BE-ORDER-0088,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00989,PROJ-001,todo,TODO-0028,BE-PO-0001,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00990,PROJ-001,todo,TODO-0028,BE-PO-0017,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00991,PROJ-001,todo,TODO-0029,BE-ORDER-0020,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00992,PROJ-001,todo,TODO-0029,BE-ORDER-0080,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00993,PROJ-001,todo,TODO-0029,BE-ORDER-0087,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00994,PROJ-001,todo,TODO-0030,BE-ORDER-0020,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00995,PROJ-001,todo,TODO-0030,BE-ORDER-0080,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00996,PROJ-001,todo,TODO-0030,BE-ORDER-0087,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00997,PROJ-001,todo,TODO-0031,BE-ORDER-0011,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00998,PROJ-001,todo,TODO-0031,BE-ORDER-0012,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-00999,PROJ-001,todo,TODO-0031,BE-ORDER-0040,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01000,PROJ-001,todo,TODO-0032,BE-ORDER-0011,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01001,PROJ-001,todo,TODO-0032,BE-ORDER-0012,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01002,PROJ-001,todo,TODO-0032,BE-ORDER-0040,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01003,PROJ-001,todo,TODO-0033,BE-ORDER-0004,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01004,PROJ-001,todo,TODO-0033,BE-ORDER-0032,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01005,PROJ-001,todo,TODO-0033,BE-ORDER-0039,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01006,PROJ-001,todo,TODO-0034,BE-ORDER-0004,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01007,PROJ-001,todo,TODO-0034,BE-ORDER-0032,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01008,PROJ-001,todo,TODO-0034,BE-ORDER-0039,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01009,PROJ-001,todo,TODO-0035,BE-ORDER-0042,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01010,PROJ-001,todo,TODO-0035,BE-ORDER-0099,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01011,PROJ-001,todo,TODO-0035,BE-ORDER-0122,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01012,PROJ-001,todo,TODO-0036,BE-ORDER-0042,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01013,PROJ-001,todo,TODO-0036,BE-ORDER-0099,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01014,PROJ-001,todo,TODO-0036,BE-ORDER-0122,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01015,PROJ-001,todo,TODO-0037,BE-ORDER-0131,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01016,PROJ-001,todo,TODO-0037,BE-SHIP-0111,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01017,PROJ-001,todo,TODO-0037,BE-CLAIM-0031,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01018,PROJ-001,todo,TODO-0038,BE-ORDER-0131,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01019,PROJ-001,todo,TODO-0038,BE-SHIP-0111,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01020,PROJ-001,todo,TODO-0038,BE-CLAIM-0031,related,Todo가 같은 issue_id 업무 객체를 참조,0.82,2026-06-01T09:00:00
+EL-01021,PROJ-001,weekly_report,WR-0001,BE-ORDER-0003,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01022,PROJ-001,weekly_report,WR-0001,BE-ORDER-0031,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01023,PROJ-001,weekly_report,WR-0001,BE-ORDER-0034,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01024,PROJ-001,weekly_report,WR-0002,BE-ORDER-0009,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01025,PROJ-001,weekly_report,WR-0002,BE-ORDER-0013,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01026,PROJ-001,weekly_report,WR-0002,BE-ORDER-0022,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01027,PROJ-001,weekly_report,WR-0003,BE-ORDER-0002,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01028,PROJ-001,weekly_report,WR-0003,BE-ORDER-0010,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01029,PROJ-001,weekly_report,WR-0003,BE-ORDER-0035,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01030,PROJ-001,monthly_report,MR-0001,BE-ORDER-0006,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01031,PROJ-001,monthly_report,MR-0001,BE-ORDER-0026,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01032,PROJ-001,monthly_report,MR-0001,BE-ORDER-0050,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01033,PROJ-001,monthly_report,MR-0002,BE-ORDER-0007,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01034,PROJ-001,monthly_report,MR-0002,BE-ORDER-0015,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01035,PROJ-001,monthly_report,MR-0002,BE-ORDER-0044,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01036,PROJ-001,monthly_report,MR-0003,BE-ORDER-0083,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01037,PROJ-001,monthly_report,MR-0003,BE-ORDER-0120,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01038,PROJ-001,monthly_report,MR-0003,BE-PO-0032,summarized_in,보고서가 업무 객체를 요약,0.80,2026-06-01T09:00:00
+EL-01039,PROJ-001,handoff_report,HR-0001,BE-ORDER-0083,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01040,PROJ-001,handoff_report,HR-0001,BE-ORDER-0120,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01041,PROJ-001,handoff_report,HR-0001,BE-PO-0032,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01042,PROJ-001,handoff_report,HR-0001,BE-PO-0042,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01043,PROJ-001,handoff_report,HR-0001,BE-ORDER-0007,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01044,PROJ-001,handoff_report,HR-0001,BE-ORDER-0015,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01045,PROJ-001,handoff_report,HR-0001,BE-ORDER-0044,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01046,PROJ-001,handoff_report,HR-0001,BE-ORDER-0103,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01047,PROJ-001,handoff_report,HR-0001,BE-ORDER-0002,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01048,PROJ-001,handoff_report,HR-0001,BE-ORDER-0010,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01049,PROJ-001,handoff_report,HR-0001,BE-ORDER-0035,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01050,PROJ-001,handoff_report,HR-0001,BE-ORDER-0065,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01051,PROJ-001,handoff_report,HR-0001,BE-ORDER-0003,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01052,PROJ-001,handoff_report,HR-0001,BE-ORDER-0031,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01053,PROJ-001,handoff_report,HR-0001,BE-ORDER-0034,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00
+EL-01054,PROJ-001,handoff_report,HR-0001,BE-ORDER-0068,handoff_scope,인수인계서 범위 업무 객체,0.92,2026-06-01T09:00:00

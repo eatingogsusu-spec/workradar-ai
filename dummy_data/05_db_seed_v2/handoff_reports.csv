@@ -1,0 +1,2 @@
+﻿id,project_id,title,from_member_id,to_member_id,scope_summary,generated_summary,status,source,created_at,updated_at
+HR-0001,PROJ-001,박서연에서 이민재로 고객 업무 인수인계 seed,PM-002,PM-003,"Hyundai Mobis Tier2와 Daesung Automotive 고객 업무, 긴급 납품, 단가 인상, 미완료 Todo 범위","담당 고객별 납기 리스크, 공급처 회신, 단가 협상, 다음 액션을 issue_events와 todos 기반으로 요약한 seed입니다.",draft,dummy_seed,2026-06-01T09:00:00,2026-06-01T09:00:00

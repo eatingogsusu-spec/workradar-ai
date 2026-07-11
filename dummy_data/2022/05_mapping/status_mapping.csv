@@ -1,0 +1,7 @@
+﻿source_value,target_value,target_table,note
+resolved,completed,issues,Closed after evidence review
+partially_resolved,in_progress,issues,Keep unresolved actions open
+in_progress,in_progress,issues,Direct mapping
+Open,open,purchase_orders,Normalize case
+Closed,completed,purchase_orders,Normalize enum
+delivered,completed,shipments,Delivered shipment

@@ -1,4 +1,4 @@
-"""Azure OpenAI chat client.
+"""Chat client (Azure OpenAI or local Ollama).
 
 Application code should call this module instead of reading API keys directly.
 """
@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from functools import lru_cache
 from typing import Any
+
+import httpx
 
 from app.core.config import settings
 
@@ -49,20 +51,61 @@ def get_azure_openai_client() -> Any:
     )
 
 
+def _ollama_chat_url() -> str:
+    """Return the Ollama OpenAI-compatible chat endpoint, tolerating a missing /v1."""
+    base = settings.OLLAMA_BASE_URL.rstrip("/") or "http://localhost:11434/v1"
+    if not base.endswith("/v1"):
+        base = f"{base}/v1"
+    return f"{base}/chat/completions"
+
+
+async def _ollama_chat(messages: list[dict[str, str]], temperature: float) -> str:
+    """Call Ollama's OpenAI-compatible chat endpoint.
+
+    Transport and protocol failures surface as RuntimeError because callers only
+    guard against RuntimeError/ValueError, not httpx exceptions.
+    """
+    try:
+        async with httpx.AsyncClient(timeout=120.0) as client:
+            response = await client.post(
+                _ollama_chat_url(),
+                headers={"Authorization": "Bearer ollama"},
+                json={
+                    "model": settings.OLLAMA_MODEL,
+                    "messages": messages,
+                    "temperature": temperature,
+                    "stream": False,
+                },
+            )
+            response.raise_for_status()
+            payload = response.json()
+    except httpx.HTTPError as exc:
+        raise RuntimeError(f"Ollama chat request failed: {exc}") from exc
+
+    choices = payload.get("choices") or []
+    if not choices:
+        raise RuntimeError("Ollama returned no chat choices")
+    return choices[0].get("message", {}).get("content") or ""
+
+
 async def chat_completion(
     user_message: str,
     *,
     system_prompt: str | None = None,
     temperature: float = 0.2,
 ) -> str:
-    """Return a chat answer from the configured Azure OpenAI deployment."""
-    if settings.AI_PROVIDER.lower() != "azure":
-        return "Set AI_PROVIDER=azure to enable Azure OpenAI responses."
+    """Return a chat answer from the configured provider (Azure OpenAI or Ollama)."""
+    provider = settings.AI_PROVIDER.lower()
+    if provider not in ("azure", "ollama"):
+        return "Set AI_PROVIDER=azure or ollama to enable LLM responses."
 
     messages: list[dict[str, str]] = []
     if system_prompt:
         messages.append({"role": "system", "content": system_prompt})
     messages.append({"role": "user", "content": user_message})
+
+    if provider == "ollama":
+        return await _ollama_chat(messages, temperature)
 
     response = await get_azure_openai_client().chat.completions.create(
         model=settings.AZURE_OPENAI_CHAT_DEPLOYMENT,

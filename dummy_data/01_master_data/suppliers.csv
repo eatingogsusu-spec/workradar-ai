@@ -1,0 +1,6 @@
+﻿supplier_id,supplier_name,region,main_products,default_lead_time_days,risk_type,notes
+SUP-001,TE Connectivity Korea,Korea,"커넥터, 터미널",21,Price,분기별 가격 인상 공지가 빠름
+SUP-002,KET Supplier,Korea,"터미널, 와이어하네스",28,Stock,재고 부족 시 리드타임 변동 큼
+SUP-003,Yazaki Parts Asia,Japan,"릴레이, 케이블 어셈블리",56,LeadTime,12월 이후 리드타임 장기화
+SUP-004,JST Components,China,"센서 케이블, 커넥터",35,Quality,품질 확인 요청 회신이 느림
+SUP-005,Local Cable Works,Korea,"와이어하네스, 대체 케이블",14,Capacity,긴급 대체품 대응 가능

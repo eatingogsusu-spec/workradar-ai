@@ -1,0 +1,6 @@
+﻿customer_id,customer_name,region,main_contact,internal_owner,risk_level,notes
+CUST-001,Hyundai Mobis Tier2,Korea,장현우,박서연,High,긴급 납품 요청과 월말 일정 변동이 잦음
+CUST-002,Daesung Automotive,Korea,이보라,박서연,High,급발주와 승인 일정이 촘촘함
+CUST-003,Mirae EV Systems,Korea,서민규,이민재,Medium,품질 이슈 재발 가능성
+CUST-004,Hanil Motors,Korea,최가은,정하늘,Low,정기 발주 중심이나 가격 협상 민감
+CUST-005,Global Harness Vietnam,Vietnam,Nguyen Linh,이민재,Medium,수출 서류와 통관 일정 주의

@@ -1,0 +1,6 @@
+﻿customer_id,customer_name,region,main_contact,internal_owner,risk_level,notes
+CUS-001,Hyundai Mobis Tier2,Korea,장현우,박서연,High,월간 납기 변동과 긴급 납품 요청이 잦음
+CUS-002,Daesung Automotive,Korea,이보라,박서연,High,급발주와 고객 승인 일정이 촘촘함
+CUS-003,Mirae EV Systems,Korea,서민규,이민재,Medium,센서 케이블 품질 이슈 재발 가능성
+CUS-004,Hanil Motors,Korea,최가은,정하늘,Low,정기 발주 중심
+CUS-005,Global Harness Vietnam,Vietnam,Nguyen Linh,이민재,Medium,수출 서류와 통관 일정 주의 필요

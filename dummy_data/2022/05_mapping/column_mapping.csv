@@ -1,0 +1,17 @@
+﻿source_file,source_column,target_table,target_column,transform_rule,required,default_value
+source_document_index.csv,doc_id,documents,id,uuid5('document:' + value),yes,
+source_document_index.csv,file_path,documents,storage_uri,prefix dummy_data/2022/,yes,
+source_document_index.csv,doc_type,documents,file_type,normalize enum,yes,other
+source_document_index.csv,created_date,documents,created_at,date to timestamp,yes,
+issue_events.csv,issue_id,issues,id,uuid5('issue:' + value),yes,
+issue_events.csv,status,issues,status,status_mapping.csv,yes,open
+issue_events.csv,severity,issues,severity,lowercase,yes,medium
+generated todo,owner_name,todos,assignee_member_id,lookup user then project_member,no,null
+generated todo,related_issue_id,todos,linked_issue_id,uuid5('issue:' + value),no,null
+calendar preview,start_at,calendar_events,starts_at,timestamp,yes,
+calendar preview,end_at,calendar_events,ends_at,timestamp,yes,
+weekly preview,period_start,weekly_reports,week_start,date,yes,
+weekly preview,period_end,weekly_reports,week_end,date,yes,
+monthly preview,period_start,monthly_reports,month_start,date,yes,
+monthly preview,period_end,monthly_reports,month_end,date,yes,
+handoff preview,content,handoff_reports,content,text,yes,

@@ -1,0 +1,31 @@
+﻿id,project_id,report_type,report_id,source_type,source_id,business_entity_id,reason,created_at
+RS-0001,PROJ-001,weekly_report,WR-0001,business_entity,BE-ORDER-0003,BE-ORDER-0003,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0002,PROJ-001,weekly_report,WR-0001,business_entity,BE-ORDER-0031,BE-ORDER-0031,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0003,PROJ-001,weekly_report,WR-0001,business_entity,BE-ORDER-0034,BE-ORDER-0034,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0004,PROJ-001,weekly_report,WR-0001,document,DOC-0001,BE-ORDER-0003,보고서 생성 근거 문서,2026-06-01T09:00:00
+RS-0005,PROJ-001,weekly_report,WR-0001,document,DOC-0003,BE-ORDER-0003,보고서 생성 근거 문서,2026-06-01T09:00:00
+RS-0006,PROJ-001,weekly_report,WR-0002,business_entity,BE-ORDER-0009,BE-ORDER-0009,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0007,PROJ-001,weekly_report,WR-0002,business_entity,BE-ORDER-0013,BE-ORDER-0013,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0008,PROJ-001,weekly_report,WR-0002,business_entity,BE-ORDER-0022,BE-ORDER-0022,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0009,PROJ-001,weekly_report,WR-0002,document,DOC-0055,BE-ORDER-0009,보고서 생성 근거 문서,2026-06-01T09:00:00
+RS-0010,PROJ-001,weekly_report,WR-0002,document,DOC-0061,BE-ORDER-0009,보고서 생성 근거 문서,2026-06-01T09:00:00
+RS-0011,PROJ-001,weekly_report,WR-0003,business_entity,BE-ORDER-0002,BE-ORDER-0002,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0012,PROJ-001,weekly_report,WR-0003,business_entity,BE-ORDER-0010,BE-ORDER-0010,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0013,PROJ-001,weekly_report,WR-0003,business_entity,BE-ORDER-0035,BE-ORDER-0035,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0014,PROJ-001,weekly_report,WR-0003,document,DOC-0098,BE-ORDER-0002,보고서 생성 근거 문서,2026-06-01T09:00:00
+RS-0015,PROJ-001,weekly_report,WR-0003,document,DOC-0100,BE-ORDER-0002,보고서 생성 근거 문서,2026-06-01T09:00:00
+RS-0016,PROJ-001,monthly_report,MR-0001,business_entity,BE-ORDER-0006,BE-ORDER-0006,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0017,PROJ-001,monthly_report,MR-0001,business_entity,BE-ORDER-0026,BE-ORDER-0026,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0018,PROJ-001,monthly_report,MR-0001,business_entity,BE-ORDER-0050,BE-ORDER-0050,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0019,PROJ-001,monthly_report,MR-0001,document,DOC-0073,BE-ORDER-0006,보고서 생성 근거 문서,2026-06-01T09:00:00
+RS-0020,PROJ-001,monthly_report,MR-0001,document,DOC-0077,BE-ORDER-0006,보고서 생성 근거 문서,2026-06-01T09:00:00
+RS-0021,PROJ-001,monthly_report,MR-0002,business_entity,BE-ORDER-0007,BE-ORDER-0007,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0022,PROJ-001,monthly_report,MR-0002,business_entity,BE-ORDER-0015,BE-ORDER-0015,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0023,PROJ-001,monthly_report,MR-0002,business_entity,BE-ORDER-0044,BE-ORDER-0044,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0024,PROJ-001,monthly_report,MR-0002,document,DOC-0116,BE-ORDER-0007,보고서 생성 근거 문서,2026-06-01T09:00:00
+RS-0025,PROJ-001,monthly_report,MR-0002,document,DOC-0121,BE-ORDER-0007,보고서 생성 근거 문서,2026-06-01T09:00:00
+RS-0026,PROJ-001,monthly_report,MR-0003,business_entity,BE-ORDER-0083,BE-ORDER-0083,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0027,PROJ-001,monthly_report,MR-0003,business_entity,BE-ORDER-0120,BE-ORDER-0120,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0028,PROJ-001,monthly_report,MR-0003,business_entity,BE-PO-0032,BE-PO-0032,보고서 seed 검증용 업무 객체 참조,2026-06-01T09:00:00
+RS-0029,PROJ-001,monthly_report,MR-0003,document,DOC-0133,BE-ORDER-0083,보고서 생성 근거 문서,2026-06-01T09:00:00
+RS-0030,PROJ-001,monthly_report,MR-0003,document,DOC-0134,BE-ORDER-0083,보고서 생성 근거 문서,2026-06-01T09:00:00

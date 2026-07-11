@@ -1,0 +1,3 @@
+﻿id,project_id,from_member_id,to_member_id,handoff_type,content,created_at
+669bf7cb-5aef-553c-b7dd-17c1d186b34a,0a4f9295-ac96-59f7-b09d-fb82f68610c8,b6ce97f8-0c0d-5492-88f5-8e92d3955338,f2790941-d2e2-5684-a3c4-9d5190079275,general,"[DUMMY] 변경된 납기와 부분 출고 수량, 고객 미회신 항목 인수인계",2026-06-01T09:00:00+09:00
+df2e7482-ca7a-556a-aa5c-3731cd04d4f6,0a4f9295-ac96-59f7-b09d-fb82f68610c8,f2790941-d2e2-5684-a3c4-9d5190079275,14c5dea0-99cd-5f9c-805f-c54d1c288527,temporary_coverage,[DUMMY] 휴가 기간 임시 담당자와 미완료 고객 회신 인수인계,2026-06-01T09:00:00+09:00

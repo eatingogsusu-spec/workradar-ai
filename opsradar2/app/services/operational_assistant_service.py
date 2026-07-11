@@ -90,7 +90,7 @@ class OperationalAssistantService:
                 """
                 SELECT
                   t.id::text AS id, t.title, t.description, t.status, t.approval_status,
-                  t.priority, t.due_at, t.updated_at, t.dept,
+                  t.priority, t.due_at, t.updated_at,
                   u.name AS assignee, team.name AS team_name,
                   COALESCE(d.file_name, t.source_document_id::text, t.source_chunk_id::text, '') AS source
                 FROM todos t
@@ -117,7 +117,7 @@ class OperationalAssistantService:
                 """
                 SELECT
                   i.id::text AS id, i.title, i.description, i.status, i.approval_status,
-                  i.severity, i.risk_reason, i.due_at, i.updated_at, i.dept,
+                  i.severity, i.risk_reason, i.due_at, i.updated_at,
                   u.name AS assignee, team.name AS team_name,
                   COALESCE(d.file_name, i.source_document_id::text, i.source_chunk_id::text, '') AS source
                 FROM issues i
@@ -197,7 +197,7 @@ class OperationalAssistantService:
         return documents
 
     async def _ask_model(self, message: str, context: dict[str, Any]) -> str | None:
-        if settings.AI_PROVIDER.lower() != "azure":
+        if not settings.llm_enabled:
             return None
         prompt = f"""당신은 자동차 부품 B2B 조직의 운영 판단을 돕는 WorkRadar AI Assistant다.
 

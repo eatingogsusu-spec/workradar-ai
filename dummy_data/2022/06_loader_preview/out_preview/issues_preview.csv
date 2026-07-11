@@ -1,0 +1,17 @@
+﻿source_id,id,project_id,title,status,severity,created_at
+ISSUE-2022-001,660fc28e-13d8-5844-bf5d-143118487cc2,586d5511-0afc-5d93-bbec-d3955db635ac,설 연휴 전 긴급 출고 일정 혼선,completed,medium,2022-01-10T09:00:00
+ISSUE-2022-002,4ea4b7d7-ebed-5515-83ef-dec554d733dc,586d5511-0afc-5d93-bbec-d3955db635ac,구매처 재고 부족과 대체품 검토,in_progress,high,2022-03-04T09:00:00
+ISSUE-2022-003,be573096-3d00-5452-9975-f254cc014e73,586d5511-0afc-5d93-bbec-d3955db635ac,수출 서류 누락으로 통관 지연,completed,medium,2022-04-07T09:00:00
+ISSUE-2022-004,caa0576a-2aa9-5f99-a1f1-a3f2dfd6b90d,586d5511-0afc-5d93-bbec-d3955db635ac,반복 불량과 고객 조립 문제 사이 클레임,in_progress,high,2022-05-09T09:00:00
+ISSUE-2022-005,266a60af-e367-571d-b464-296b68480018,586d5511-0afc-5d93-bbec-d3955db635ac,리드타임 변경 공지와 고객 발주 일정 충돌,in_progress,high,2022-07-01T09:00:00
+ISSUE-2022-006,ef79a62f-deca-5e01-85c3-c3e599e0c293,586d5511-0afc-5d93-bbec-d3955db635ac,항공 이송 전환 비용 승인 지연,completed,medium,2022-08-11T09:00:00
+ISSUE-2022-007,f62de1f2-9e7b-5904-a3fa-3f7af89c113e,586d5511-0afc-5d93-bbec-d3955db635ac,단가 인상 공지와 기존 견적 적용 기준 충돌,in_progress,high,2022-10-03T09:00:00
+ISSUE-2022-008,cc4b2d10-8d1f-566d-bc53-e5fe8d07cbf3,586d5511-0afc-5d93-bbec-d3955db635ac,담당자 부재로 고객 회신 누락,in_progress,medium,2022-12-05T09:00:00
+ISSUE-2022-009,5f6428e5-c725-5fe6-97f2-9c55e42ca7b7,586d5511-0afc-5d93-bbec-d3955db635ac,2월 고객 납기 재확인,completed,low,2022-02-03T09:00:00
+ISSUE-2022-010,ab1c7956-e348-5070-88af-87bbcecf4892,586d5511-0afc-5d93-bbec-d3955db635ac,2월 품목 코드 오기입,completed,low,2022-02-17T09:00:00
+ISSUE-2022-011,8beb5eae-a179-5fcb-9191-01ebc69139c2,586d5511-0afc-5d93-bbec-d3955db635ac,6월 구매처 회신 지연,completed,medium,2022-06-02T09:00:00
+ISSUE-2022-012,f2bd2dd6-6596-5345-9059-31c6b407150e,586d5511-0afc-5d93-bbec-d3955db635ac,6월 출고 수량 정정,completed,medium,2022-06-16T09:00:00
+ISSUE-2022-013,0b7d9f49-cd66-5ae1-b71d-c4a69cfe965a,586d5511-0afc-5d93-bbec-d3955db635ac,9월 내부 담당자 변경,completed,low,2022-09-02T09:00:00
+ISSUE-2022-014,6499bd8b-a3fc-5437-8067-5be8fcbad15f,586d5511-0afc-5d93-bbec-d3955db635ac,9월 반복 Todo 미완료,in_progress,medium,2022-09-16T09:00:00
+ISSUE-2022-015,1ead51db-07dd-5124-9310-57c84b47868f,586d5511-0afc-5d93-bbec-d3955db635ac,11월 월말 마감 확인,completed,low,2022-11-02T09:00:00
+ISSUE-2022-016,eb42277b-2aee-51ec-bc4f-b46b6820323c,586d5511-0afc-5d93-bbec-d3955db635ac,11월 고객 단가 업데이트 누락,in_progress,medium,2022-11-16T09:00:00

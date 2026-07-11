@@ -1,0 +1,25 @@
+﻿id,project_id,handoff_report_id,source_type,source_id,business_entity_id,reason,created_at
+HS-0001,PROJ-001,HR-0001,business_entity,BE-ORDER-0083,BE-ORDER-0083,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0002,PROJ-001,HR-0001,business_entity,BE-ORDER-0120,BE-ORDER-0120,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0003,PROJ-001,HR-0001,business_entity,BE-PO-0032,BE-PO-0032,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0004,PROJ-001,HR-0001,business_entity,BE-PO-0042,BE-PO-0042,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0005,PROJ-001,HR-0001,todo,TODO-0015,BE-ORDER-0083,인수인계 미완료 Todo,2026-06-01T09:00:00
+HS-0006,PROJ-001,HR-0001,todo,TODO-0016,BE-ORDER-0083,인수인계 미완료 Todo,2026-06-01T09:00:00
+HS-0007,PROJ-001,HR-0001,business_entity,BE-ORDER-0007,BE-ORDER-0007,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0008,PROJ-001,HR-0001,business_entity,BE-ORDER-0015,BE-ORDER-0015,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0009,PROJ-001,HR-0001,business_entity,BE-ORDER-0044,BE-ORDER-0044,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0010,PROJ-001,HR-0001,business_entity,BE-ORDER-0103,BE-ORDER-0103,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0011,PROJ-001,HR-0001,todo,TODO-0013,BE-ORDER-0007,인수인계 미완료 Todo,2026-06-01T09:00:00
+HS-0012,PROJ-001,HR-0001,todo,TODO-0014,BE-ORDER-0007,인수인계 미완료 Todo,2026-06-01T09:00:00
+HS-0013,PROJ-001,HR-0001,business_entity,BE-ORDER-0002,BE-ORDER-0002,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0014,PROJ-001,HR-0001,business_entity,BE-ORDER-0010,BE-ORDER-0010,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0015,PROJ-001,HR-0001,business_entity,BE-ORDER-0035,BE-ORDER-0035,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0016,PROJ-001,HR-0001,business_entity,BE-ORDER-0065,BE-ORDER-0065,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0017,PROJ-001,HR-0001,todo,TODO-0011,BE-ORDER-0002,인수인계 미완료 Todo,2026-06-01T09:00:00
+HS-0018,PROJ-001,HR-0001,todo,TODO-0012,BE-ORDER-0002,인수인계 미완료 Todo,2026-06-01T09:00:00
+HS-0019,PROJ-001,HR-0001,business_entity,BE-ORDER-0003,BE-ORDER-0003,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0020,PROJ-001,HR-0001,business_entity,BE-ORDER-0031,BE-ORDER-0031,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0021,PROJ-001,HR-0001,business_entity,BE-ORDER-0034,BE-ORDER-0034,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0022,PROJ-001,HR-0001,business_entity,BE-ORDER-0068,BE-ORDER-0068,인수인계 범위에 포함된 고객/공급 업무 객체,2026-06-01T09:00:00
+HS-0023,PROJ-001,HR-0001,todo,TODO-0001,BE-ORDER-0003,인수인계 미완료 Todo,2026-06-01T09:00:00
+HS-0024,PROJ-001,HR-0001,todo,TODO-0002,BE-ORDER-0003,인수인계 미완료 Todo,2026-06-01T09:00:00

@@ -1,0 +1,2 @@
+﻿id,team_id,name,description,status,created_at,updated_at
+PROJ-001,TEAM-001,AutoParts One Korea 운영관리 프로젝트,"고객 발주, 구매 지연, 품질 클레임, 물류 차질, 단가 변경, 인수인계 테스트용 프로젝트",active,2026-06-01T09:00:00,2026-06-01T09:00:00

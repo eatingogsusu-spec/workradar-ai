@@ -104,7 +104,7 @@ class ReportDraftService:
     """Generate a report only when the configured Azure model is available."""
 
     async def generate(self, period: str, report_input: dict[str, Any]) -> str | None:
-        if settings.AI_PROVIDER.lower() != "azure":
+        if not settings.llm_enabled:
             return None
 
         normalized_period = "monthly" if period == "monthly" else "weekly"

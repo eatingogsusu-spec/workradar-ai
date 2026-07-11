@@ -160,7 +160,7 @@ async def run_document_pipeline(document_id: str) -> None:
                 document_id=document.id,
             )
             await db.commit()
-            if settings.AI_PROVIDER.lower() == "azure":
+            if settings.embedding_enabled:
                 try:
                     texts = [chunk["text"] for chunk in chunks]
                     embeddings = await embed_texts(texts)
@@ -190,7 +190,7 @@ async def run_document_pipeline(document_id: str) -> None:
                     await db.commit()
                     notes.append(f"embedding failed: {error_message}")
             else:
-                error_message = "AI_PROVIDER is not azure"
+                error_message = "embedding provider not configured (AI_PROVIDER)"
                 await embedding_repository.record_failures(
                     chunk_ids=[row.id for row in chunk_rows],
                     model=embedding_model,

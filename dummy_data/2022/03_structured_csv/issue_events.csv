@@ -1,0 +1,17 @@
+﻿issue_id,issue_title,issue_type,start_date,end_date,related_customer_id,related_supplier_id,related_product_id,related_teams,severity,status,description
+ISSUE-2022-001,설 연휴 전 긴급 출고 일정 혼선,urgent_shipment_conflict,2022-01-10,2022-01-28,CUST-002,SUP-001,PROD-001,영업관리팀;구매팀;물류팀,Medium,resolved,부분 출고일과 잔량 입고일이 메일과 채팅마다 다르게 전달됨
+ISSUE-2022-002,구매처 재고 부족과 대체품 검토,supplier_stock_substitute,2022-03-04,2022-03-25,CUST-001,SUP-002,PROD-002,구매팀;영업관리팀,High,partially_resolved,재고 부족 회신이 모호하고 대체품 고객 승인 필요 여부가 뒤늦게 확인됨
+ISSUE-2022-003,수출 서류 누락으로 통관 지연,export_document_gap,2022-04-07,2022-04-22,CUST-005,SUP-002,PROD-005,물류팀;영업관리팀,Medium,resolved,원산지 증명서와 패킹리스트 중 누락 문서에 대한 부서별 설명이 다름
+ISSUE-2022-004,반복 불량과 고객 조립 문제 사이 클레임,quality_or_assembly_claim,2022-05-09,2022-05-31,CUST-003,SUP-005,PROD-003,품질 클레임팀;영업관리팀;구매팀,High,in_progress,샘플 회수 전 생산 불량과 고객 조립 공정 가능성이 동시에 제기됨
+ISSUE-2022-005,리드타임 변경 공지와 고객 발주 일정 충돌,lead_time_conflict,2022-07-01,2022-07-29,CUST-004,SUP-003,PROD-004,구매팀;영업관리팀;운영총괄팀,High,in_progress,공급처 리드타임이 8주에서 11~12주로 바뀌었으나 고객 발주 기준은 그대로임
+ISSUE-2022-006,항공 이송 전환 비용 승인 지연,air_freight_approval_delay,2022-08-11,2022-08-30,CUST-001,SUP-001,PROD-001,물류팀;구매팀;운영총괄팀,Medium,resolved,항공 이송 필요성은 명확하지만 비용 부담 주체와 승인 시점이 불분명함
+ISSUE-2022-007,단가 인상 공지와 기존 견적 적용 기준 충돌,price_quote_conflict,2022-10-03,2022-10-28,CUST-004,SUP-001,PROD-001,구매팀;영업관리팀;운영총괄팀,High,in_progress,"공식 인상 공지와 기존 견적 유효 조건, 고객 반영 시점이 일치하지 않음"
+ISSUE-2022-008,담당자 부재로 고객 회신 누락,temporary_owner_gap,2022-12-05,2022-12-23,CUST-003,SUP-002,PROD-004,영업관리팀;구매팀,Medium,in_progress,휴가 전 전달 메모가 짧고 임시 담당자가 불명확해 고객 회신과 Todo가 누락됨
+ISSUE-2022-009,2월 고객 납기 재확인,delivery_recheck,2022-02-03,2022-02-12,CUST-001,SUP-002,PROD-005,영업관리팀;물류팀,Low,resolved,고객 요청일과 내부 출고 예정일을 재확인한 일반 이슈
+ISSUE-2022-010,2월 품목 코드 오기입,product_code_typo,2022-02-17,2022-02-25,CUST-002,SUP-001,PROD-001,영업관리팀;구매팀,Low,resolved,메일 제목의 품목 코드가 본문과 달라 정정이 필요함
+ISSUE-2022-011,6월 구매처 회신 지연,supplier_reply_delay,2022-06-02,2022-06-14,CUST-003,SUP-004,PROD-003,구매팀;품질 클레임팀,Medium,resolved,품질 확인 회신 예정일이 두 차례 변경됨
+ISSUE-2022-012,6월 출고 수량 정정,shipment_quantity_fix,2022-06-16,2022-06-27,CUST-004,SUP-005,PROD-006,물류팀;영업관리팀,Medium,resolved,출고 로그와 고객 수령 수량 차이를 정정함
+ISSUE-2022-013,9월 내부 담당자 변경,owner_change,2022-09-02,2022-09-13,CUST-005,SUP-003,PROD-004,영업관리팀;물류팀,Low,resolved,수출 담당 변경이 일부 메일에만 반영됨
+ISSUE-2022-014,9월 반복 Todo 미완료,repeated_todo_open,2022-09-16,2022-09-29,CUST-002,SUP-001,PROD-001,영업관리팀;구매팀,Medium,in_progress,같은 확인 요청 Todo가 중복 생성되고 일부가 미완료로 남음
+ISSUE-2022-015,11월 월말 마감 확인,month_end_check,2022-11-02,2022-11-14,CUST-005,SUP-004,PROD-002,물류팀;운영총괄팀,Low,resolved,출고 완료와 고객 수령 확인 시점이 달라 마감 기준을 확인함
+ISSUE-2022-016,11월 고객 단가 업데이트 누락,customer_price_update_gap,2022-11-16,2022-11-29,CUST-002,SUP-001,PROD-001,영업관리팀;구매팀,Medium,in_progress,내부 단가표는 변경됐지만 고객 회신 초안에는 이전 가격이 남음

@@ -56,7 +56,7 @@ async def summarize_document(document_text: str) -> dict:
     text = document_text.strip()
     if not text:
         return {"summary": "", "keywords": []}
-    if settings.AI_PROVIDER.lower() != "azure":
+    if not settings.llm_enabled:
         return {"summary": _simple_summary(text), "keywords": _simple_keywords(text)}
 
     prompt = (
@@ -78,7 +78,7 @@ async def extract_todos(document_text: str) -> dict:
     csv_claims = _extract_claims_csv(text)
     if csv_claims:
         return csv_claims
-    if settings.AI_PROVIDER.lower() != "azure":
+    if not settings.llm_enabled:
         return _heuristic_extract(text)
 
     prompt = f"""

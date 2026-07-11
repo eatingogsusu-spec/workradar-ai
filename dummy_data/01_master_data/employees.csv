@@ -1,0 +1,15 @@
+﻿employee_id,name,team,role,permission_level,email
+EMP-001,김도윤,운영총괄팀,운영총괄,admin,doyun.kim@autopartsone.kr
+EMP-002,박서연,영업관리팀,선임 매니저,manager,seoyeon.park@autopartsone.kr
+EMP-003,이민재,영업관리팀,매니저,user,minjae.lee@autopartsone.kr
+EMP-004,정하늘,영업관리팀,매니저,user,haneul.jung@autopartsone.kr
+EMP-005,최유진,구매팀,구매 리드,manager,yujin.choi@autopartsone.kr
+EMP-006,강민호,구매팀,구매 담당,user,minho.kang@autopartsone.kr
+EMP-007,오세진,구매팀,구매 담당,user,sejin.oh@autopartsone.kr
+EMP-008,한지우,품질 클레임팀,품질 리드,manager,jiwoo.han@autopartsone.kr
+EMP-009,송태현,품질 클레임팀,품질 담당,user,taehyun.song@autopartsone.kr
+EMP-010,배수민,품질 클레임팀,품질 담당,user,sumin.bae@autopartsone.kr
+EMP-011,윤예린,물류팀,물류 리드,manager,yerin.yoon@autopartsone.kr
+EMP-012,권재윤,물류팀,물류 담당,user,jaeyoon.kwon@autopartsone.kr
+EMP-013,문태준,물류팀,물류 담당,user,taejun.moon@autopartsone.kr
+EMP-014,시스템 관리자,시스템관리,시스템 관리자,admin,admin@autopartsone.kr

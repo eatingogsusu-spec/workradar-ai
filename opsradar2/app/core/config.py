@@ -42,6 +42,10 @@ class Settings:
     )
     MAX_UPLOAD_BYTES: int = parse_int_env("MAX_UPLOAD_BYTES", 25 * 1024 * 1024)
     AI_PROVIDER: str = os.getenv("AI_PROVIDER", "disabled")
+    # Ollama (local, OpenAI-compatible). OLLAMA_BASE_URL should end in /v1.
+    OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434/v1")
+    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "exaone3.5:7.8b")
+    OLLAMA_EMBED_MODEL: str = os.getenv("OLLAMA_EMBED_MODEL", "nomic-embed-text")
     AZURE_OPENAI_API_KEY: str = os.getenv("AZURE_OPENAI_API_KEY", "")
     AZURE_OPENAI_ENDPOINT: str = os.getenv("AZURE_OPENAI_ENDPOINT", "")
     AZURE_OPENAI_API_VERSION: str = os.getenv("AZURE_OPENAI_API_VERSION", "")
@@ -53,7 +57,7 @@ class Settings:
         "AZURE_OPENAI_EMBEDDING_DEPLOYMENT",
         "",
     )
-    EMBEDDING_DIMENSION: int = parse_int_env("EMBEDDING_DIMENSION", 1536)
+    EMBEDDING_DIMENSION: int = parse_int_env("EMBEDDING_DIMENSION", 768)
     EMBEDDING_BATCH_SIZE: int = parse_int_env("EMBEDDING_BATCH_SIZE", 16)
     AZURE_OPENAI_MAX_RETRIES: int = parse_int_env("AZURE_OPENAI_MAX_RETRIES", 3)
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "change-this-secret-in-production")
@@ -61,6 +65,21 @@ class Settings:
     JWT_EXPIRE_HOURS: int = parse_int_env("JWT_EXPIRE_HOURS", 8)
     # Telegram bot (프로토타입). 비어 있으면 폴링 스크립트가 비활성 처리한다.
     TELEGRAM_BOT_TOKEN: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
+
+    @property
+    def llm_enabled(self) -> bool:
+        """True when a chat/LLM provider is configured (azure or ollama)."""
+        return self.AI_PROVIDER.lower() in ("azure", "ollama")
+
+    @property
+    def embedding_enabled(self) -> bool:
+        """True when an embedding provider is configured (azure or ollama)."""
+        return self.AI_PROVIDER.lower() in ("azure", "ollama")
+
+    @property
+    def EMBEDDING_DIM(self) -> int:
+        """Alias for EMBEDDING_DIMENSION."""
+        return self.EMBEDDING_DIMENSION
 
 
 settings = Settings()

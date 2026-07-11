@@ -1,0 +1,38 @@
+﻿claim_id,claim_date,customer_id,product_id,defect_type,defect_quantity,severity,claim_status,quality_owner,related_issue_id
+CLM-00001,2025-09-18,CUS-003,AP-SC-330,외관 손상,27,Medium,Corrective Action,송태현,ISS-2026-003
+CLM-00002,2025-07-03,CUS-003,AP-SC-330,접촉 불량,178,Medium,Closed,배수민,ISS-2025-011
+CLM-00003,2025-11-29,CUS-003,AP-SC-330,외관 손상,179,High,Received,배수민,ISS-2026-003
+CLM-00004,2026-05-19,CUS-003,AP-SC-330,핀 배열 불일치,6,High,Closed,송태현,ISS-2026-003
+CLM-00005,2025-06-16,CUS-003,AP-SC-330,외관 손상,119,Low,Closed,한지우,ISS-2026-003
+CLM-00006,2025-06-17,CUS-003,AP-CB-510,작동 불량,176,Low,Received,송태현,ISS-2025-010
+CLM-00007,2026-02-01,CUS-003,AP-SC-330,접촉 불량,15,Low,Corrective Action,한지우,ISS-2025-014
+CLM-00008,2026-02-22,CUS-003,AP-SC-330,접촉 불량,135,High,Received,한지우,ISS-2026-003
+CLM-00009,2026-04-12,CUS-003,AP-SC-330,외관 손상,147,High,Under Analysis,송태현,ISS-2026-003
+CLM-00010,2025-11-18,CUS-003,AP-SC-330,작동 불량,128,Medium,Corrective Action,송태현,ISS-2025-011
+CLM-00011,2025-09-23,CUS-003,AP-SC-330,외관 손상,113,Low,Closed,한지우,ISS-2025-014
+CLM-00012,2026-05-20,CUS-003,AP-SC-330,외관 손상,42,High,Closed,배수민,ISS-2025-014
+CLM-00013,2025-12-27,CUS-003,AP-SC-330,작동 불량,9,High,Closed,배수민,ISS-2025-011
+CLM-00014,2026-03-13,CUS-003,AP-SC-330,외관 손상,92,High,Under Analysis,배수민,ISS-2025-014
+CLM-00015,2026-05-07,CUS-001,AP-CN-204,작동 불량,77,Medium,Received,한지우,
+CLM-00016,2026-01-14,CUS-003,AP-SC-330,작동 불량,81,Medium,Received,한지우,ISS-2026-003
+CLM-00017,2026-03-15,CUS-003,AP-SC-330,접촉 불량,70,Low,Corrective Action,송태현,ISS-2025-011
+CLM-00018,2026-04-15,CUS-003,AP-SC-330,외관 손상,63,Low,Under Analysis,송태현,ISS-2025-011
+CLM-00019,2025-12-01,CUS-001,AP-WH-220,외관 손상,103,High,Under Analysis,한지우,
+CLM-00020,2026-05-28,CUS-003,AP-SC-330,라벨 오류,167,High,Received,송태현,ISS-2025-011
+CLM-00021,2026-02-10,CUS-003,AP-SC-330,라벨 오류,49,Medium,Under Analysis,배수민,ISS-2026-003
+CLM-00022,2025-06-30,CUS-003,AP-SC-330,핀 배열 불일치,81,High,Corrective Action,배수민,ISS-2025-011
+CLM-00023,2026-05-06,CUS-003,AP-CB-510,핀 배열 불일치,63,Low,Closed,한지우,ISS-2025-010
+CLM-00024,2026-01-07,CUS-003,AP-CB-510,라벨 오류,63,High,Received,배수민,ISS-2025-010
+CLM-00025,2025-09-12,CUS-003,AP-SC-330,외관 손상,77,High,Closed,송태현,ISS-2026-003
+CLM-00026,2025-12-05,CUS-003,AP-SC-330,외관 손상,163,Medium,Closed,배수민,ISS-2026-003
+CLM-00027,2026-05-01,CUS-003,AP-CB-510,접촉 불량,139,Low,Under Analysis,한지우,ISS-2025-010
+CLM-00028,2026-03-30,CUS-003,AP-SC-330,핀 배열 불일치,129,Medium,Closed,송태현,ISS-2025-014
+CLM-00029,2025-08-04,CUS-003,AP-CB-510,라벨 오류,144,Medium,Corrective Action,한지우,ISS-2025-010
+CLM-00030,2025-09-07,CUS-001,AP-WH-220,핀 배열 불일치,12,High,Closed,송태현,
+CLM-00031,2026-05-16,CUS-004,AP-CB-510,quantity_mismatch,150,Medium,in_progress,한지우,ISSUE-2026-009
+CLM-MESSY-2026-010,2026-07-29,CUS-001,AP-WH-220,messy_due_date_change,0,High,in_progress,한지우,ISSUE-2026-010
+CLM-MESSY-2026-011,2026-08-22,CUS-002,AP-CB-510,messy_claim_or_logistics_damage,24,Medium,in_progress,한지우,ISSUE-2026-011
+CLM-MESSY-2026-012,2026-09-26,CUS-004,AP-CN-204,messy_price_conflict,0,High,in_progress,김도윤,ISSUE-2026-012
+CLM-MESSY-2026-013,2026-11-05,CUS-005,AP-TM-118,messy_month_end_shipment_confirmation,24,Medium,closed,한지우,ISSUE-2026-013
+CLM-MESSY-2026-014,2026-12-20,CUS-003,AP-RL-450,messy_temporary_coverage_gap,0,Medium,in_progress,한지우,ISSUE-2026-014
+CLM-MESSY-2026-015,2026-12-28,CUS-004,AP-CB-510,messy_substitute_approval_conflict,24,High,in_progress,한지우,ISSUE-2026-015

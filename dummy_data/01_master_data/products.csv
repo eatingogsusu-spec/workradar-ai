@@ -1,0 +1,7 @@
+﻿product_id,product_name,category,main_supplier,unit_price,safety_stock_qty
+AP-CN-204,AP-CN-204 커넥터,Connector,TE Connectivity Korea,1250,1800
+AP-TM-118,AP-TM-118 터미널,Terminal,KET Supplier,780,2500
+AP-SC-330,AP-SC-330 센서 케이블,Sensor Cable,JST Components,4200,900
+AP-RL-450,AP-RL-450 릴레이,Relay,Yazaki Parts Asia,3100,700
+AP-WH-220,AP-WH-220 와이어하네스,Wire Harness,KET Supplier,5600,650
+AP-CB-510,AP-CB-510 케이블 어셈블리,Cable Assembly,Local Cable Works,4800,500

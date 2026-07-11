@@ -104,7 +104,7 @@ class HandoverDraftService:
     """Generate a handover document when Azure OpenAI is configured."""
 
     async def generate(self, handover_input: dict[str, Any], *, document_type: str = "handoff") -> str | None:
-        if settings.AI_PROVIDER.lower() != "azure":
+        if not settings.llm_enabled:
             return None
 
         owner = handover_input.get("owner") or "전임자"

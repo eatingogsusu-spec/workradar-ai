@@ -1,0 +1,6 @@
+﻿id,business_entity_id,project_id,supplier_id,product_id,notice_type,title,description,notice_date,severity,status,related_issue_id,created_at,updated_at
+SN-0001,BE-NOTICE-0001,PROJ-001,SUP-002,AP-WH-220,stock_shortage,KET Supplier 재고 부족으로 납기 지연 가능,KET Supplier의 AP-WH-220 재고 부족으로 Hyundai Mobis Tier2 납기 지연 위험이 발생함,2025-08-05,High,closed,ISS-2025-008,2025-08-05T09:00:00,2026-06-01T09:00:00
+SN-0002,BE-NOTICE-0002,PROJ-001,SUP-003,AP-RL-450,lead_time_change,Yazaki Parts Asia 리드타임 8주에서 12주 증가,Yazaki Parts Asia가 AP-RL-450 리드타임을 8주에서 12주로 변경 공지함,2025-12-02,Medium,closed,ISS-2025-012,2025-12-02T09:00:00,2026-06-01T09:00:00
+SN-0003,BE-NOTICE-0003,PROJ-001,SUP-001,AP-CN-204,price_change,TE Connectivity Korea 단가 7% 인상 통보,TE Connectivity Korea가 주요 커넥터 단가 7% 인상을 통보하여 고객 단가 협상이 필요함,2026-04-03,Medium,open,ISS-2026-004,2026-04-03T09:00:00,2026-06-01T09:00:00
+SN-0004,BE-NOTICE-0004,PROJ-001,SUP-002,AP-TM-118,supplier_delay,KET Supplier 월말 입고 분할,KET Supplier 월말 입고가 두 차례로 분할됨,2025-12-20,Medium,closed,ISS-2025-013,2025-12-20T09:00:00,2026-06-01T09:00:00
+SN-0005,BE-NOTICE-0005,PROJ-001,SUP-001,,supplier_notice,분기 공급사 평가 자료 취합,"분기 공급사 납기, 품질, 단가 변동 데이터를 취합함",2026-04-18,Low,closed,ISS-2026-009,2026-04-18T09:00:00,2026-06-01T09:00:00

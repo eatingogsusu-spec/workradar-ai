@@ -1,0 +1,15 @@
+﻿id,department_id,project_member_id,position_title,is_primary,joined_at
+DM-001,DEPT-001,PM-001,운영총괄,true,2025-06-01
+DM-002,DEPT-002,PM-002,선임 매니저,true,2025-06-01
+DM-003,DEPT-002,PM-003,매니저,true,2025-06-01
+DM-004,DEPT-002,PM-004,매니저,true,2025-06-01
+DM-005,DEPT-003,PM-005,구매 리드,true,2025-06-01
+DM-006,DEPT-003,PM-006,구매 담당,true,2025-06-01
+DM-007,DEPT-003,PM-007,구매 담당,true,2025-06-01
+DM-008,DEPT-004,PM-008,품질 리드,true,2025-06-01
+DM-009,DEPT-004,PM-009,품질 담당,true,2025-06-01
+DM-010,DEPT-004,PM-010,품질 담당,true,2025-06-01
+DM-011,DEPT-005,PM-011,물류 리드,true,2025-06-01
+DM-012,DEPT-005,PM-012,물류 담당,true,2025-06-01
+DM-013,DEPT-005,PM-013,물류 담당,true,2025-06-01
+DM-014,DEPT-006,PM-014,시스템 관리자,true,2025-06-01

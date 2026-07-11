@@ -1,0 +1,26 @@
+﻿issue_id,issue_title,issue_type,start_date,end_date,related_customer_id,related_supplier_id,related_product_id,related_teams,severity,status,description
+ISS-2025-006,Daesung Automotive 긴급 발주 대응,UrgentOrder,2025-06-10,2025-06-24,CUS-002,SUP-001,AP-CN-204,영업관리팀;구매팀;물류팀,High,Closed,"Daesung Automotive가 AP-CN-204 5,000개 긴급 납품을 요청하여 재고 확인, 구매처 협의, 출고 우선순위 조정이 발생함"
+ISS-2025-008,KET Supplier 재고 부족으로 납기 지연 가능,SupplierStock,2025-08-05,2025-08-29,CUS-001,SUP-002,AP-WH-220,구매팀;영업관리팀,High,Closed,KET Supplier의 AP-WH-220 재고 부족으로 Hyundai Mobis Tier2 납기 지연 위험이 발생함
+ISS-2025-009,Global Harness Vietnam 수출 서류 누락 통관 지연,ExportDelay,2025-09-08,2025-09-22,CUS-005,,AP-CB-510,물류팀;영업관리팀,Medium,Closed,Global Harness Vietnam 출하 건에서 원산지 증명 서류 누락으로 통관 지연이 발생함
+ISS-2025-011,Mirae EV Systems 센서 케이블 반복 클레임,QualityClaim,2025-11-04,2025-12-03,CUS-003,SUP-004,AP-SC-330,품질 클레임팀;구매팀;영업관리팀,High,Monitoring,Mirae EV Systems에서 AP-SC-330 센서 케이블 접촉 불량 클레임이 반복 접수됨
+ISS-2025-012,Yazaki Parts Asia 리드타임 8주에서 12주 증가,LeadTimeChange,2025-12-02,2026-01-10,CUS-004,SUP-003,AP-RL-450,구매팀;영업관리팀,Medium,Closed,Yazaki Parts Asia가 AP-RL-450 리드타임을 8주에서 12주로 변경 공지함
+ISS-2026-002,Hyundai Mobis Tier2 긴급 항공 이송,ExpediteShipping,2026-02-06,2026-02-19,CUS-001,SUP-002,AP-TM-118,물류팀;영업관리팀;구매팀,High,Closed,Hyundai Mobis Tier2 납기 대응을 위해 AP-TM-118 일부 수량을 항공 긴급 이송함
+ISS-2026-004,TE Connectivity Korea 단가 7% 인상 통보,PriceIncrease,2026-04-03,2026-05-02,CUS-002,SUP-001,AP-CN-204,구매팀;영업관리팀;운영총괄팀,Medium,Open,TE Connectivity Korea가 주요 커넥터 단가 7% 인상을 통보하여 고객 단가 협상이 필요함
+ISS-2026-005,박서연 담당 고객 인수인계 준비,Handover,2026-05-12,2026-06-01,CUS-001;CUS-002,SUP-001;SUP-002,AP-CN-204;AP-TM-118;AP-WH-220,영업관리팀;구매팀;물류팀,High,Open,박서연 담당 Hyundai Mobis Tier2와 Daesung Automotive 업무 일부를 이민재에게 인수인계해야 함
+ISS-2025-007,Hanil Motors 정기 발주 수량 변경,OrderChange,2025-07-12,2025-07-18,CUS-004,,AP-RL-450,영업관리팀,Low,Closed,Hanil Motors가 7월 정기 발주 수량을 일부 조정함
+ISS-2025-010,Local Cable Works 대체품 승인 검토,AlternativePart,2025-10-11,2025-10-25,CUS-003,SUP-005,AP-CB-510,구매팀;품질 클레임팀,Medium,Closed,센서 케이블 대체 출하 가능성을 검토함
+ISS-2026-001,월초 재고 실사 차이 조정,Inventory,2026-01-05,2026-01-12,,,AP-TM-118,물류팀,Low,Closed,월초 재고 실사에서 시스템 수량과 실물 수량 차이를 조정함
+ISS-2026-003,Mirae EV Systems 개선대책 회신 지연,CustomerFollowUp,2026-03-03,2026-03-15,CUS-003,SUP-004,AP-SC-330,품질 클레임팀;영업관리팀,Medium,Closed,개선대책서 회신 일정이 지연되어 고객 후속 안내가 필요함
+ISS-2026-006,Vietnam향 포장 라벨 문구 수정,ExportLabel,2026-05-18,2026-05-27,CUS-005,,AP-CB-510,물류팀,Low,Open,Global Harness Vietnam향 박스 라벨에 PO 번호 표기 방식 변경 요청이 접수됨
+ISS-2025-013,KET Supplier 월말 입고 분할,InboundSplit,2025-12-20,2026-01-08,CUS-001,SUP-002,AP-TM-118,구매팀;물류팀,Medium,Closed,KET Supplier 월말 입고가 두 차례로 분할됨
+ISS-2026-007,고객별 월간 리스크 태그 정리,Reporting,2026-05-20,2026-06-01,CUS-001;CUS-002;CUS-003,,,운영총괄팀;영업관리팀,Low,Open,월간 보고서용 고객별 리스크 태그를 정리함
+ISS-2025-014,JST Components 검사 성적서 보완,QualityDocs,2025-11-18,2025-11-29,CUS-003,SUP-004,AP-SC-330,품질 클레임팀;구매팀,Medium,Closed,검사 성적서 항목 누락에 대한 보완 요청이 진행됨
+ISS-2026-008,Daesung Automotive 신규 안전재고 기준 협의,SafetyStock,2026-03-22,2026-04-12,CUS-002,SUP-001,AP-CN-204,영업관리팀;구매팀,Medium,Open,긴급 발주 재발 방지를 위해 고객별 안전재고 기준을 협의함
+ISS-2026-009,분기 공급사 평가 자료 취합,SupplierReview,2026-04-18,2026-04-30,,SUP-001;SUP-002;SUP-003,,구매팀,Low,Closed,"분기 공급사 납기, 품질, 단가 변동 데이터를 취합함"
+ISSUE-2026-009,Hanil Motors 수량 불일치 클레임,quantity_mismatch_claim,2026-05-13,2026-05-24,CUS-004,SUP-005,AP-CB-510,영업관리팀;물류팀;품질 클레임팀,Medium,in_progress,고객 입고 검사 수량과 내부 출고 처리 수량이 일치하지 않아 확인 및 재출고 또는 차액 조정 검토가 필요한 이슈
+ISSUE-2026-010,Hyundai Mobis Tier2 납기 일정 반복 변경 긴급 주문,messy_due_date_change,2026-07-08,2026-07-29,CUS-001,SUP-003,AP-WH-220,영업관리팀;구매팀;물류팀,High,in_progress,"고객 긴급 주문과 구매처 생산 일정 변경, 물류 출고 가능일 확인이 서로 다르게 전달되어 확정 납기와 임시 납기가 혼재된 이슈"
+ISSUE-2026-011,Daesung Automotive 케이블 클레임 원인 불명확,messy_claim_or_logistics_damage,2026-08-04,2026-08-22,CUS-002,SUP-005,AP-CB-510,품질 클레임팀;물류팀;영업관리팀,Medium,in_progress,고객은 외관 이상을 제기했지만 생산 불량인지 운송 중 박스 손상인지 원인이 확정되지 않은 클레임 이슈
+ISSUE-2026-012,TE Connectivity Korea 단가 인상 공지와 구두 합의 충돌,messy_price_conflict,2026-09-01,2026-09-26,CUS-004,SUP-001,AP-CN-204,구매팀;영업관리팀;운영총괄팀,High,in_progress,공식 단가 인상 공지와 이전 구두 합의가 충돌하여 고객 단가 제안 기준과 마진 영향 계산이 불확실한 이슈
+ISSUE-2026-013,Global Harness Vietnam 월말 출고 확인 누락,messy_month_end_shipment_confirmation,2026-10-24,2026-11-05,CUS-005,SUP-004,AP-TM-118,물류팀;영업관리팀;운영총괄팀,Medium,closed,시스템상 출고 완료이나 고객 수령 확인이 늦게 도착해 월말 매출 인식 여부가 흔들린 이슈
+ISSUE-2026-014,Mirae EV Systems 담당자 휴가 중 임시 인수인계 누락,messy_temporary_coverage_gap,2026-12-05,2026-12-20,CUS-003,SUP-002,AP-RL-450,영업관리팀;구매팀,Medium,in_progress,담당자 휴가 중 고객 요청 일부가 임시 담당자에게 전달되지 않아 회신 지연과 Todo 누락이 발생한 인수인계 이슈
+ISSUE-2026-015,Hanil Motors 대체품 승인과 원품 재입고 일정 혼선,messy_substitute_approval_conflict,2026-11-18,2026-12-28,CUS-004,SUP-005,AP-CB-510,영업관리팀;구매팀;품질 클레임팀;물류팀,High,in_progress,"대체품 선출고 가능성, 원품 재입고 일정, 고객 승인 조건이 문서마다 다르게 남아 확정 가능한 조치가 불명확한 상황"

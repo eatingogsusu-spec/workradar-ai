@@ -1,0 +1,9 @@
+﻿id,team_id,name,email,role,created_at,updated_at
+64259496-d298-50d7-9c22-5623a7802bba,5ff1ad0b-a5fc-57fb-b1c8-804bae10d049,김도윤,doyun.kim@autopartsone.kr,admin,2026-06-01T09:00:00+09:00,2026-06-01T09:00:00+09:00
+b06c5222-d4e0-52c3-862e-81eaf1612131,5ff1ad0b-a5fc-57fb-b1c8-804bae10d049,박서연,seoyeon.park@autopartsone.kr,member,2026-06-01T09:00:00+09:00,2026-06-01T09:00:00+09:00
+f65a6997-e095-517d-8147-e25cd1f6f844,5ff1ad0b-a5fc-57fb-b1c8-804bae10d049,이민재,minjae.lee@autopartsone.kr,member,2026-06-01T09:00:00+09:00,2026-06-01T09:00:00+09:00
+274dcf1e-dfa2-5f56-9156-f8975e9ce127,5ff1ad0b-a5fc-57fb-b1c8-804bae10d049,정하늘,haneul.jung@autopartsone.kr,member,2026-06-01T09:00:00+09:00,2026-06-01T09:00:00+09:00
+8dc9fa40-9afd-5c5f-b9fb-7c02fb7862e8,5ff1ad0b-a5fc-57fb-b1c8-804bae10d049,최유진,yujin.choi@autopartsone.kr,member,2026-06-01T09:00:00+09:00,2026-06-01T09:00:00+09:00
+ef44500f-ad09-5c96-8a0b-c1130d9c9004,5ff1ad0b-a5fc-57fb-b1c8-804bae10d049,강민호,minho.kang@autopartsone.kr,member,2026-06-01T09:00:00+09:00,2026-06-01T09:00:00+09:00
+d737bb1b-f735-57c2-823e-880ec00a110a,5ff1ad0b-a5fc-57fb-b1c8-804bae10d049,오세진,sejin.oh@autopartsone.kr,member,2026-06-01T09:00:00+09:00,2026-06-01T09:00:00+09:00
+fb2dee8f-e4b6-5253-bb47-d5369acce327,5ff1ad0b-a5fc-57fb-b1c8-804bae10d049,한지우,jiwoo.han@autopartsone.kr,member,2026-06-01T09:00:00+09:00,2026-06-01T09:00:00+09:00

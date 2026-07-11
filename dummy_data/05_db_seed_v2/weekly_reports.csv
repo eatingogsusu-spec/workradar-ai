@@ -1,0 +1,4 @@
+﻿id,project_id,title,period_start,period_end,summary,status,source,created_at,updated_at
+WR-0001,PROJ-001,주간 보고서 seed - Daesung Automotive 긴급 발주 대응,2025-06-10,2025-06-16,"Daesung Automotive가 AP-CN-204 5,000개 긴급 납품을 요청하여 재고 확인, 구매처 협의, 출고 우선순위 조정이 발생함",draft,dummy_seed,2025-06-10T09:00:00,2026-06-01T09:00:00
+WR-0002,PROJ-001,주간 보고서 seed - Mirae EV Systems 센서 케이블 반복 클레임,2025-11-04,2025-11-10,Mirae EV Systems에서 AP-SC-330 센서 케이블 접촉 불량 클레임이 반복 접수됨,draft,dummy_seed,2025-11-04T09:00:00,2026-06-01T09:00:00
+WR-0003,PROJ-001,주간 보고서 seed - Hyundai Mobis Tier2 긴급 항공 이송,2026-02-06,2026-02-12,Hyundai Mobis Tier2 납기 대응을 위해 AP-TM-118 일부 수량을 항공 긴급 이송함,draft,dummy_seed,2026-02-06T09:00:00,2026-06-01T09:00:00

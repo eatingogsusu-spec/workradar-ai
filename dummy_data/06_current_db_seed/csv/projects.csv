@@ -1,0 +1,2 @@
+﻿id,team_id,name,description,status,created_at,updated_at
+0a4f9295-ac96-59f7-b09d-fb82f68610c8,5ff1ad0b-a5fc-57fb-b1c8-804bae10d049,[DUMMY] OpsRadar2 운영 인수인계 데모,"문서 분석, Todo, 이슈, 리포트, 인수인계 흐름 검증용 seed",active,2026-06-01T09:00:00+09:00,2026-06-01T09:00:00+09:00
