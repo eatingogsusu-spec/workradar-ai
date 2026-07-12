@@ -25,8 +25,11 @@
 BEGIN;
 
 -- ── todos ────────────────────────────────────────────────────────────────────
--- bucket 1  due_at < ref-60d   (24 rows) → 15 completed  + 9 in_progress (지연 건)
--- bucket 2  ref-60d..ref       ( 4 rows) → in_progress            (마감 막 지남)
+-- bucket 1  due_at < ref-60d   (24 rows) → 13 completed  + 11 in_progress (지연 건)
+-- bucket 2  ref-60d..ref       ( 4 rows) →  2 completed  +  2 in_progress (마감 막 지남)
+--                                           이 2건은 "이번 달에 늦게 마감한 건"이라
+--                                           updated_at이 이번 달에 들어가고, 월간
+--                                           보고서의 "완료된 업무"가 비지 않게 된다.
 -- bucket 3  ref..ref+45d       ( 5 rows) → in_progress            (마감 임박, 작업 중)
 -- bucket 4  > ref+45d          (12 rows) → pending                (아직 착수 전)
 -- target: completed 15 / in_progress 18 / pending 12
@@ -53,11 +56,14 @@ ranked AS (
 assigned AS (
     SELECT
         id,
+        bucket,
         CASE
-            -- oldest 15 of the long-overdue bucket: finished and closed out
-            WHEN bucket = 1 AND rn <= 15 THEN 'completed'
+            -- oldest 13 of the long-overdue bucket: finished and closed out back then
+            WHEN bucket = 1 AND rn <= 13 THEN 'completed'
             -- the rest of the overdue bucket: slipped, still being worked
             WHEN bucket = 1              THEN 'in_progress'
+            -- just-missed deadlines: the two oldest were closed out late, this month
+            WHEN bucket = 2 AND rn <= 2  THEN 'completed'
             WHEN bucket IN (2, 3)        THEN 'in_progress'
             ELSE                              'pending'
         END AS new_status,
@@ -69,10 +75,24 @@ assigned AS (
         END AS new_approval
     FROM ranked
 )
+-- updated_at must stay plausible, not "now". The monthly report counts a todo as done
+-- this month when status='completed' AND updated_at falls inside the month, so stamping
+-- now() on every row made every completed todo look like it was finished this month
+-- (completion rate 29/30). Anchor it to the work instead: finished around its due date,
+-- in-flight work touched recently, untouched work still at creation time.
 UPDATE opsradar2.todos t
 SET status          = a.new_status,
     approval_status = a.new_approval,
-    updated_at      = now()
+    updated_at      = CASE
+                          -- closed out late, during the current month
+                          WHEN a.new_status = 'completed' AND a.bucket = 2 THEN
+                              (DATE :'ref_date' - 3)::timestamptz
+                          -- finished around when it was due
+                          WHEN a.new_status = 'completed'   THEN t.due_at
+                          WHEN a.new_status = 'in_progress' THEN
+                              greatest(t.created_at, (DATE :'ref_date' - 7)::timestamptz)
+                          ELSE t.created_at
+                      END
 FROM assigned a
 WHERE t.id = a.id;
 
@@ -116,7 +136,10 @@ UPDATE opsradar2.issues i
 SET status          = a.new_status,
     -- unreviewed open issues sit in the approval queue; everything else is approved
     approval_status = CASE WHEN a.new_status = 'open' THEN 'pending' ELSE 'approved' END,
-    updated_at      = now()
+    updated_at      = CASE
+                          WHEN a.new_status = 'resolved' THEN i.due_at
+                          ELSE greatest(i.created_at, (DATE :'ref_date' - 7)::timestamptz)
+                      END
 FROM assigned a
 WHERE i.id = a.id;
 

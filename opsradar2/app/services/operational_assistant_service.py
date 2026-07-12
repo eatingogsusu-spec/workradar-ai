@@ -17,6 +17,13 @@ from app.core.config import settings
 
 ACTIVE_TODO_STATUSES = {"pending", "approved", "in_progress", "blocked"}
 COMPLETED_TODO_STATUSES = {"completed", "done", "resolved"}
+
+# Identifiers a user can only mean literally: part numbers (AP-CB-510), document and
+# issue codes. Vector search always returns its top-k, so a question about a part that
+# does not exist still comes back with neighbours around 0.65 — close enough to look
+# like evidence, and the model will happily write about them. When the question pins a
+# concrete identifier, we require that identifier to actually appear in the evidence.
+SPECIFIC_ID_PATTERN = re.compile(r"\b(?:[A-Z]{2,}-[A-Z0-9]{2,}-[0-9]{2,}|DOC-[0-9A-Z-]+|ISS(?:UE)?-[0-9-]+)\b")
 STOPWORDS = {
     "현재", "지금", "관련", "업무", "상태", "진행", "진행중", "알려줘", "어떻게",
     "무엇", "뭐야", "무슨", "해주세요", "해줘", "확인", "그", "이", "저", "에서",
@@ -40,6 +47,19 @@ class OperationalAssistantService:
         project_id = actor["project_id"]
         evidence = await self._collect_evidence(project_id, message)
         document_evidence = await self._retrieve_documents(message, project_id)
+
+        missing = self._unsupported_identifiers(message, evidence, document_evidence)
+        if missing:
+            return {
+                "answer": self._not_found_answer(missing),
+                "sources": [],
+                "related_todos": [],
+                "related_issues": [],
+                "related_calendar_events": [],
+                "suggested_questions": self._suggested_questions(evidence),
+                "mode": "not_found",
+            }
+
         context = self._model_context(actor, evidence, document_evidence, history or [])
 
         ai_answer = await self._ask_model(message, context)
@@ -177,6 +197,39 @@ class OperationalAssistantService:
             "issues": self._rank(message, issues, limit=10),
             "events": self._rank(message, events, limit=8),
         }
+
+    @staticmethod
+    def _unsupported_identifiers(
+        message: str,
+        evidence: dict[str, Any],
+        documents: list[dict[str, Any]],
+    ) -> list[str]:
+        """Identifiers the question names that appear nowhere in the retrieved evidence."""
+        asked = {token.upper() for token in SPECIFIC_ID_PATTERN.findall(message.upper())}
+        if not asked:
+            return []
+
+        haystack = json.dumps(
+            {
+                "todos": evidence.get("todos", []),
+                "issues": evidence.get("issues", []),
+                "events": evidence.get("events", []),
+                "documents": documents,
+            },
+            ensure_ascii=False,
+            default=str,
+        ).upper()
+        return sorted(token for token in asked if token not in haystack)
+
+    @staticmethod
+    def _not_found_answer(missing: list[str]) -> str:
+        names = ", ".join(f"`{token}`" for token in missing)
+        return (
+            f"{names}에 대한 근거 자료를 찾지 못했습니다.\n\n"
+            "- 등록된 문서, Todo, 이슈 어디에서도 해당 식별자를 확인할 수 없습니다.\n"
+            "- 다른 자료로 대신 답하면 사실과 다른 내용이 될 수 있어 답변하지 않았습니다.\n"
+            "- 품번이나 문서 번호의 표기를 다시 확인하시거나, 해당 자료를 먼저 업로드해 주세요."
+        )
 
     async def _retrieve_documents(self, message: str, project_id: str) -> list[dict[str, Any]]:
         try:

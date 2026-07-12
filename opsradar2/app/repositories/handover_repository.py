@@ -43,6 +43,9 @@ def _todo_input(row: dict) -> dict:
         "assignee": assignee or "미지정",
         "due_at": row["due_at"].date().isoformat() if row.get("due_at") else "확인 필요",
         "source": _short_text(row.get("source"), 180) or "확인 필요",
+        # The real issue this todo came from. Without it the model is asked to group
+        # "issue -> resulting todos" with no link data and invents todos to fill the shape.
+        "linked_issue_id": row.get("linked_issue_id"),
     }
 
 
@@ -103,6 +106,7 @@ async def gather_handover_input(
                 SELECT
                   t.id::text AS id, t.title, t.description, t.status, t.approval_status,
                   t.priority, t.due_at, t.created_at, t.updated_at,
+                  t.linked_issue_id::text AS linked_issue_id,
                   assignee.name AS assignee_name, assignee_team.name AS assignee_team,
                   COALESCE(d.file_name, t.source_document_id::text, t.source_chunk_id::text, '확인 필요') AS source
                 FROM todos t
@@ -218,6 +222,13 @@ async def gather_handover_input(
             }
             for row in dresult.mappings().all()
         ]
+
+    # A link is only usable as grounding if the issue it points at is also in this
+    # handover. Dangling links would push the model to describe an issue it cannot see.
+    selected_issue_ids = {issue["id"] for issue in issues}
+    for todo in todos:
+        if todo.get("linked_issue_id") not in selected_issue_ids:
+            todo["linked_issue_id"] = None
 
     return {
         "owner": owner,

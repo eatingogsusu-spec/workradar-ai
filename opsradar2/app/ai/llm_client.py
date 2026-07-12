@@ -51,30 +51,41 @@ def get_azure_openai_client() -> Any:
     )
 
 
+# Ollama defaults num_ctx to 2048, which silently truncates the *prompt* — grounding
+# data gets dropped before the model ever sees it, and answers drift off-topic with
+# no error. The OpenAI-compatible /v1 endpoint gives no way to raise it, so we talk to
+# the native /api/chat endpoint, which accepts `options`.
+OLLAMA_NUM_CTX = 16384
+OLLAMA_NUM_PREDICT = 2048
+
+
 def _ollama_chat_url() -> str:
-    """Return the Ollama OpenAI-compatible chat endpoint, tolerating a missing /v1."""
-    base = settings.OLLAMA_BASE_URL.rstrip("/") or "http://localhost:11434/v1"
-    if not base.endswith("/v1"):
-        base = f"{base}/v1"
-    return f"{base}/chat/completions"
+    """Return Ollama's native chat endpoint, tolerating a configured /v1 suffix."""
+    base = settings.OLLAMA_BASE_URL.rstrip("/") or "http://localhost:11434"
+    if base.endswith("/v1"):
+        base = base[: -len("/v1")]
+    return f"{base}/api/chat"
 
 
 async def _ollama_chat(messages: list[dict[str, str]], temperature: float) -> str:
-    """Call Ollama's OpenAI-compatible chat endpoint.
+    """Call Ollama's native chat endpoint.
 
     Transport and protocol failures surface as RuntimeError because callers only
     guard against RuntimeError/ValueError, not httpx exceptions.
     """
     try:
-        async with httpx.AsyncClient(timeout=120.0) as client:
+        async with httpx.AsyncClient(timeout=300.0) as client:
             response = await client.post(
                 _ollama_chat_url(),
-                headers={"Authorization": "Bearer ollama"},
                 json={
                     "model": settings.OLLAMA_MODEL,
                     "messages": messages,
-                    "temperature": temperature,
                     "stream": False,
+                    "options": {
+                        "temperature": temperature,
+                        "num_ctx": OLLAMA_NUM_CTX,
+                        "num_predict": OLLAMA_NUM_PREDICT,
+                    },
                 },
             )
             response.raise_for_status()
@@ -82,10 +93,10 @@ async def _ollama_chat(messages: list[dict[str, str]], temperature: float) -> st
     except httpx.HTTPError as exc:
         raise RuntimeError(f"Ollama chat request failed: {exc}") from exc
 
-    choices = payload.get("choices") or []
-    if not choices:
-        raise RuntimeError("Ollama returned no chat choices")
-    return choices[0].get("message", {}).get("content") or ""
+    content = (payload.get("message") or {}).get("content")
+    if not content:
+        raise RuntimeError("Ollama returned no chat message")
+    return content
 
 
 async def chat_completion(
