@@ -206,7 +206,10 @@ async def run_document_pipeline(document_id: str) -> None:
 
             await _update_document(db, document, analysis_status="analyzing", progress=85)
             summary = await summarize_document(text)
-            extracted = await extract_todos(text)
+            extracted = await extract_todos(
+                text,
+                document_date=document.created_at.date() if document.created_at else None,
+            )
             await _create_extracted_items(db, document, extracted, chunk_rows, text)
             await _create_ai_summary(db, document, summary, extracted)
 
