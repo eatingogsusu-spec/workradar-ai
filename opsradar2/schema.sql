@@ -96,7 +96,8 @@ CREATE TABLE IF NOT EXISTS chunk_embeddings (
     chunk_id UUID NOT NULL REFERENCES document_chunks(id) ON DELETE CASCADE,
     faiss_index_id UUID REFERENCES faiss_indexes(id) ON DELETE CASCADE,
     vector_external_id INTEGER,
-    embedding vector(1536),
+    -- Must match EMBEDDING_DIMENSION (nomic-embed-text = 768; Azure text-embedding-3-* = 1536).
+    embedding vector(768),
     embedding_model VARCHAR(100) NOT NULL,
     embedding_dimension INTEGER NOT NULL,
     embedding_status VARCHAR(50) NOT NULL DEFAULT 'completed'
@@ -272,10 +273,14 @@ CREATE INDEX IF NOT EXISTS idx_faiss_indexes_project_id ON faiss_indexes(project
 CREATE INDEX IF NOT EXISTS idx_chunk_embeddings_chunk_id ON chunk_embeddings(chunk_id);
 CREATE INDEX IF NOT EXISTS idx_chunk_embeddings_faiss_index_id ON chunk_embeddings(faiss_index_id);
 CREATE INDEX IF NOT EXISTS idx_chunk_embeddings_model_status ON chunk_embeddings(embedding_model, embedding_status);
-CREATE INDEX IF NOT EXISTS idx_chunk_embeddings_embedding_cosine
-    ON chunk_embeddings USING ivfflat (embedding vector_cosine_ops)
-    WITH (lists = 100)
-    WHERE embedding IS NOT NULL;
+-- ivfflat clusters rows into `lists` buckets at build time and probes only one by
+-- default, so building it here (empty table) or at small row counts silently drops
+-- results -- at 88 rows a top_k=3 search returned 1 row. Exact search is fast until
+-- roughly the low tens of thousands of chunks. Create it only once the data is loaded
+-- and large enough, with lists ~= rows/1000:
+--   CREATE INDEX idx_chunk_embeddings_embedding_cosine
+--       ON chunk_embeddings USING ivfflat (embedding vector_cosine_ops)
+--       WITH (lists = 100) WHERE embedding IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_embedding_jobs_project_id ON embedding_jobs(project_id);
 CREATE INDEX IF NOT EXISTS idx_embedding_jobs_document_id ON embedding_jobs(document_id);
 CREATE INDEX IF NOT EXISTS idx_embedding_jobs_faiss_index_id ON embedding_jobs(faiss_index_id);

@@ -81,5 +81,16 @@ class Settings:
         """Alias for EMBEDDING_DIMENSION."""
         return self.EMBEDDING_DIMENSION
 
+    @property
+    def embedding_model_name(self) -> str:
+        """Model name recorded in chunk_embeddings.embedding_model.
+
+        Vectors from different providers are not comparable, so this label is what
+        keeps an Ollama backfill from being mistaken for existing Azure rows.
+        """
+        if self.AI_PROVIDER.lower() == "ollama":
+            return self.OLLAMA_EMBED_MODEL
+        return self.AZURE_OPENAI_EMBEDDING_DEPLOYMENT
+
 
 settings = Settings()

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import re
 import sys
 from pathlib import Path
 
@@ -30,10 +31,34 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+async def column_dimension() -> int | None:
+    """Actual declared dimension of chunk_embeddings.embedding, or None if unknown."""
+    async with AsyncSessionLocal() as db:
+        result = await db.execute(
+            text(
+                """
+                SELECT format_type(a.atttypid, a.atttypmod)
+                FROM pg_attribute a
+                JOIN pg_class c ON c.oid = a.attrelid
+                JOIN pg_namespace n ON n.oid = c.relnamespace
+                WHERE n.nspname = :schema
+                  AND c.relname = 'chunk_embeddings'
+                  AND a.attname = 'embedding'
+                """
+            ),
+            {"schema": settings.DB_SCHEMA},
+        )
+        formatted = result.scalar_one_or_none()
+    if not formatted:
+        return None
+    match = re.search(r"\((\d+)\)", formatted)
+    return int(match.group(1)) if match else None
+
+
 async def load_pending_chunks(limit: int) -> list[dict]:
     limit_clause = "LIMIT :limit" if limit > 0 else ""
     params = {
-        "embedding_model": settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
+        "embedding_model": settings.embedding_model_name,
         "limit": limit,
     }
     async with AsyncSessionLocal() as db:
@@ -60,13 +85,25 @@ async def load_pending_chunks(limit: int) -> list[dict]:
 
 
 async def backfill(args: argparse.Namespace) -> int:
-    if settings.AI_PROVIDER.lower() != "azure":
-        raise RuntimeError("AI_PROVIDER=azure is required")
-    if not settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT:
-        raise RuntimeError("AZURE_OPENAI_EMBEDDING_DEPLOYMENT is required")
-    if settings.EMBEDDING_DIMENSION != 1536:
-        raise RuntimeError("Current DB column is vector(1536); set EMBEDDING_DIMENSION=1536")
+    if not settings.embedding_enabled:
+        raise RuntimeError("AI_PROVIDER=azure or ollama is required")
 
+    model = settings.embedding_model_name
+    if not model:
+        raise RuntimeError(
+            "No embedding model configured; set OLLAMA_EMBED_MODEL (ollama) "
+            "or AZURE_OPENAI_EMBEDDING_DEPLOYMENT (azure)"
+        )
+
+    declared = await column_dimension()
+    if declared is not None and declared != settings.EMBEDDING_DIMENSION:
+        raise RuntimeError(
+            f"DB column chunk_embeddings.embedding is vector({declared}) but "
+            f"EMBEDDING_DIMENSION={settings.EMBEDDING_DIMENSION}. "
+            f"Migrate the column to vector({settings.EMBEDDING_DIMENSION}) or change the setting."
+        )
+
+    print(f"Provider={settings.AI_PROVIDER} model={model} dim={settings.EMBEDDING_DIMENSION}")
     chunks = await load_pending_chunks(args.limit)
     print(f"Pending pgvector chunks: {len(chunks)}")
     if not args.execute or not chunks:
@@ -84,7 +121,7 @@ async def backfill(args: argparse.Namespace) -> int:
                 await repository.save_embeddings(
                     chunk_ids=[row["id"] for row in batch],
                     embeddings=vectors,
-                    model=settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
+                    model=model,
                 )
                 await db.commit()
                 completed += len(batch)
@@ -92,7 +129,7 @@ async def backfill(args: argparse.Namespace) -> int:
                 await db.rollback()
                 await repository.record_failures(
                     chunk_ids=[row["id"] for row in batch],
-                    model=settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT,
+                    model=model,
                     error_message=str(exc),
                 )
                 await db.commit()

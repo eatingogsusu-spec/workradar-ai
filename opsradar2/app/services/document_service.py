@@ -154,7 +154,7 @@ async def run_document_pipeline(document_id: str) -> None:
                 db,
                 dimension=settings.EMBEDDING_DIMENSION,
             )
-            embedding_model = settings.AZURE_OPENAI_EMBEDDING_DEPLOYMENT or "unconfigured"
+            embedding_model = settings.embedding_model_name or "unconfigured"
             embedding_job_id = await embedding_repository.create_job(
                 project_id=document.project_id,
                 document_id=document.id,
