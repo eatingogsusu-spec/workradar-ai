@@ -221,9 +221,13 @@ class OperationalAssistantService:
                 **{key: int(value or 0) for key, value in dict(metrics_result.mappings().one()).items()},
                 **{key: int(value or 0) for key, value in dict(issue_metrics_result.mappings().one()).items()},
             },
-            "todos": self._rank(message, todos, limit=12),
-            "issues": self._rank(message, issues, limit=10),
-            "events": self._rank(message, events, limit=8),
+            # Every grounding item costs ~2.5ms/token to ingest and the payload is
+            # dominated by item count, not field length. _rank already orders by
+            # relevance to the question, so the tail of these lists is the least useful
+            # and the most expensive part of the prompt.
+            "todos": self._rank(message, todos, limit=8),
+            "issues": self._rank(message, issues, limit=6),
+            "events": self._rank(message, events, limit=5),
         }
 
     # ── question routing ────────────────────────────────────────────────────
@@ -416,7 +420,11 @@ class OperationalAssistantService:
                     "document_id": result.get("document_id"),
                     "title": result.get("source") or result.get("file_name") or "문서",
                     "score": result.get("score"),
-                    "snippet": self._short(result.get("text"), 900),
+                    # Prompt tokens cost ~2.5ms each to ingest on this box, and the
+                    # grounding payload is almost entirely these snippets and the
+                    # todo/issue descriptions. Trim the text, keep the item count, so
+                    # nothing relevant drops out of the evidence.
+                    "snippet": self._short(result.get("text"), 400),
                     "section": result.get("section_title") or "",
                 }
             )
@@ -571,7 +579,7 @@ class OperationalAssistantService:
         status = str(row.get("status") or "").lower()
         return {
             "id": row["id"], "title": cls._short(row.get("title"), 220) or "확인 필요",
-            "description": cls._short(row.get("description"), 500), "status": status,
+            "description": cls._short(row.get("description"), 220), "status": status,
             "status_label": cls._status_label(status), "priority": str(row.get("priority") or "medium").lower(),
             "due_at": row["due_at"].date().isoformat() if row.get("due_at") else "미지정",
             "owner": cls._short(row.get("dept") or row.get("team_name") or row.get("assignee"), 120) or "미지정",
@@ -584,7 +592,7 @@ class OperationalAssistantService:
         severity = str(row.get("severity") or "medium").lower()
         return {
             "id": row["id"], "title": cls._short(row.get("title"), 220) or "확인 필요",
-            "description": cls._short(row.get("description"), 500), "risk_reason": cls._short(row.get("risk_reason"), 350),
+            "description": cls._short(row.get("description"), 220), "risk_reason": cls._short(row.get("risk_reason"), 220),
             "status": status, "status_label": cls._status_label(status), "severity": severity,
             "severity_label": {"critical": "Critical", "high": "High", "medium": "Medium", "low": "Low"}.get(severity, "확인 필요"),
             "owner": cls._short(row.get("dept") or row.get("team_name") or row.get("assignee"), 120) or "미지정",

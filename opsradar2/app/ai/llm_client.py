@@ -55,8 +55,11 @@ def get_azure_openai_client() -> Any:
 # data gets dropped before the model ever sees it, and answers drift off-topic with
 # no error. The OpenAI-compatible /v1 endpoint gives no way to raise it, so we talk to
 # the native /api/chat endpoint, which accepts `options`.
-OLLAMA_NUM_CTX = 16384
-OLLAMA_NUM_PREDICT = 2048
+OLLAMA_NUM_CTX = 12288
+# A cap, not a target: generation still stops at the model's own stop token, so raising
+# this costs nothing on a normal answer. The monthly report legitimately runs to ~2000
+# tokens and was hitting 2048 exactly (done_reason=length), losing its tail mid-section.
+OLLAMA_NUM_PREDICT = 3072
 
 
 def _ollama_chat_url() -> str:
