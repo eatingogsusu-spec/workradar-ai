@@ -610,15 +610,38 @@
     return request(`/documents/${documentId}/chunks`);
   }
 
-  async function waitForDocumentAnalysis(documentId, onStatus) {
+  // Analysis makes two full LLM passes over the document (summarize, then extract).
+  // Measured against the local 7.8B model, a 10,000-character document — the size the
+  // backend itself caps at — needs ~57s of model time before parsing, chunking and DB
+  // writes are even counted. The old budget was 40 attempts (5x700ms + 35x1500ms ≈ 56s),
+  // so it expired mid-analysis and reported failure while the backend was still working
+  // and would have succeeded. Wait on a real deadline instead of an attempt count.
+  const DOCUMENT_ANALYSIS_TIMEOUT_MS = 300000; // 5 minutes
+
+  async function waitForDocumentAnalysis(documentId, onStatus, options = {}) {
+    const budgetMs = Number(options.timeoutMs) || DOCUMENT_ANALYSIS_TIMEOUT_MS;
     const terminal = new Set(["completed", "failed", "error"]);
-    for (let attempt = 0; attempt < 40; attempt += 1) {
+    const startedAt = Date.now();
+    let attempt = 0;
+    let last = null;
+
+    while (Date.now() - startedAt < budgetMs) {
       const status = await getDocumentStatus(documentId);
+      last = status;
       if (typeof onStatus === "function") onStatus(status);
       if (terminal.has(status.analysis_status || status.status)) return status;
-      await new Promise((resolve) => setTimeout(resolve, attempt < 5 ? 700 : 1500));
+      await new Promise((resolve) => setTimeout(resolve, attempt < 5 ? 700 : 2000));
+      attempt += 1;
     }
-    throw new Error("문서 분석 대기 시간이 초과되었습니다.");
+
+    const elapsed = Math.round((Date.now() - startedAt) / 1000);
+    const stage = last?.analysis_status || last?.status || "알 수 없음";
+    const progress = Number(last?.progress || 0);
+    throw new Error(
+      `문서 분석이 ${elapsed}초 안에 끝나지 않았습니다. ` +
+        `(마지막 단계: ${stage}, 진행률 ${progress}%) ` +
+        `백엔드는 계속 처리 중일 수 있으니 잠시 후 문서 목록을 새로고침해 주세요.`
+    );
   }
 
   async function createTodoFromChunk(documentId, chunkId, data) {
