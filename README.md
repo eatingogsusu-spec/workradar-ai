@@ -4,6 +4,12 @@
 
 5인 학생 개발팀 프로젝트로 시작했고, 저는 AI/RAG 파이프라인을 맡았습니다. 이 저장소는 발표 이후 제가 개인 포트폴리오로 이어서 작업한 버전으로, 클라우드 의존성을 걷어내고 전부 로컬에서 돌아가도록 다시 만든 결과물입니다.
 
+## 데모
+
+[![WorkRadar AI 시연 영상](https://img.youtube.com/vi/HMNRRRgvk-I/maxresdefault.jpg)](https://www.youtube.com/watch?v=HMNRRRgvk-I)
+
+▶ [시연 영상 보기](https://www.youtube.com/watch?v=HMNRRRgvk-I) — 문서 업로드부터 할 일·이슈 추출, AI 어시스턴트 질의, 보고서·인수인계 생성까지의 실제 동작을 담았습니다.
+
 ## 무엇을 하는가
 
 문서를 업로드하면 다음을 자동으로 만들어냅니다.
